@@ -21,7 +21,7 @@ function ballDotLabel(delivery) {
   const eType = delivery.extras ? delivery.extras.type : null;
   const eRuns = delivery.extras ? (delivery.extras.runs || 0) : 0;
   if (eType === 'wide')    return eRuns > 0 ? 'Wd+' + eRuns : 'Wd';
-  if (eType === 'no_ball') return 'NB+' + (1 + delivery.runs);
+  if (eType === 'no_ball') return delivery.runs > 0 ? 'NB+' + delivery.runs : 'NB';
   if (eType === 'bye')     return 'B';
   if (eType === 'leg_bye') return 'LB';
   if (delivery.runs === 0) return '·';

@@ -276,7 +276,8 @@ function handleExtrasRuns(runs) {
   // For wide/no_ball, 'runs' in the modal means different things:
   // wide: total wides (so extra penalty runs = runs - 1)
   // no_ball: runs off bat (penalty 1 is added automatically in match.js)
-  const extras = { type, runs }; // wide: extra runs beyond the 1-run penalty; no_ball: bat runs; bye/lb: run count
+  // wide: extra runs beyond penalty; no_ball: bat runs go in delivery.runs only (extras.runs=0 avoids double-count); bye/lb: run count
+  const extras = type === 'no_ball' ? { type, runs: 0 } : { type, runs };
 
   const ballRuns = (type === 'bye' || type === 'leg_bye') ? 0 : (type === 'no_ball' ? runs : 0);
 
