@@ -43,9 +43,10 @@
   <!-- HOME -->
   <section id="screen-home" class="screen active">
     <div class="screen-inner">
-      <button id="btn-new-match" class="btn btn-primary btn-lg">
-        &#127951; New Match
-      </button>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:stretch">
+        <button id="btn-new-match" class="btn btn-primary btn-lg">&#127951; New Match</button>
+        <button id="btn-rosters" class="btn btn-ghost btn-lg" style="width:auto;padding:14px 14px" title="Manage Rosters">&#128100;</button>
+      </div>
       <div id="match-list"></div>
     </div>
   </section>
@@ -279,6 +280,11 @@
           </div>
         </div>
         <button class="btn btn-primary mt-md btn-sm" id="btn-save-settings" type="button">Save</button>
+      </div>
+      <div class="card mt-sm">
+        <div class="section-head">Rosters</div>
+        <p class="text-sm text-2 mt-sm">View and manage saved player names.</p>
+        <button id="btn-go-rosters" class="btn btn-ghost btn-sm mt-md" type="button">&#128100; Manage Rosters</button>
       </div>
       <div class="card" style="border-left:4px solid var(--c-danger)">
         <div class="section-head" style="color:var(--c-danger)">Danger Zone</div>

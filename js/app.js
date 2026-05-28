@@ -72,7 +72,8 @@ function initApp() {
 function wireButtons() {
   // Header
   on('btn-back',  'click', () => history.back());
-  on('btn-menu',  'click', () => navigateTo('rosters'));
+  on('btn-menu',  'click', () => navigateTo('settings'));
+  on('btn-rosters', 'click', () => navigateTo('rosters'));
 
   // Home
   on('btn-new-match', 'click', () => { state.matchId = null; navigateTo('match-setup'); });
@@ -174,6 +175,7 @@ function wireButtons() {
     saveSettings({ defaultOvers: overs });
     showToast('Settings saved');
   });
+  on('btn-go-rosters', 'click', () => navigateTo('rosters'));
   on('btn-clear-data', 'click', () => {
     if (confirm('Delete all matches and rosters? This cannot be undone.')) {
       clearAll(); navigateTo('home'); showToast('All data cleared');
