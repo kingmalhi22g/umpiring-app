@@ -149,6 +149,18 @@
   border-bottom: 1px solid var(--c-border);
 }
 .player-row:last-child { border-bottom: none; }
+
+/* Switch strike button — sits on the right edge between the two batsman rows */
+.btn-switch-strike {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1.5px solid var(--c-border);
+  background: var(--c-surface); color: var(--c-primary-mid);
+  font-size: 16px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  z-index: 1;
+}
+.btn-switch-strike:active { background: #E8F5E9; }
 .player-name { font-weight: 600; font-size: 12px; }
 .player-score { font-size: 12px; color: var(--c-text-2); }
 .player-on-strike .player-name::after { content: ' *'; color: var(--c-primary-light); }
@@ -159,7 +171,7 @@
 .form-input {
   width: 100%; padding: 10px var(--sp-md);
   border: 2px solid var(--c-border); border-radius: var(--r-md);
-  font-size: 13px; background: var(--c-surface); color: var(--c-text);
+  font-size: 16px; background: var(--c-surface); color: var(--c-text);
   outline: none; transition: border-color 0.15s;
   -webkit-appearance: none; appearance: none;
 }

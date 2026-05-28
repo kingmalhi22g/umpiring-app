@@ -121,13 +121,14 @@
         <!-- Free hit -->
         <div class="free-hit-badge hidden" id="live-freehit">&#9889; FREE HIT — only run-out valid</div>
         <!-- Batsmen -->
-        <div class="card" style="padding:0">
+        <div class="card" style="padding:0;position:relative">
           <div class="player-row player-on-strike" id="live-striker">
             <div class="player-name">—</div><div class="player-score"></div>
           </div>
           <div class="player-row" id="live-nonstriker">
             <div class="player-name">—</div><div class="player-score"></div>
           </div>
+          <button class="btn-switch-strike" id="btn-switch-strike" type="button" title="Switch strike">&#8645;</button>
         </div>
         <!-- Bowler -->
         <div class="card card-sm flex items-center justify-between">

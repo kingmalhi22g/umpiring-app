@@ -83,8 +83,9 @@ function wireButtons() {
   on('ball-btn-b',  'click', debounced(() => { haptic(); handleBallExtra('bye'); }));
   on('ball-btn-lb', 'click', debounced(() => { haptic(); handleBallExtra('leg_bye'); }));
   on('ball-btn-w',  'click', debounced(() => { haptic(); handleWicketButton(); }));
-  on('btn-undo',        'click', handleUndo);
-  on('btn-end-innings', 'click', handleEndInningsEarly);
+  on('btn-undo',          'click', handleUndo);
+  on('btn-end-innings',   'click', handleEndInningsEarly);
+  on('btn-switch-strike', 'click', handleSwitchStrike);
 
   // Extras modal
   document.querySelectorAll('.extras-run-btn').forEach(btn =>
@@ -380,6 +381,19 @@ function handleNewBatsmanConfirm() {
   closeModal();
   renderLiveHeader(m);
   afterBall(m);
+}
+
+function handleSwitchStrike() {
+  const m = getMatch(state.matchId);
+  if (!m) return;
+  const inn = m.innings[m.currentInnings];
+  if (!inn) return;
+  const tmp = inn.strikerIdx;
+  inn.strikerIdx = inn.nonStrikerIdx;
+  inn.nonStrikerIdx = tmp;
+  saveMatch(m);
+  renderLiveHeader(m);
+  haptic();
 }
 
 function handleUndo() {
