@@ -1,5 +1,18 @@
 // app.js — event wiring, screen logic, state management
 
+// ── Haptic + debounce helpers ─────────────────────────────
+function haptic() { if (navigator.vibrate) navigator.vibrate(10); }
+
+let _lastBallTap = 0;
+function debounced(fn) {
+  return function(...args) {
+    const now = Date.now();
+    if (now - _lastBallTap < 250) return;
+    _lastBallTap = now;
+    fn.apply(this, args);
+  };
+}
+
 const state = {
   matchId:            null,
   viewMatchId:        null,
@@ -63,13 +76,13 @@ function wireButtons() {
   // Openers modal
   on('btn-start-innings', 'click', handleStartInnings);
 
-  // Ball buttons
-  [0,1,2,3,4,6].forEach(r => on('ball-btn-' + r, 'click', () => handleBallRun(r)));
-  on('ball-btn-wd', 'click', () => handleBallExtra('wide'));
-  on('ball-btn-nb', 'click', () => handleBallExtra('no_ball'));
-  on('ball-btn-b',  'click', () => handleBallExtra('bye'));
-  on('ball-btn-lb', 'click', () => handleBallExtra('leg_bye'));
-  on('ball-btn-w',  'click', handleWicketButton);
+  // Ball buttons — debounced + haptic
+  [0,1,2,3,4,6].forEach(r => on('ball-btn-' + r, 'click', debounced(() => { haptic(); handleBallRun(r); })));
+  on('ball-btn-wd', 'click', debounced(() => { haptic(); handleBallExtra('wide'); }));
+  on('ball-btn-nb', 'click', debounced(() => { haptic(); handleBallExtra('no_ball'); }));
+  on('ball-btn-b',  'click', debounced(() => { haptic(); handleBallExtra('bye'); }));
+  on('ball-btn-lb', 'click', debounced(() => { haptic(); handleBallExtra('leg_bye'); }));
+  on('ball-btn-w',  'click', debounced(() => { haptic(); handleWicketButton(); }));
   on('btn-undo',        'click', handleUndo);
   on('btn-end-innings', 'click', handleEndInningsEarly);
 

@@ -1,6 +1,6 @@
 // service-worker.js — cache-first offline strategy
 
-const CACHE_NAME = 'cricket-umpire-v4';
+const CACHE_NAME = 'cricket-umpire-v5';
 
 const ASSETS = [
   '/',

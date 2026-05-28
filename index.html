@@ -110,12 +110,13 @@
     <div id="live-scroll">
       <div class="screen-inner">
         <!-- Score banner -->
-        <div class="score-banner">
+        <div class="score-banner" style="position:relative">
           <div class="score-team" id="live-score-team">Team A</div>
           <div class="score-main" id="live-score-main">0/0</div>
           <div class="score-overs" id="live-score-overs">(0.0 ov)</div>
           <div class="score-target hidden" id="live-score-target"></div>
           <div class="score-rates hidden" id="live-score-rates"></div>
+          <button class="live-undo-btn" id="btn-undo" type="button" title="Undo last ball">&#8629;</button>
         </div>
         <!-- Free hit -->
         <div class="free-hit-badge hidden" id="live-freehit">&#9889; FREE HIT — only run-out valid</div>
@@ -143,13 +144,12 @@
     <!-- Sticky ball input -->
     <div id="ball-input-area">
       <div class="ball-btns">
-        <button class="ball-btn" id="ball-btn-0" type="button">0</button>
-        <button class="ball-btn" id="ball-btn-1" type="button">1</button>
-        <button class="ball-btn" id="ball-btn-2" type="button">2</button>
-        <button class="ball-btn" id="ball-btn-3" type="button">3</button>
+        <button class="ball-btn ball-btn-0" id="ball-btn-0" type="button">0</button>
+        <button class="ball-btn ball-btn-1" id="ball-btn-1" type="button">1</button>
+        <button class="ball-btn ball-btn-2" id="ball-btn-2" type="button">2</button>
+        <button class="ball-btn ball-btn-3" id="ball-btn-3" type="button">3</button>
         <button class="ball-btn ball-btn-4" id="ball-btn-4" type="button">4</button>
         <button class="ball-btn ball-btn-6" id="ball-btn-6" type="button">6</button>
-        <button class="ball-btn ball-btn-undo" id="btn-undo" type="button" title="Undo last ball">&#8629;</button>
       </div>
       <div class="ball-btns-extras">
         <button class="ball-btn ball-btn-wd" id="ball-btn-wd" type="button">WD</button>
