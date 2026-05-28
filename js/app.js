@@ -5,8 +5,12 @@ function applyDarkMode(val) {
   // val: true = dark, false = light, null = follow system
   document.body.classList.toggle('dark-mode',  val === true);
   document.body.classList.toggle('light-mode', val === false);
-  const btn = document.getElementById('btn-dark-toggle');
-  if (btn) btn.textContent = val === true ? 'On' : val === false ? 'Off' : 'Auto';
+  // Sync 3-way toggle active state
+  const map = { 'dm-auto': val === null, 'dm-on': val === true, 'dm-off': val === false };
+  Object.entries(map).forEach(([id, active]) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.classList.toggle('dm-active', active);
+  });
 }
 
 // ── Haptic + debounce helpers ─────────────────────────────
@@ -103,8 +107,12 @@ function wireButtons() {
   on('btn-switch-strike', 'click', handleSwitchStrike);
   on('btn-live-stats',   'click', handleOpenStats);
   on('btn-stats-close',  'click', closeModal);
-  on('btn-dark-toggle',  'click', handleDarkToggle);
   on('btn-export-card',  'click', handleExportCard);
+  // Dark mode 3-way toggle
+  [['dm-auto', null], ['dm-on', true], ['dm-off', false]].forEach(([id, val]) => {
+    on(id, 'click', () => { saveDarkMode(val); applyDarkMode(val);
+      showToast('Dark mode: ' + (val === null ? 'Auto (follows system)' : val ? 'On' : 'Off')); });
+  });
 
   // Extras modal
   document.querySelectorAll('.extras-run-btn').forEach(btn =>
@@ -446,16 +454,6 @@ function handleNewBatsmanConfirm() {
   closeModal();
   renderLiveHeader(m);
   afterBall(m);
-}
-
-function handleDarkToggle() {
-  // Cycle: null (auto) → true (dark) → false (light) → null
-  const cur = getDarkMode();
-  const next = cur === null ? true : cur === true ? false : null;
-  saveDarkMode(next);
-  applyDarkMode(next);
-  const label = next === true ? 'On' : next === false ? 'Off' : 'Auto';
-  showToast('Dark mode: ' + label);
 }
 
 function handleOpenStats() {

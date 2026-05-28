@@ -1,6 +1,6 @@
 // service-worker.js — cache-first offline strategy
 
-const CACHE_NAME = 'cricket-umpire-v9';
+const CACHE_NAME = 'cricket-umpire-v10';
 
 const ASSETS = [
   '/',
@@ -13,7 +13,8 @@ const ASSETS = [
   '/js/match.js',
   '/js/router.js',
   '/js/ui.js',
-  '/js/app.js'
+  '/js/app.js',
+  '/js/html2canvas.min.js'
 ];
 
 self.addEventListener('install', event => {

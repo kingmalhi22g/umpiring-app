@@ -69,16 +69,21 @@ function renderLiveHeader(match) {
 
   const target = match.currentInnings === 1 ? getTarget(match) : null;
   const needEl   = document.getElementById('stat-need');
+  const rrrEl    = document.getElementById('stat-rrr');
   const targetEl = document.getElementById('stat-target');
   if (target) {
     const ballsLeft  = Math.max(0, match.overs * 6 - ballsBowled);
     const runsNeeded = Math.max(0, target - inn.totalRuns);
+    const rrr        = ballsLeft > 0 ? (runsNeeded / (ballsLeft / 6)).toFixed(2) : '—';
     setEl('live-stat-need',   runsNeeded + ' in ' + ballsLeft);
+    setEl('live-stat-rrr',    rrr);
     setEl('live-stat-target', target);
     if (needEl)   needEl.classList.remove('hidden');
+    if (rrrEl)    rrrEl.classList.remove('hidden');
     if (targetEl) targetEl.classList.remove('hidden');
   } else {
     if (needEl)   needEl.classList.add('hidden');
+    if (rrrEl)    rrrEl.classList.add('hidden');
     if (targetEl) targetEl.classList.add('hidden');
   }
 

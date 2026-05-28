@@ -97,7 +97,7 @@
             <span class="choice-label">Bat</span>
           </button>
           <button id="btn-field" class="choice-btn" type="button">
-            <span class="choice-icon">&#128308;</span>
+            <span class="choice-icon">⚾</span>
             <span class="choice-label">Field</span>
           </button>
         </div>
@@ -127,6 +127,7 @@
             <div class="stat"><span class="stat-label">CRR</span><span class="stat-val" id="live-stat-crr">&mdash;</span></div>
             <div class="stat" id="stat-pship"><span class="stat-label">P'ship</span><span class="stat-val" id="live-stat-pship">&mdash;</span></div>
             <div class="stat hidden" id="stat-need"><span class="stat-label">Need</span><span class="stat-val" id="live-stat-need">&mdash;</span></div>
+            <div class="stat hidden" id="stat-rrr"><span class="stat-label">RRR</span><span class="stat-val" id="live-stat-rrr">&mdash;</span></div>
             <div class="stat hidden" id="stat-target"><span class="stat-label">Target</span><span class="stat-val" id="live-stat-target">&mdash;</span></div>
           </div>
         </div>
@@ -187,7 +188,7 @@
   <section id="screen-end-of-over" class="screen">
     <div class="screen-inner">
       <div class="card text-center">
-        <div style="font-size:36px">&#128277;</div>
+        <div style="font-size:36px">🏏</div>
         <h2 class="text-lg text-bold mt-sm" id="eos-over-num">Over complete</h2>
         <div class="text-2 mt-sm" id="eos-total"></div>
       </div>
@@ -263,7 +264,11 @@
         </div>
         <div class="flex items-center justify-between mt-md" style="padding:4px 0">
           <span class="form-label" style="font-size:12px">🌙 Dark Mode</span>
-          <button id="btn-dark-toggle" class="btn btn-ghost btn-sm" style="width:auto;padding:6px 14px" type="button">Off</button>
+          <div class="dm-toggle">
+            <button class="dm-btn" id="dm-auto" type="button">Auto</button>
+            <button class="dm-btn" id="dm-on"   type="button">On</button>
+            <button class="dm-btn" id="dm-off"  type="button">Off</button>
+          </div>
         </div>
         <button class="btn btn-primary mt-md btn-sm" id="btn-save-settings" type="button">Save</button>
       </div>
@@ -396,7 +401,7 @@
   <div id="ec-body" style="background:#F1F8E9;padding:20px 20px 24px;border-radius:0 0 0 0"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
+<script src="js/html2canvas.min.js"></script>
 
 </body>
 </html>
