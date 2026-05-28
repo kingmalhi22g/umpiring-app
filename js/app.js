@@ -23,7 +23,6 @@ function initApp() {
     const handlers = {
       'home':          setupHome,
       'match-setup':   setupMatchSetup,
-      'player-setup':  setupPlayerSetup,
       'toss':          setupToss,
       'live':          setupLive,
       'end-of-over':   setupEndOfOver,
@@ -56,13 +55,6 @@ function wireButtons() {
 
   // Match setup
   on('btn-match-continue', 'click', handleMatchSetupContinue);
-
-  // Player setup
-  on('btn-add-bowler-1',  'click', () => addPlayerRow('bowlers-1',  'team1', 'Bowler'));
-  on('btn-add-bowler-2',  'click', () => addPlayerRow('bowlers-2',  'team2', 'Bowler'));
-  on('btn-add-batsman-1', 'click', () => addPlayerRow('batsmen-1',  'team1', 'Batsman'));
-  on('btn-add-batsman-2', 'click', () => addPlayerRow('batsmen-2',  'team2', 'Batsman'));
-  on('btn-player-continue', 'click', handlePlayerSetupContinue);
 
   // Toss
   on('btn-bat',   'click', () => handleTossElect('bat'));
@@ -134,24 +126,6 @@ function setupMatchSetup() {
   if (overInput && !overInput.value) overInput.value = getSettings().defaultOvers;
 }
 
-function setupPlayerSetup() {
-  const m = getMatch(state.matchId);
-  if (!m) { navigateTo('home'); return; }
-
-  setEl('ps-team1-name', m.teams[0].name);
-  setEl('ps-team2-name', m.teams[1].name);
-
-  // Datalists from saved rosters
-  populateDatalist('ps-dl-1', [...m.teams[0].batsmen, ...getRoster(m.teams[0].name)]);
-  populateDatalist('ps-dl-2', [...m.teams[1].batsmen, ...getRoster(m.teams[1].name)]);
-
-  // Seed one empty row if none exist
-  ['bowlers-1','bowlers-2'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el && el.children.length === 0) addPlayerRow(id, id.endsWith('1') ? 'team1' : 'team2', 'Bowler');
-  });
-}
-
 function setupToss() {
   const m = getMatch(state.matchId);
   if (!m) { navigateTo('home'); return; }
@@ -195,40 +169,6 @@ function handleMatchSetupContinue() {
   const m = createMatch({ team1:{name:t1}, team2:{name:t2}, date, ground, overs });
   state.matchId = m.id;
   setActiveMatchId(m.id);
-  saveMatch(m);
-  navigateTo('player-setup');
-}
-
-// ── Player setup ──────────────────────────────────────────
-function addPlayerRow(containerId, teamKey, placeholder) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  const dlId = teamKey === 'team1' ? 'ps-dl-1' : 'ps-dl-2';
-  const div  = document.createElement('div');
-  div.className = 'player-entry';
-  div.innerHTML = `
-    <input type="text" class="form-input" placeholder="${placeholder} name"
-           list="${dlId}" autocomplete="off">
-    <button class="btn-remove" type="button" aria-label="Remove">×</button>`;
-  div.querySelector('.btn-remove').addEventListener('click', () => div.remove());
-  container.appendChild(div);
-  div.querySelector('input').focus();
-}
-
-function getNames(containerId) {
-  return [...document.querySelectorAll('#' + containerId + ' input')]
-    .map(i => i.value.trim()).filter(Boolean);
-}
-
-function handlePlayerSetupContinue() {
-  const m = getMatch(state.matchId);
-  if (!m) return;
-  const b1 = getNames('bowlers-1'), b2 = getNames('bowlers-2');
-  if (!b1.length) { showToast(m.teams[0].name + ': add at least 1 bowler'); return; }
-  if (!b2.length) { showToast(m.teams[1].name + ': add at least 1 bowler'); return; }
-  m.teams[0].bowlers = b1; m.teams[0].batsmen = getNames('batsmen-1');
-  m.teams[1].bowlers = b2; m.teams[1].batsmen = getNames('batsmen-2');
-  savePlayersFromMatch(m);
   saveMatch(m);
   navigateTo('toss');
 }
@@ -277,9 +217,10 @@ function handleStartInnings() {
   const m   = getMatch(state.matchId);
   if (!m) return;
   const inn = m.innings[m.currentInnings];
-  const op1 = val('opener1'), op2 = val('opener2'), bwl = val('first-bowler');
+  const op1 = val('opener1') || 'Batsman 1';
+  const op2 = val('opener2') || 'Batsman 2';
+  const bwl = val('first-bowler');
 
-  if (!op1 || !op2)  { showToast('Enter both opener names'); return; }
   if (op1 === op2)   { showToast('Openers must be different players'); return; }
   if (!bwl)          { showToast('Enter first bowler name'); return; }
 

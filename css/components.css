@@ -75,8 +75,8 @@
 .bd-3    { background: #E8F5E9; color: #1B5E20; }
 .bd-4    { background: var(--c-4); color: white; }
 .bd-6    { background: var(--c-6); color: white; }
-.bd-wd   { background: var(--c-wide); color: white; font-size: 10px; }
-.bd-nb   { background: var(--c-noball); color: white; font-size: 9px; }
+.bd-wd   { background: var(--c-wide); color: white; font-size: 9px; width: auto; min-width: 32px; border-radius: 10px; padding: 0 5px; }
+.bd-nb   { background: var(--c-noball); color: white; font-size: 9px; width: auto; min-width: 32px; border-radius: 10px; padding: 0 5px; }
 .bd-bye  { background: #EDE7F6; color: var(--c-bye); font-size: 10px; }
 .bd-lb   { background: #E8EAF6; color: #283593; font-size: 9px; }
 .bd-w    { background: var(--c-wicket); color: white; }

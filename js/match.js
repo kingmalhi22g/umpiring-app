@@ -263,7 +263,18 @@ function getBowlerFigures(inn, bowlerName) {
   const overStr = inOver ? completedOvers + '.' + inOver : String(completedOvers);
   const runs    = myOvers.reduce((s, o) => s + o.runs, 0);
   const wkts    = myOvers.reduce((s, o) => s + o.wickets, 0);
-  return `${overStr}-${runs}-${wkts}`;
+
+  const oversDec = completedOvers + inOver / 6;
+  const eco = oversDec > 0 ? (runs / oversDec).toFixed(1) : '-';
+
+  let wides = 0, noBalls = 0;
+  myOvers.forEach(o => o.allDeliveries.forEach(d => {
+    if (d.extras && d.extras.type === 'wide')    wides++;
+    if (d.extras && d.extras.type === 'no_ball') noBalls++;
+  }));
+
+  const extrasStr = (wides > 0 || noBalls > 0) ? ` · Wd:${wides} NB:${noBalls}` : '';
+  return `${overStr}-${runs}-${wkts} · eco:${eco}${extrasStr}`;
 }
 
 function totalExtras(inn) {

@@ -80,40 +80,11 @@
     </div>
   </section>
 
-  <!-- PLAYER SETUP -->
-  <section id="screen-player-setup" class="screen">
-    <div class="screen-inner">
-      <!-- Team 1 -->
-      <div class="card">
-        <div class="section-head" id="ps-team1-name">Team 1</div>
-        <p class="text-sm text-2 mt-sm">Bowlers (required)</p>
-        <div class="player-list mt-sm" id="bowlers-1"></div>
-        <button class="btn-add-player mt-sm" id="btn-add-bowler-1" type="button">+ Add Bowler</button>
-        <p class="text-sm text-2 mt-md">Batsmen <span class="text-xs">(optional — helps with autocomplete)</span></p>
-        <div class="player-list mt-sm" id="batsmen-1"></div>
-        <button class="btn-add-player mt-sm" id="btn-add-batsman-1" type="button">+ Add Batsman</button>
-      </div>
-      <!-- Team 2 -->
-      <div class="card">
-        <div class="section-head" id="ps-team2-name">Team 2</div>
-        <p class="text-sm text-2 mt-sm">Bowlers (required)</p>
-        <div class="player-list mt-sm" id="bowlers-2"></div>
-        <button class="btn-add-player mt-sm" id="btn-add-bowler-2" type="button">+ Add Bowler</button>
-        <p class="text-sm text-2 mt-md">Batsmen <span class="text-xs">(optional)</span></p>
-        <div class="player-list mt-sm" id="batsmen-2"></div>
-        <button class="btn-add-player mt-sm" id="btn-add-batsman-2" type="button">+ Add Batsman</button>
-      </div>
-      <button id="btn-player-continue" class="btn btn-primary btn-lg">Continue &rarr;</button>
-    </div>
-    <datalist id="ps-dl-1"></datalist>
-    <datalist id="ps-dl-2"></datalist>
-  </section>
-
   <!-- TOSS -->
   <section id="screen-toss" class="screen">
     <div class="screen-inner">
       <div class="card text-center">
-        <div style="font-size:48px;margin-bottom:8px">&#127856;</div>
+        <div style="font-size:48px;margin-bottom:8px">&#129689;</div>
         <div class="section-head" style="border:none;text-align:center;font-size:16px">Toss</div>
         <div class="form-group mt-md">
           <label class="form-label" for="toss-winner">Who won the toss?</label>
@@ -126,7 +97,7 @@
             <span class="choice-label">Bat</span>
           </button>
           <button id="btn-field" class="choice-btn" type="button">
-            <span class="choice-icon">&#9917;</span>
+            <span class="choice-icon">&#9918;</span>
             <span class="choice-label">Field</span>
           </button>
         </div>
@@ -288,11 +259,11 @@
     <div class="modal-title" id="openers-team">Opening Pair</div>
     <div class="form-group">
       <label class="form-label">Striker (Opener 1)</label>
-      <input id="opener1" class="form-input" type="text" placeholder="Batsman name" list="openers-dl" autocomplete="off">
+      <input id="opener1" class="form-input" type="text" placeholder="Batsman name (optional)" list="openers-dl" autocomplete="off">
     </div>
     <div class="form-group mt-md">
       <label class="form-label">Non-Striker (Opener 2)</label>
-      <input id="opener2" class="form-input" type="text" placeholder="Batsman name" list="openers-dl" autocomplete="off">
+      <input id="opener2" class="form-input" type="text" placeholder="Batsman name (optional)" list="openers-dl" autocomplete="off">
     </div>
     <div class="divider mt-md"></div>
     <div class="form-group mt-md">

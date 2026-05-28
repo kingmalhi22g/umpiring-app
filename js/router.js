@@ -3,7 +3,6 @@
 const SCREEN_TITLES = {
   'home':          'Cricket Umpire',
   'match-setup':   'New Match',
-  'player-setup':  'Squad Setup',
   'toss':          'Toss',
   'live':          'Live Match',
   'end-of-over':   'End of Over',
@@ -14,7 +13,7 @@ const SCREEN_TITLES = {
 };
 
 // Screens where the back button should show
-const BACK_SCREENS = ['match-setup','player-setup','toss','rosters','settings'];
+const BACK_SCREENS = ['match-setup','toss','rosters','settings'];
 
 // Screens where the live match header info should show
 const LIVE_SCREENS = ['live','end-of-over'];

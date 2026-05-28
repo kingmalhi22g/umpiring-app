@@ -19,8 +19,9 @@ function ballDotLabel(delivery) {
   if (!delivery) return '·';
   if (delivery.isWicket) return 'W';
   const eType = delivery.extras ? delivery.extras.type : null;
-  if (eType === 'wide')    return 'Wd';
-  if (eType === 'no_ball') return 'NB';
+  const eRuns = delivery.extras ? (delivery.extras.runs || 0) : 0;
+  if (eType === 'wide')    return 'Wd+' + (1 + eRuns);
+  if (eType === 'no_ball') return 'NB+' + (1 + delivery.runs);
   if (eType === 'bye')     return 'B';
   if (eType === 'leg_bye') return 'LB';
   if (delivery.runs === 0) return '·';
