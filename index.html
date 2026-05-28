@@ -317,6 +317,20 @@
       <button class="wicket-btn" data-type="stumped"     type="button">Stumped</button>
       <button class="wicket-btn" data-type="hit_wicket"  type="button">Hit Wicket</button>
     </div>
+    <div id="wicket-runout-group" class="hidden mt-md">
+      <label class="form-label">Runs completed before run-out</label>
+      <div class="ro-grid ro-runs" id="runout-runs">
+        <button class="ro-btn selected" data-runs="0" type="button">0</button>
+        <button class="ro-btn" data-runs="1" type="button">1</button>
+        <button class="ro-btn" data-runs="2" type="button">2</button>
+        <button class="ro-btn" data-runs="3" type="button">3</button>
+      </div>
+      <label class="form-label mt-md">Who is out?</label>
+      <div class="ro-grid ro-who" id="runout-who">
+        <button class="ro-btn selected" data-end="striker" id="ro-who-striker" type="button">Striker</button>
+        <button class="ro-btn" data-end="nonstriker" id="ro-who-nonstriker" type="button">Non-striker</button>
+      </div>
+    </div>
     <div id="wicket-fielder-group" class="form-group mt-md hidden">
       <label class="form-label">Fielder / Keeper</label>
       <input id="wicket-fielder" class="form-input" type="text" placeholder="Fielder name (optional)" autocomplete="off">

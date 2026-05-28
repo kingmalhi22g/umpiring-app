@@ -17,7 +17,9 @@ const state = {
   matchId:            null,
   viewMatchId:        null,
   selectedWicketType: null,
-  pendingExtrasType:  null   // 'wide'|'no_ball'|'bye'|'leg_bye'
+  pendingExtrasType:  null,  // 'wide'|'no_ball'|'bye'|'leg_bye'
+  runoutRuns:         0,     // runs completed before a run-out
+  runoutWho:          'striker'  // which batsman is run out: 'striker'|'nonstriker'
 };
 
 // ── Init ─────────────────────────────────────────────────
@@ -101,6 +103,22 @@ function wireButtons() {
       state.selectedWicketType = btn.dataset.type;
       const showFielder = ['caught','run_out','stumped'].includes(state.selectedWicketType);
       document.getElementById('wicket-fielder-group').classList.toggle('hidden', !showFielder);
+      document.getElementById('wicket-runout-group').classList.toggle('hidden', state.selectedWicketType !== 'run_out');
+    })
+  );
+  // Run-out: runs completed + who is out
+  document.querySelectorAll('#runout-runs .ro-btn').forEach(btn =>
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#runout-runs .ro-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.runoutRuns = parseInt(btn.dataset.runs) || 0;
+    })
+  );
+  document.querySelectorAll('#runout-who .ro-btn').forEach(btn =>
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#runout-who .ro-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.runoutWho = btn.dataset.end;
     })
   );
   on('btn-wicket-confirm', 'click', handleWicketConfirm);
@@ -322,6 +340,17 @@ function handleWicketButton() {
   setEl('wicket-batsman-name', striker.name);
   document.getElementById('wicket-fielder').value = '';
   document.getElementById('wicket-fielder-group').classList.add('hidden');
+
+  // Reset run-out controls
+  const nonStriker = inn.batsmen[inn.nonStrikerIdx];
+  state.runoutRuns = 0;
+  state.runoutWho  = 'striker';
+  setEl('ro-who-striker',    striker.name);
+  setEl('ro-who-nonstriker', nonStriker ? nonStriker.name : 'Non-striker');
+  document.querySelectorAll('#runout-runs .ro-btn').forEach(b => b.classList.toggle('selected', b.dataset.runs === '0'));
+  document.querySelectorAll('#runout-who .ro-btn').forEach(b => b.classList.toggle('selected', b.dataset.end === 'striker'));
+  document.getElementById('wicket-runout-group').classList.add('hidden');
+
   const fhEl = document.getElementById('wicket-freehit-warning');
   if (fhEl) fhEl.classList.toggle('hidden', !inn.freeHitNext);
   openModal('modal-wicket');
@@ -337,15 +366,22 @@ function handleWicketConfirm() {
     showToast('Free hit — only run-out is valid'); return;
   }
 
-  const striker = inn.batsmen[inn.strikerIdx];
+  const striker    = inn.batsmen[inn.strikerIdx];
+  const nonStriker = inn.batsmen[inn.nonStrikerIdx];
+
+  const isRunOut   = wType === 'run_out';
+  const runoutRuns = isRunOut ? (state.runoutRuns || 0) : 0;
+  const batsmanOut = (isRunOut && state.runoutWho === 'nonstriker' && nonStriker)
+    ? nonStriker.name : striker.name;
+
   const wicket  = {
     type:        wType || 'out',
-    batsmanOut:  striker.name,
+    batsmanOut:  batsmanOut,
     fielder:     val('wicket-fielder') || null,
     bowlerCredit: wType ? !['run_out','obstructing'].includes(wType) : true
   };
 
-  m = recordBall(m, { runs: 0, extras: { type: null, runs: 0 }, isWicket: true, wicket });
+  m = recordBall(m, { runs: runoutRuns, extras: { type: null, runs: 0 }, isWicket: true, wicket });
   closeModal();
 
   const updatedInn = m.innings[m.currentInnings];
@@ -367,7 +403,8 @@ function handleWicketConfirm() {
 
   document.getElementById('new-batsman-name').value = '';
   const howLabel = wType ? wType.replace(/_/g,' ') : 'out';
-  setEl('new-batsman-info', wicket.batsmanOut + ' out · ' + howLabel);
+  const runsNote = runoutRuns > 0 ? ' · ' + runoutRuns + ' run' + (runoutRuns > 1 ? 's' : '') + ' completed' : '';
+  setEl('new-batsman-info', wicket.batsmanOut + ' out · ' + howLabel + runsNote);
   openModal('modal-new-batsman');
 }
 

@@ -17,7 +17,11 @@ function ballDotClass(delivery) {
 
 function ballDotLabel(delivery) {
   if (!delivery) return '·';
-  if (delivery.isWicket) return 'W';
+  if (delivery.isWicket) {
+    const eType = delivery.extras ? delivery.extras.type : null;
+    if (delivery.runs > 0 && !eType) return delivery.runs + 'W';
+    return 'W';
+  }
   const eType = delivery.extras ? delivery.extras.type : null;
   const eRuns = delivery.extras ? (delivery.extras.runs || 0) : 0;
   if (eType === 'wide')    return eRuns > 0 ? 'Wd+' + eRuns : 'Wd';

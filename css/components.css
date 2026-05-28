@@ -268,6 +268,22 @@
   border-color: var(--c-danger); background: var(--c-danger-bg); color: var(--c-danger);
 }
 
+/* ── Run-out: runs completed + who is out ── */
+.ro-grid { display: grid; gap: var(--sp-sm); margin-top: 6px; }
+.ro-runs { grid-template-columns: repeat(4, 1fr); }
+.ro-who  { grid-template-columns: 1fr 1fr; }
+.ro-btn {
+  padding: 11px 8px; border: 2px solid var(--c-border);
+  border-radius: var(--r-md); background: var(--c-surface); color: var(--c-text);
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: all 0.1s;
+}
+.ro-btn.selected {
+  border-color: var(--c-primary-light); background: #E8F5E9; color: var(--c-primary);
+}
+
 /* ── Scorecard table ── */
 .scorecard-table { width: 100%; border-collapse: collapse; font-size: 11px; }
 .scorecard-table th {

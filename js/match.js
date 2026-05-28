@@ -50,10 +50,15 @@ function setOpeners(innings, striker, nonStriker) {
   innings.nonStrikerIdx = 1;
 }
 
-// Add a new batsman (after wicket)
+// Add a new batsman (after wicket). The replacement takes the crease vacated
+// by the dismissed batsman — important for run-outs where the non-striker is out.
 function addBatsman(innings, name) {
+  const newIdx = innings.batsmen.length;
   innings.batsmen.push({ name, runs: 0, balls: 0, fours: 0, sixes: 0, isOut: false, how: '' });
-  innings.strikerIdx = innings.batsmen.length - 1;
+  const strikerOut    = innings.batsmen[innings.strikerIdx]    && innings.batsmen[innings.strikerIdx].isOut;
+  const nonStrikerOut = innings.batsmen[innings.nonStrikerIdx] && innings.batsmen[innings.nonStrikerIdx].isOut;
+  if (nonStrikerOut && !strikerOut) innings.nonStrikerIdx = newIdx;
+  else                              innings.strikerIdx    = newIdx;
 }
 
 function recordBall(match, { runs, extras, isWicket, wicket }) {
@@ -126,8 +131,10 @@ function recordBall(match, { runs, extras, isWicket, wicket }) {
   if (isLegal && !isNB) inn.freeHitNext = false;
 
   // ── Wicket ───────────────────────────────────────────────
-  if (delivery.isWicket && delivery.wicket && !delivery.freeHit) {
-    // Note: on free hit, only run-out counts. Handled in UI layer.
+  // On a free hit only a run-out counts; every other dismissal is void.
+  const wicketCounts = delivery.isWicket && delivery.wicket &&
+    (!delivery.freeHit || delivery.wicket.type === 'run_out');
+  if (wicketCounts) {
     const out = inn.batsmen.find(b => b.name === delivery.wicket.batsmanOut);
     if (out) { out.isOut = true; out.how = delivery.wicket.type; }
     inn.wickets++;
@@ -178,43 +185,56 @@ function undoLastBall(match) {
   const isWide = eType === 'wide', isNB = eType === 'no_ball';
   const isBye = eType === 'bye',   isLB = eType === 'leg_bye';
 
-  // Reverse runs
-  if (isWide) {
-    const tot = 1 + eRuns; inn.extras.wides -= tot; inn.totalRuns -= tot; over.runs -= tot;
-  } else if (isNB) {
-    const tot = 1 + delivery.runs + eRuns;
-    inn.extras.noBalls--; inn.totalRuns -= tot; over.runs -= tot;
-    const s = inn.batsmen[inn.strikerIdx];
-    if (s) { s.runs -= delivery.runs; s.balls--; if(delivery.runs===4)s.fours--;if(delivery.runs===6)s.sixes--; }
-  } else if (isBye) {
-    inn.extras.byes -= delivery.runs; inn.totalRuns -= delivery.runs; over.runs -= delivery.runs;
-    const s = inn.batsmen[inn.strikerIdx]; if(s) s.balls--;
-  } else if (isLB) {
-    inn.extras.legByes -= delivery.runs; inn.totalRuns -= delivery.runs; over.runs -= delivery.runs;
-    const s = inn.batsmen[inn.strikerIdx]; if(s) s.balls--;
-  } else {
-    inn.totalRuns -= delivery.runs; over.runs -= delivery.runs;
-    const s = inn.batsmen[inn.strikerIdx];
-    if (s) { s.runs -= delivery.runs; s.balls--; if(delivery.runs===4)s.fours--;if(delivery.runs===6)s.sixes--; }
+  // Reverse in the opposite order to recordBall + addBatsman:
+  // 1) remove the replacement batsman, 2) un-rotate strike, 3) un-mark the
+  // wicket, 4) reverse runs — so strikerIdx is back to the original striker
+  // before we subtract the bat runs (correct even for run-outs with runs).
+
+  // 1) Remove the replacement batsman (the last one added), restoring the
+  //    dismissed batsman to whichever end they occupied.
+  if (delivery.isWicket && delivery.wicket) {
+    const lastIdx = inn.batsmen.length - 1;
+    if (inn.batsmen.length > 2 && (inn.strikerIdx === lastIdx || inn.nonStrikerIdx === lastIdx)) {
+      const outIdx = inn.batsmen.findIndex(b => b.name === delivery.wicket.batsmanOut);
+      if (outIdx >= 0) {
+        if (inn.strikerIdx === lastIdx) inn.strikerIdx = outIdx;
+        else                            inn.nonStrikerIdx = outIdx;
+        inn.batsmen.pop();
+      }
+    }
   }
 
-  // Reverse wicket
+  // 2) Reverse strike rotation
+  if (!isWide) {
+    const runsForStrike = (isBye || isLB) ? delivery.runs : (delivery.runs || 0) + (isNB ? eRuns : 0);
+    if (runsForStrike % 2 === 1) _swapStrike(inn);
+  }
+
+  // 3) Reverse wicket marking
   if (delivery.isWicket && delivery.wicket) {
     const out = inn.batsmen.find(b => b.name === delivery.wicket.batsmanOut);
     if (out) { out.isOut = false; out.how = ''; }
     inn.wickets--;
     over.wickets--;
-    // If batsman was added as replacement, remove them
-    if (inn.batsmen.length > 2 && inn.strikerIdx === inn.batsmen.length - 1) {
-      inn.batsmen.pop();
-      inn.strikerIdx = inn.batsmen.findIndex(b => b.name === delivery.wicket.batsmanOut);
-    }
   }
 
-  // Reverse strike rotation
-  if (!isWide) {
-    const runsForStrike = (isBye || isLB) ? delivery.runs : delivery.runs;
-    if (runsForStrike % 2 === 1) _swapStrike(inn);
+  // 4) Reverse runs (strikerIdx now points at the original striker)
+  const s = inn.batsmen[inn.strikerIdx];
+  if (isWide) {
+    const tot = 1 + eRuns; inn.extras.wides -= tot; inn.totalRuns -= tot; over.runs -= tot;
+  } else if (isNB) {
+    const tot = 1 + delivery.runs + eRuns;
+    inn.extras.noBalls--; inn.totalRuns -= tot; over.runs -= tot;
+    if (s) { s.runs -= delivery.runs; s.balls--; if(delivery.runs===4)s.fours--;if(delivery.runs===6)s.sixes--; }
+  } else if (isBye) {
+    inn.extras.byes -= delivery.runs; inn.totalRuns -= delivery.runs; over.runs -= delivery.runs;
+    if (s) s.balls--;
+  } else if (isLB) {
+    inn.extras.legByes -= delivery.runs; inn.totalRuns -= delivery.runs; over.runs -= delivery.runs;
+    if (s) s.balls--;
+  } else {
+    inn.totalRuns -= delivery.runs; over.runs -= delivery.runs;
+    if (s) { s.runs -= delivery.runs; s.balls--; if(delivery.runs===4)s.fours--;if(delivery.runs===6)s.sixes--; }
   }
 
   inn.freeHitNext = false; // safest reset on undo
