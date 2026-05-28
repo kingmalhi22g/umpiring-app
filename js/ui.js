@@ -255,18 +255,21 @@ function renderOverSummary(match) {
     ]);
   }
 
-  // Recent bowlers chips (current innings only)
+  // Recent bowlers chips (current innings only) — last bowler greyed out
   const chipsEl = document.getElementById('eos-recent-bowlers');
   if (chipsEl) {
     const bowlerOvers = {};
     inn.overs.forEach(o => { bowlerOvers[o.bowler] = (bowlerOvers[o.bowler] || 0) + 1; });
     const names = Object.keys(bowlerOvers);
+    const justBowled = lastOver.bowler;
     chipsEl.innerHTML = names.length
-      ? names.map(name =>
-          `<button class="eos-bowler-chip" type="button" data-bowler="${esc(name)}">
+      ? names.map(name => {
+          const disabled = name === justBowled;
+          return `<button class="eos-bowler-chip${disabled ? ' eos-chip-used' : ''}"
+            type="button" ${disabled ? 'disabled' : `data-bowler="${esc(name)}"`}>
             ${esc(name)}<span class="chip-overs">${bowlerOvers[name]}ov</span>
-          </button>`
-        ).join('')
+          </button>`;
+        }).join('')
       : '';
   }
 }

@@ -427,6 +427,12 @@ function endInnings(m) {
 function handleEndOfOverContinue() {
   const bowler = val('eos-next-bowler');
   if (!bowler) { showToast('Enter next bowler name'); return; }
+  const m0  = getMatch(state.matchId);
+  const inn0 = m0.innings[m0.currentInnings];
+  const lastBowler = inn0.overs.length ? inn0.overs[inn0.overs.length - 1].bowler : null;
+  if (lastBowler && bowler.trim().toLowerCase() === lastBowler.toLowerCase()) {
+    showToast(lastBowler + ' just bowled — choose a different bowler'); return;
+  }
   let m = getMatch(state.matchId);
   m = startNewOver(m, bowler);
   addPlayerToRoster(m.innings[m.currentInnings].bowlingTeam, bowler);

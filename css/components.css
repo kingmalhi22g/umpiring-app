@@ -94,6 +94,7 @@
   transition: background 0.12s;
 }
 .eos-bowler-chip:active { background: #C8E6C9; }
+.eos-chip-used { opacity: 0.38; cursor: not-allowed; background: #EEEEEE; color: #999; border-color: #DDD; }
 .chip-overs {
   font-size: 11px; color: var(--c-primary-mid);
   font-weight: 400; background: rgba(0,0,0,.06);
