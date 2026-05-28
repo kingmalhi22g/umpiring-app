@@ -21,10 +21,10 @@
     #ball-input-area {
       flex-shrink: 0;
       background: var(--c-surface);
-      padding: var(--sp-sm) var(--sp-md);
-      padding-bottom: calc(var(--sp-sm) + var(--safe-b));
-      border-top: 2px solid var(--c-border);
-      display: flex; flex-direction: column; gap: 6px;
+      padding: 10px 12px calc(10px + var(--safe-b));
+      border-top: 1px solid #E2E6E2;
+      box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+      display: flex; flex-direction: column; gap: 8px;
     }
   </style>
 </head>
@@ -109,33 +109,50 @@
   <section id="screen-live" class="screen">
     <div id="live-scroll">
       <div class="screen-inner">
-        <!-- Score banner -->
-        <div class="score-banner" style="position:relative">
-          <div class="score-team" id="live-score-team">Team A</div>
-          <div class="score-main" id="live-score-main">0/0</div>
-          <div class="score-overs" id="live-score-overs">(0.0 ov)</div>
-          <div class="score-target hidden" id="live-score-target"></div>
-          <div class="score-rates hidden" id="live-score-rates"></div>
-          <button class="live-undo-btn" id="btn-undo" type="button" title="Undo last ball">&#8629;</button>
+        <!-- Score hero -->
+        <div class="score-hero">
+          <div class="score-hero-top">
+            <div class="score-hero-team">
+              <span id="live-score-team">Team A</span> &middot; <span id="live-score-overs">0.0 ov</span>
+            </div>
+            <button class="undo-btn" id="btn-undo" type="button" title="Undo last ball">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
+              Undo
+            </button>
+          </div>
+          <div class="score-hero-main">
+            <span id="live-score-runs">0</span><span class="score-hero-wkts">/<span id="live-score-wkts">0</span></span>
+          </div>
+          <div class="score-hero-stats">
+            <div class="stat"><span class="stat-label">CRR</span><span class="stat-val" id="live-stat-crr">&mdash;</span></div>
+            <div class="stat" id="stat-pship"><span class="stat-label">P'ship</span><span class="stat-val" id="live-stat-pship">&mdash;</span></div>
+            <div class="stat hidden" id="stat-need"><span class="stat-label">Need</span><span class="stat-val" id="live-stat-need">&mdash;</span></div>
+          </div>
         </div>
         <!-- Free hit -->
-        <div class="free-hit-badge hidden" id="live-freehit">&#9889; FREE HIT — only run-out valid</div>
-        <!-- Batsmen -->
-        <div class="card" style="padding:0;position:relative">
-          <div class="player-row player-on-strike" id="live-striker">
-            <div class="player-name">—</div><div class="player-score"></div>
-          </div>
-          <div class="player-row" id="live-nonstriker">
-            <div class="player-name">—</div><div class="player-score"></div>
-          </div>
-          <button class="btn-switch-strike" id="btn-switch-strike" type="button" title="Switch strike">&#8645;</button>
+        <div class="free-hit-bar hidden" id="live-freehit">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h12l-2.5 4L17 12H5"/></svg>
+          <span>Free hit <span class="fh-sub">&mdash; only run-out valid</span></span>
         </div>
-        <!-- Bowler -->
-        <div class="card card-sm flex items-center justify-between">
-          <div class="text-sm text-2">Bowling</div>
-          <div>
-            <span class="player-name" id="live-bowler-name">—</span>
-            <span class="text-sm text-2" id="live-bowler-fig" style="margin-left:8px"></span>
+        <!-- Batsmen + bowler -->
+        <div class="card play-card">
+          <div class="bat-rows">
+            <div class="player-row player-on-strike" id="live-striker">
+              <div class="player-name">&mdash;</div><div class="player-score"></div>
+            </div>
+            <div class="player-row" id="live-nonstriker">
+              <div class="player-name">&mdash;</div><div class="player-score"></div>
+            </div>
+            <button class="btn-switch-strike" id="btn-switch-strike" type="button" title="Switch strike">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l3-3 3 3M10 7v6M17 14l-3 3-3-3M14 17v-6"/></svg>
+            </button>
+          </div>
+          <div class="player-row player-row-bowler" id="live-bowler-row">
+            <div class="player-name">
+              <svg class="ball-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M7.5 4.5c2.5 3 2.5 12 0 15M16.5 4.5c-2.5 3-2.5 12 0 15"/></svg>
+              <span id="live-bowler-name">&mdash;</span>
+            </div>
+            <div class="player-score" id="live-bowler-fig"></div>
           </div>
         </div>
         <!-- Ball dots -->
@@ -144,22 +161,22 @@
     </div>
     <!-- Sticky ball input -->
     <div id="ball-input-area">
-      <div class="ball-btns">
-        <button class="ball-btn ball-btn-0" id="ball-btn-0" type="button">0</button>
-        <button class="ball-btn ball-btn-1" id="ball-btn-1" type="button">1</button>
-        <button class="ball-btn ball-btn-2" id="ball-btn-2" type="button">2</button>
-        <button class="ball-btn ball-btn-3" id="ball-btn-3" type="button">3</button>
-        <button class="ball-btn ball-btn-4" id="ball-btn-4" type="button">4</button>
-        <button class="ball-btn ball-btn-6" id="ball-btn-6" type="button">6</button>
+      <div class="run-grid">
+        <button class="run-btn run-0" id="ball-btn-0" type="button">0</button>
+        <button class="run-btn run-1" id="ball-btn-1" type="button">1</button>
+        <button class="run-btn run-2" id="ball-btn-2" type="button">2</button>
+        <button class="run-btn run-3" id="ball-btn-3" type="button">3</button>
+        <button class="run-btn run-4" id="ball-btn-4" type="button">4</button>
+        <button class="run-btn run-6" id="ball-btn-6" type="button">6</button>
       </div>
-      <div class="ball-btns-extras">
-        <button class="ball-btn ball-btn-wd" id="ball-btn-wd" type="button">WD</button>
-        <button class="ball-btn ball-btn-nb" id="ball-btn-nb" type="button">NB</button>
-        <button class="ball-btn ball-btn-b"  id="ball-btn-b"  type="button">Bye</button>
-        <button class="ball-btn ball-btn-lb" id="ball-btn-lb" type="button">LB</button>
+      <div class="extras-row">
+        <button class="extra-btn" id="ball-btn-wd" type="button">WD</button>
+        <button class="extra-btn" id="ball-btn-nb" type="button">NB</button>
+        <button class="extra-btn" id="ball-btn-b"  type="button">B</button>
+        <button class="extra-btn" id="ball-btn-lb" type="button">LB</button>
+        <button class="wicket-btn-main" id="ball-btn-w" type="button">WICKET</button>
       </div>
-      <button class="ball-btn ball-btn-w" id="ball-btn-w" type="button">WICKET</button>
-      <button class="btn btn-outline btn-sm" id="btn-end-innings" type="button" style="margin-top:8px;border-color:#EF5350;color:#EF5350">End Innings Early</button>
+      <button class="end-innings-link" id="btn-end-innings" type="button">End innings early</button>
     </div>
   </section>
 

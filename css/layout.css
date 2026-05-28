@@ -43,6 +43,10 @@
   overflow: hidden;
 }
 
+/* Live scoring screen owns the full viewport — score hero is the header */
+body[data-screen="live"] #app-header { display: none; }
+body[data-screen="live"] #app-main { top: var(--safe-t); }
+
 /* ── Screens ── */
 .screen {
   position: absolute; inset: 0;

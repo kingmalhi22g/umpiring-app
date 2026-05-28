@@ -52,34 +52,26 @@ function renderLiveHeader(match) {
   if (!inn) return;
 
   setEl('live-score-team', inn.battingTeam);
-  setEl('live-score-main', inn.totalRuns + '/' + inn.wickets);
-  setEl('live-score-overs', '(' + getOverDisplay(inn) + ' ov)');
-
-  const target   = match.currentInnings === 1 ? getTarget(match) : null;
-  const targetEl = document.getElementById('live-score-target');
-  const ratesEl  = document.getElementById('live-score-rates');
+  setEl('live-score-runs', inn.totalRuns);
+  setEl('live-score-wkts', inn.wickets);
+  setEl('live-score-overs', getOverDisplay(inn) + ' ov');
 
   const ballsBowled = inn.overs.length * 6 + (inn.currentOver ? inn.currentOver.balls.length : 0);
   const crr = ballsBowled > 0 ? (inn.totalRuns / (ballsBowled / 6)).toFixed(2) : null;
+  setEl('live-stat-crr', crr || '—');
 
+  const pship = getPartnership(inn);
+  setEl('live-stat-pship', pship.runs + ' (' + pship.balls + ')');
+
+  const target = match.currentInnings === 1 ? getTarget(match) : null;
+  const needEl = document.getElementById('stat-need');
   if (target) {
-    if (targetEl) { targetEl.textContent = 'Target: ' + target; targetEl.classList.remove('hidden'); }
-    const ballsLeft = match.overs * 6 - ballsBowled;
-    const runsNeeded = target - inn.totalRuns;
-    const rrr = ballsLeft > 0 ? (runsNeeded / (ballsLeft / 6)).toFixed(2) : null;
-    if (ratesEl) {
-      const parts = [];
-      if (crr)  parts.push('CRR: ' + crr);
-      if (rrr)  parts.push('RRR: ' + rrr);
-      ratesEl.textContent = parts.join('  ·  ');
-      ratesEl.classList.toggle('hidden', parts.length === 0);
-    }
-  } else {
-    if (targetEl) targetEl.classList.add('hidden');
-    if (ratesEl) {
-      if (crr) { ratesEl.textContent = 'CRR: ' + crr; ratesEl.classList.remove('hidden'); }
-      else       ratesEl.classList.add('hidden');
-    }
+    const ballsLeft  = Math.max(0, match.overs * 6 - ballsBowled);
+    const runsNeeded = Math.max(0, target - inn.totalRuns);
+    setEl('live-stat-need', runsNeeded + ' in ' + ballsLeft);
+    if (needEl) needEl.classList.remove('hidden');
+  } else if (needEl) {
+    needEl.classList.add('hidden');
   }
 
   // Batsmen
@@ -112,7 +104,11 @@ function renderBatsmanRow(elId, batsman, isStriker) {
   const nameEl  = el.querySelector('.player-name');
   const scoreEl = el.querySelector('.player-score');
   if (nameEl)  nameEl.textContent  = batsman.name;
-  if (scoreEl) scoreEl.textContent = batsman.runs + '(' + batsman.balls + ')';
+  let score = batsman.runs + ' (' + batsman.balls + ')';
+  if (isStriker && batsman.balls > 0) {
+    score += ' · SR ' + Math.round(batsman.runs / batsman.balls * 100);
+  }
+  if (scoreEl) scoreEl.textContent = score;
 }
 
 // ── Match list (home) ─────────────────────────────────────

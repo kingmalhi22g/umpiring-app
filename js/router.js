@@ -33,6 +33,8 @@ function _activate(screen) {
   const el = document.getElementById('screen-' + screen);
   if (el) el.classList.add('active');
 
+  document.body.dataset.screen = screen;
+
   // Update header
   const titleEl = document.getElementById('screen-title');
   if (titleEl) titleEl.textContent = SCREEN_TITLES[screen] || 'Cricket Umpire';

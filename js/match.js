@@ -263,19 +263,38 @@ function getBowlerStats(inn, bowlerName) {
   const overStr = inOver ? completedOvers + '.' + inOver : String(completedOvers);
   const runs = myOvers.reduce((s, o) => s + o.runs, 0);
   const wkts = myOvers.reduce((s, o) => s + o.wickets, 0);
+  const maidens = inn.overs.filter(o => o.bowler === bowlerName && o.runs === 0).length;
   let wides = 0, noBalls = 0;
   myOvers.forEach(o => o.allDeliveries.forEach(d => {
     if (d.extras && d.extras.type === 'wide')    wides++;
     if (d.extras && d.extras.type === 'no_ball') noBalls++;
   }));
-  return { overStr, completedOvers, inOver, runs, wkts, extras: wides + noBalls };
+  return { overStr, completedOvers, inOver, runs, wkts, maidens, extras: wides + noBalls };
 }
 
 function getBowlerFigures(inn, bowlerName) {
   const s = getBowlerStats(inn, bowlerName);
-  return s.extras > 0
-    ? `${s.overStr}-${s.runs}-${s.wkts} · Ext:${s.extras}`
-    : `${s.overStr}-${s.runs}-${s.wkts}`;
+  return `${s.overStr}-${s.maidens}-${s.runs}-${s.wkts}`;
+}
+
+// Current (unbroken) partnership: runs and legal balls since the last wicket fell
+function getPartnership(inn) {
+  let runs = 0, balls = 0;
+  const allOvers = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])];
+  allOvers.forEach(over => {
+    over.allDeliveries.forEach(d => {
+      const eType = d.extras ? d.extras.type : null;
+      const eRuns = d.extras ? (d.extras.runs || 0) : 0;
+      let teamRuns;
+      if (eType === 'wide')         teamRuns = 1 + eRuns;
+      else if (eType === 'no_ball') teamRuns = 1 + (d.runs || 0) + eRuns;
+      else                          teamRuns = d.runs || 0;
+      runs += teamRuns;
+      if (eType !== 'wide' && eType !== 'no_ball') balls += 1;
+      if (d.isWicket && !d.freeHit) { runs = 0; balls = 0; }
+    });
+  });
+  return { runs, balls };
 }
 
 function getMaxBowlerOvers(totalOvers) {
