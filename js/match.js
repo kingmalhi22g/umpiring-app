@@ -278,6 +278,10 @@ function getBowlerFigures(inn, bowlerName) {
     : `${s.overStr}-${s.runs}-${s.wkts}`;
 }
 
+function getMaxBowlerOvers(totalOvers) {
+  return Math.max(1, Math.floor(totalOvers / 5));
+}
+
 function totalExtras(inn) {
   const e = inn.extras;
   return e.wides + e.noBalls + e.byes + e.legByes;

@@ -95,6 +95,7 @@
 }
 .eos-bowler-chip:active { background: #C8E6C9; }
 .eos-chip-used { opacity: 0.38; cursor: not-allowed; background: #EEEEEE; color: #999; border-color: #DDD; }
+.chip-max { font-size: 9px; font-weight: 700; background: rgba(0,0,0,.12); border-radius: 6px; padding: 1px 4px; letter-spacing: 0.3px; }
 .chip-overs {
   font-size: 11px; color: var(--c-primary-mid);
   font-weight: 400; background: rgba(0,0,0,.06);

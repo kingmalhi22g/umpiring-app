@@ -255,19 +255,25 @@ function renderOverSummary(match) {
     ]);
   }
 
-  // Recent bowlers chips (current innings only) — last bowler greyed out
+  // Recent bowlers chips (current innings only) — grey out last bowler and quota-reached bowlers
   const chipsEl = document.getElementById('eos-recent-bowlers');
   if (chipsEl) {
     const bowlerOvers = {};
     inn.overs.forEach(o => { bowlerOvers[o.bowler] = (bowlerOvers[o.bowler] || 0) + 1; });
     const names = Object.keys(bowlerOvers);
     const justBowled = lastOver.bowler;
+    const maxOv = getMaxBowlerOvers(match.overs);
     chipsEl.innerHTML = names.length
       ? names.map(name => {
-          const disabled = name === justBowled;
+          const isJust  = name === justBowled;
+          const isMaxed = bowlerOvers[name] >= maxOv;
+          const disabled = isJust || isMaxed;
+          const badge = isMaxed
+            ? '<span class="chip-max">MAX</span>'
+            : isJust ? '<span class="chip-max">JUST</span>' : '';
           return `<button class="eos-bowler-chip${disabled ? ' eos-chip-used' : ''}"
             type="button" ${disabled ? 'disabled' : `data-bowler="${esc(name)}"`}>
-            ${esc(name)}<span class="chip-overs">${bowlerOvers[name]}ov</span>
+            ${esc(name)}<span class="chip-overs">${bowlerOvers[name]}ov</span>${badge}
           </button>`;
         }).join('')
       : '';

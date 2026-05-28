@@ -430,11 +430,16 @@ function endInnings(m) {
 function handleEndOfOverContinue() {
   const bowler = val('eos-next-bowler');
   if (!bowler) { showToast('Enter next bowler name'); return; }
-  const m0  = getMatch(state.matchId);
+  const m0   = getMatch(state.matchId);
   const inn0 = m0.innings[m0.currentInnings];
   const lastBowler = inn0.overs.length ? inn0.overs[inn0.overs.length - 1].bowler : null;
   if (lastBowler && bowler.trim().toLowerCase() === lastBowler.toLowerCase()) {
     showToast(lastBowler + ' just bowled — choose a different bowler'); return;
+  }
+  const maxOv = getMaxBowlerOvers(m0.overs);
+  const alreadyBowled = inn0.overs.filter(o => o.bowler.toLowerCase() === bowler.trim().toLowerCase()).length;
+  if (alreadyBowled >= maxOv) {
+    showToast(bowler + ' has already bowled ' + maxOv + ' overs (maximum)'); return;
   }
   let m = getMatch(state.matchId);
   m = startNewOver(m, bowler);
