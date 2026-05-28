@@ -55,16 +55,30 @@ function renderLiveHeader(match) {
   setEl('live-score-main', inn.totalRuns + '/' + inn.wickets);
   setEl('live-score-overs', '(' + getOverDisplay(inn) + ' ov)');
 
-  const target = match.currentInnings === 1 ? getTarget(match) : null;
+  const target   = match.currentInnings === 1 ? getTarget(match) : null;
   const targetEl = document.getElementById('live-score-target');
-  if (targetEl) {
-    if (target) {
-      const needed = target - inn.totalRuns;
-      const ballsLeft = (match.overs * 6) - (inn.overs.length * 6 + (inn.currentOver ? inn.currentOver.balls.length : 0));
-      targetEl.textContent = 'Need ' + needed + ' off ' + ballsLeft + ' balls';
-      targetEl.classList.remove('hidden');
-    } else {
-      targetEl.classList.add('hidden');
+  const ratesEl  = document.getElementById('live-score-rates');
+
+  const ballsBowled = inn.overs.length * 6 + (inn.currentOver ? inn.currentOver.balls.length : 0);
+  const crr = ballsBowled > 0 ? (inn.totalRuns / (ballsBowled / 6)).toFixed(2) : null;
+
+  if (target) {
+    if (targetEl) { targetEl.textContent = 'Target: ' + target; targetEl.classList.remove('hidden'); }
+    const ballsLeft = match.overs * 6 - ballsBowled;
+    const runsNeeded = target - inn.totalRuns;
+    const rrr = ballsLeft > 0 ? (runsNeeded / (ballsLeft / 6)).toFixed(2) : null;
+    if (ratesEl) {
+      const parts = [];
+      if (crr)  parts.push('CRR: ' + crr);
+      if (rrr)  parts.push('RRR: ' + rrr);
+      ratesEl.textContent = parts.join('  ·  ');
+      ratesEl.classList.toggle('hidden', parts.length === 0);
+    }
+  } else {
+    if (targetEl) targetEl.classList.add('hidden');
+    if (ratesEl) {
+      if (crr) { ratesEl.textContent = 'CRR: ' + crr; ratesEl.classList.remove('hidden'); }
+      else       ratesEl.classList.add('hidden');
     }
   }
 

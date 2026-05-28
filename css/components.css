@@ -122,7 +122,8 @@
 .score-main { font-size: 38px; font-weight: 900; letter-spacing: -1px; }
 .score-team { font-size: 13px; opacity: 0.85; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
 .score-overs { font-size: 16px; opacity: 0.8; }
-.score-target { font-size: 13px; opacity: 0.75; margin-top: 2px; }
+.score-target { font-size: 18px; font-weight: 700; opacity: 0.95; margin-top: 4px; }
+.score-rates  { font-size: 13px; opacity: 0.75; margin-top: 2px; }
 
 /* ── Batsman / bowler info ── */
 .player-row {
