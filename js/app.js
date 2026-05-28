@@ -125,10 +125,12 @@ function setupHome() {
 }
 
 function setupMatchSetup() {
+  const set = id => { const el = document.getElementById(id); if (el) el.value = ''; };
+  set('ms-team1'); set('ms-team2'); set('ms-ground');
   const dateInput = document.getElementById('ms-date');
-  if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().slice(0,10);
+  if (dateInput) dateInput.value = new Date().toISOString().slice(0,10);
   const overInput = document.getElementById('ms-overs');
-  if (overInput && !overInput.value) overInput.value = getSettings().defaultOvers;
+  if (overInput) overInput.value = getSettings().defaultOvers;
 }
 
 function setupToss() {
