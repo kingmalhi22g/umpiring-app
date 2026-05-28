@@ -342,6 +342,36 @@
 /* ── Divider ── */
 .divider { height: 1px; background: var(--c-border); margin: var(--sp-sm) 0; }
 
+/* ── Dark mode overrides for hardcoded colours ── */
+/* Applied via body.dark-mode (manual) or prefers-color-scheme (auto) */
+body.dark-mode .ball-btn-0, body.dark-mode .ball-btn-1,
+body.dark-mode .ball-btn-2, body.dark-mode .ball-btn-3   { background:#2E2E2E; color:#E8E8E8; }
+body.dark-mode .ball-btn-4                                { background:#1A2E3F; color:#90CAF9; }
+body.dark-mode .ball-btn-6                                { background:#2A1A3F; color:#CE93D8; }
+body.dark-mode .ball-btn-wd, body.dark-mode .ball-btn-nb,
+body.dark-mode .ball-btn-b,  body.dark-mode .ball-btn-lb  { background:#2E2E2E; color:#AAA; }
+body.dark-mode #ball-input-area  { background:#162018; box-shadow:0 -3px 16px rgba(0,0,0,.5); }
+body.dark-mode .bd-dot           { background:#2E2E2E; }
+body.dark-mode .choice-btn       { background:var(--c-surface); border-color:var(--c-border); }
+body.dark-mode .choice-btn.selected { background:#1B3020; border-color:var(--c-primary-light); }
+body.dark-mode .wicket-btn       { background:var(--c-surface); border-color:var(--c-border); color:var(--c-text); }
+body.dark-mode .eos-bowler-chip  { background:#1B3020; border-color:#2E4030; color:#81C784; }
+
+@media (prefers-color-scheme: dark) {
+  body:not(.light-mode) .ball-btn-0, body:not(.light-mode) .ball-btn-1,
+  body:not(.light-mode) .ball-btn-2, body:not(.light-mode) .ball-btn-3   { background:#2E2E2E; color:#E8E8E8; }
+  body:not(.light-mode) .ball-btn-4                                       { background:#1A2E3F; color:#90CAF9; }
+  body:not(.light-mode) .ball-btn-6                                       { background:#2A1A3F; color:#CE93D8; }
+  body:not(.light-mode) .ball-btn-wd, body:not(.light-mode) .ball-btn-nb,
+  body:not(.light-mode) .ball-btn-b,  body:not(.light-mode) .ball-btn-lb  { background:#2E2E2E; color:#AAA; }
+  body:not(.light-mode) #ball-input-area  { background:#162018; box-shadow:0 -3px 16px rgba(0,0,0,.5); }
+  body:not(.light-mode) .bd-dot           { background:#2E2E2E; }
+  body:not(.light-mode) .choice-btn       { background:var(--c-surface); border-color:var(--c-border); }
+  body:not(.light-mode) .choice-btn.selected { background:#1B3020; border-color:var(--c-primary-light); }
+  body:not(.light-mode) .wicket-btn       { background:var(--c-surface); border-color:var(--c-border); color:var(--c-text); }
+  body:not(.light-mode) .eos-bowler-chip  { background:#1B3020; border-color:#2E4030; color:#81C784; }
+}
+
 /* ════════════════════════════════════════════════════════════
    LIVE SCORING REDESIGN
    ════════════════════════════════════════════════════════════ */

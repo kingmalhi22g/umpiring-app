@@ -90,3 +90,27 @@ input, textarea, select { user-select: auto; font-family: inherit; font-size: 16
 .items-center { align-items: center; }
 .justify-between { justify-content: space-between; }
 .justify-center { justify-content: center; }
+
+/* ── Dark mode ──────────────────────────────────────────── */
+/* System auto-dark (when no manual override) */
+@media (prefers-color-scheme: dark) {
+  body:not(.light-mode) {
+    --c-bg:        #0D1B0F;
+    --c-surface:   #162018;
+    --c-text:      #E8F5E9;
+    --c-text-2:    #7A9A7A;
+    --c-border:    #263828;
+    --c-danger-bg: #3B1515;
+    --c-primary-light: #66BB6A;
+  }
+}
+/* Manual dark mode class on body */
+body.dark-mode {
+  --c-bg:        #0D1B0F;
+  --c-surface:   #162018;
+  --c-text:      #E8F5E9;
+  --c-text-2:    #7A9A7A;
+  --c-border:    #263828;
+  --c-danger-bg: #3B1515;
+  --c-primary-light: #66BB6A;
+}

@@ -1,5 +1,14 @@
 // app.js — event wiring, screen logic, state management
 
+// ── Dark mode ─────────────────────────────────────────────
+function applyDarkMode(val) {
+  // val: true = dark, false = light, null = follow system
+  document.body.classList.toggle('dark-mode',  val === true);
+  document.body.classList.toggle('light-mode', val === false);
+  const btn = document.getElementById('btn-dark-toggle');
+  if (btn) btn.textContent = val === true ? 'On' : val === false ? 'Off' : 'Auto';
+}
+
 // ── Haptic + debounce helpers ─────────────────────────────
 function haptic() { if (navigator.vibrate) navigator.vibrate(10); }
 
@@ -28,6 +37,9 @@ function initApp() {
     navigator.serviceWorker.register('service-worker.js').catch(() => {});
   }
 
+  // Apply saved dark mode preference on startup
+  applyDarkMode(getDarkMode());
+
   init(); // router
 
   // Resume active match if one exists
@@ -43,7 +55,8 @@ function initApp() {
       'end-of-over':   setupEndOfOver,
       'innings-break': setupInningsBreak,
       'summary':       setupSummary,
-      'rosters':       renderRosters
+      'rosters':       renderRosters,
+      'settings':      setupSettings
     };
     if (handlers[screen]) handlers[screen]();
   });
@@ -88,6 +101,10 @@ function wireButtons() {
   on('btn-undo',          'click', handleUndo);
   on('btn-end-innings',   'click', handleEndInningsEarly);
   on('btn-switch-strike', 'click', handleSwitchStrike);
+  on('btn-live-stats',   'click', handleOpenStats);
+  on('btn-stats-close',  'click', closeModal);
+  on('btn-dark-toggle',  'click', handleDarkToggle);
+  on('btn-export-card',  'click', handleExportCard);
 
   // Extras modal
   document.querySelectorAll('.extras-run-btn').forEach(btn =>
@@ -143,7 +160,12 @@ function wireButtons() {
     navigateTo('home');
   });
 
-  // Settings — clear data
+  // Settings
+  on('btn-save-settings', 'click', () => {
+    const overs = parseInt(document.getElementById('settings-overs').value) || 20;
+    saveSettings({ defaultOvers: overs });
+    showToast('Settings saved');
+  });
   on('btn-clear-data', 'click', () => {
     if (confirm('Delete all matches and rosters? This cannot be undone.')) {
       clearAll(); navigateTo('home'); showToast('All data cleared');
@@ -154,6 +176,12 @@ function wireButtons() {
 // ── Screen setup ──────────────────────────────────────────
 function setupHome() {
   renderMatchList(document.getElementById('match-list'));
+}
+
+function setupSettings() {
+  const oInput = document.getElementById('settings-overs');
+  if (oInput) oInput.value = getSettings().defaultOvers;
+  applyDarkMode(getDarkMode()); // syncs the toggle label
 }
 
 function setupMatchSetup() {
@@ -418,6 +446,56 @@ function handleNewBatsmanConfirm() {
   closeModal();
   renderLiveHeader(m);
   afterBall(m);
+}
+
+function handleDarkToggle() {
+  // Cycle: null (auto) → true (dark) → false (light) → null
+  const cur = getDarkMode();
+  const next = cur === null ? true : cur === true ? false : null;
+  saveDarkMode(next);
+  applyDarkMode(next);
+  const label = next === true ? 'On' : next === false ? 'Off' : 'Auto';
+  showToast('Dark mode: ' + label);
+}
+
+function handleOpenStats() {
+  const m = getMatch(state.matchId);
+  if (!m) return;
+  renderStatsModal(m);
+  openModal('modal-stats');
+}
+
+function handleExportCard() {
+  const idToUse = state.viewMatchId || state.matchId;
+  const m = getMatch(idToUse);
+  if (!m) { showToast('No match data to export'); return; }
+  showToast('Generating scorecard…', 3000);
+  renderExportCard(m);
+  setTimeout(() => {
+    const card = document.getElementById('export-card');
+    if (!card || typeof html2canvas === 'undefined') { showToast('Export unavailable'); return; }
+    html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#1B5E20' }).then(canvas => {
+      canvas.toBlob(blob => {
+        if (!blob) { showToast('Could not generate image'); return; }
+        const url = URL.createObjectURL(blob);
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'scorecard.png', { type: 'image/png' })] })) {
+          navigator.share({ files: [new File([blob], 'scorecard.png', { type: 'image/png' })], title: 'Match Scorecard' })
+            .catch(() => _downloadScorecard(url));
+        } else {
+          _downloadScorecard(url);
+        }
+      }, 'image/png');
+    }).catch(() => showToast('Export failed'));
+  }, 200);
+}
+
+function _downloadScorecard(url) {
+  const a = document.createElement('a');
+  a.href = url; a.download = 'scorecard.png';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+  showToast('Scorecard saved!');
 }
 
 function handleSwitchStrike() {

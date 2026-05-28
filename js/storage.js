@@ -1,10 +1,11 @@
 // storage.js — all localStorage I/O goes through here
 
 const KEYS = {
-  MATCHES:  'umpire_matches',
-  ROSTERS:  'umpire_rosters',
-  SETTINGS: 'umpire_settings',
-  ACTIVE:   'umpire_active_match'
+  MATCHES:   'umpire_matches',
+  ROSTERS:   'umpire_rosters',
+  SETTINGS:  'umpire_settings',
+  ACTIVE:    'umpire_active_match',
+  DARK_MODE: 'umpire_dark_mode'
 };
 
 function _get(key, fallback) {
@@ -75,6 +76,11 @@ function savePlayersFromMatch(match) {
 // ── Settings ─────────────────────────────────────────────
 function getSettings() { return _get(KEYS.SETTINGS, { defaultOvers: 20 }); }
 function saveSettings(s) { _set(KEYS.SETTINGS, s); }
+
+// ── Dark mode ─────────────────────────────────────────────
+// null = follow system, true = always dark, false = always light
+function getDarkMode() { return _get(KEYS.DARK_MODE, null); }
+function saveDarkMode(v) { _set(KEYS.DARK_MODE, v); }
 
 // ── Clear all ────────────────────────────────────────────
 function clearAll() {

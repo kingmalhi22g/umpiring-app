@@ -68,14 +68,18 @@ function renderLiveHeader(match) {
   setEl('live-stat-pship', pship.runs + ' (' + pship.balls + ')');
 
   const target = match.currentInnings === 1 ? getTarget(match) : null;
-  const needEl = document.getElementById('stat-need');
+  const needEl   = document.getElementById('stat-need');
+  const targetEl = document.getElementById('stat-target');
   if (target) {
     const ballsLeft  = Math.max(0, match.overs * 6 - ballsBowled);
     const runsNeeded = Math.max(0, target - inn.totalRuns);
-    setEl('live-stat-need', runsNeeded + ' in ' + ballsLeft);
-    if (needEl) needEl.classList.remove('hidden');
-  } else if (needEl) {
-    needEl.classList.add('hidden');
+    setEl('live-stat-need',   runsNeeded + ' in ' + ballsLeft);
+    setEl('live-stat-target', target);
+    if (needEl)   needEl.classList.remove('hidden');
+    if (targetEl) targetEl.classList.remove('hidden');
+  } else {
+    if (needEl)   needEl.classList.add('hidden');
+    if (targetEl) targetEl.classList.add('hidden');
   }
 
   // Batsmen
@@ -322,6 +326,145 @@ function populateDatalist(id, names) {
   if (!dl) return;
   const unique = [...new Set(names.filter(Boolean))].sort();
   dl.innerHTML = unique.map(n => `<option value="${esc(n)}">`).join('');
+}
+
+// ── Live Stats modal ─────────────────────────────────────
+function renderStatsModal(match) {
+  const el = document.getElementById('stats-content');
+  if (!el || !match) return;
+  const inn = match.innings[match.currentInnings];
+  if (!inn) return;
+
+  // Batting table
+  const batRows = inn.batsmen.map((b, i) => {
+    const isStriker = i === inn.strikerIdx;
+    const sr = b.balls > 0 ? (b.runs / b.balls * 100).toFixed(0) : '—';
+    return `<tr>
+      <td><div class="player-name">${esc(b.name)}${isStriker ? ' *' : ''}</div>
+          <div class="sc-out" style="font-size:9px">${b.isOut ? esc(b.how) : 'batting'}</div></td>
+      <td class="sc-runs">${b.runs}</td><td>${b.balls}</td>
+      <td>${b.fours}</td><td>${b.sixes}</td><td>${sr}</td>
+    </tr>`;
+  }).join('');
+
+  // Bowling table
+  const seen = new Set();
+  const bowlers = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])]
+    .filter(o => { if (seen.has(o.bowler)) return false; seen.add(o.bowler); return true; })
+    .map(o => o.bowler);
+
+  const bowlRows = bowlers.map(name => {
+    const s = getBowlerStats(inn, name);
+    const balls = s.completedOvers * 6 + s.inOver;
+    const econ = balls > 0 ? (s.runs / (balls / 6)).toFixed(1) : '—';
+    const isCurrent = inn.currentOver && inn.currentOver.bowler === name;
+    return `<tr${isCurrent ? ' style="font-weight:700"' : ''}>
+      <td><div class="player-name">${esc(name)}${isCurrent ? ' ▶' : ''}</div></td>
+      <td>${s.overStr}</td><td>${s.runs}</td><td>${s.wkts}</td><td>${econ}</td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="section-head">BATTING — ${esc(inn.battingTeam)}</div>
+    <table class="scorecard-table mt-sm">
+      <thead><tr><th>Batsman</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead>
+      <tbody>${batRows}</tbody>
+    </table>
+    <div class="text-xs text-2 mt-sm">
+      Extras: ${totalExtras(inn)}
+      (Wd ${inn.extras.wides}, NB ${inn.extras.noBalls}, B ${inn.extras.byes}, LB ${inn.extras.legByes})
+    </div>
+    ${bowlRows ? `
+    <div class="divider mt-sm"></div>
+    <div class="section-head mt-sm">BOWLING — ${esc(inn.bowlingTeam)}</div>
+    <table class="scorecard-table mt-sm">
+      <thead><tr><th>Bowler</th><th>O</th><th>R</th><th>W</th><th>Econ</th></tr></thead>
+      <tbody>${bowlRows}</tbody>
+    </table>` : ''}
+  `;
+}
+
+// ── Scorecard export card ─────────────────────────────────
+function renderExportCard(match) {
+  if (!match) return;
+  const t1 = match.teams[0].name, t2 = match.teams[1].name;
+  setEl('ec-title', `${t1} vs ${t2}`);
+  setEl('ec-meta', `${match.date}${match.ground ? ' · ' + match.ground : ''} · ${match.overs} overs`);
+
+  let body = '';
+  match.innings.forEach((inn, i) => {
+    if (!inn) return;
+    const batRows = inn.batsmen.map(b => `
+      <tr>
+        <td style="padding:5px 4px"><strong>${esc(b.name)}</strong><br>
+          <span style="font-size:10px;color:#666">${b.isOut ? esc(b.how) : 'not out'}</span></td>
+        <td style="padding:5px 4px;font-weight:700;text-align:center">${b.runs}</td>
+        <td style="padding:5px 4px;text-align:center">${b.balls}</td>
+        <td style="padding:5px 4px;text-align:center">${b.fours}</td>
+        <td style="padding:5px 4px;text-align:center">${b.sixes}</td>
+      </tr>`).join('');
+
+    const seen = new Set();
+    const bowlers = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])]
+      .filter(o => { if (seen.has(o.bowler)) return false; seen.add(o.bowler); return true; })
+      .map(o => o.bowler);
+    const bowlRows = bowlers.map(name => {
+      const s = getBowlerStats(inn, name);
+      return `<tr>
+        <td style="padding:5px 4px"><strong>${esc(name)}</strong></td>
+        <td style="padding:5px 4px;text-align:center">${s.overStr}</td>
+        <td style="padding:5px 4px;font-weight:700;text-align:center">${s.runs}</td>
+        <td style="padding:5px 4px;text-align:center">${s.wkts}</td>
+      </tr>`;
+    }).join('');
+
+    body += `
+      <div style="margin-bottom:16px">
+        <div style="background:#1B5E20;color:white;padding:8px 12px;border-radius:6px 6px 0 0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">
+          ${esc(inn.battingTeam)} — Innings ${i+1}
+        </div>
+        <div style="background:white;border-radius:0 0 6px 6px;overflow:hidden">
+          <div style="padding:10px 12px">
+            <span style="font-size:28px;font-weight:900;color:#1B5E20">${inn.totalRuns}/${inn.wickets}</span>
+            <span style="font-size:13px;color:#666;margin-left:6px">(${getOverDisplay(inn)} ov)</span>
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead><tr style="background:#F1F8E9">
+              <th style="padding:5px 4px;text-align:left;font-size:10px;color:#666;text-transform:uppercase">Batsman</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">R</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">B</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">4s</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">6s</th>
+            </tr></thead>
+            <tbody>${batRows}</tbody>
+          </table>
+          <div style="padding:6px 12px;font-size:11px;color:#666;border-top:1px solid #E8F5E9">
+            Extras: ${totalExtras(inn)} (Wd ${inn.extras.wides}, NB ${inn.extras.noBalls}, B ${inn.extras.byes}, LB ${inn.extras.legByes})
+          </div>
+          ${bowlRows ? `
+          <table style="width:100%;border-collapse:collapse;font-size:12px;border-top:2px solid #E8F5E9">
+            <thead><tr style="background:#F1F8E9">
+              <th style="padding:5px 4px;text-align:left;font-size:10px;color:#666;text-transform:uppercase">Bowler</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">O</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">R</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">W</th>
+            </tr></thead>
+            <tbody>${bowlRows}</tbody>
+          </table>` : ''}
+        </div>
+      </div>`;
+  });
+
+  if (match.result) {
+    const r = match.result;
+    const txt = r.marginType === 'tie' ? 'Match Tied!' : `${esc(r.winner)} won by ${r.margin} ${r.marginType}`;
+    body += `<div style="background:#FFCA28;color:#1B5E20;padding:12px;border-radius:6px;text-align:center;font-weight:900;font-size:16px">${txt}</div>`;
+  }
+
+  body += `<div style="text-align:center;padding:12px 0 4px;font-size:10px;color:#999">Made with Cricket Umpire App</div>`;
+
+  const ecBody = document.getElementById('ec-body');
+  if (ecBody) ecBody.innerHTML = body;
 }
 
 function showToast(msg, duration) {
