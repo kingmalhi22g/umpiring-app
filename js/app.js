@@ -94,7 +94,11 @@ function wireButtons() {
   // New batsman modal
   on('btn-new-batsman-ok', 'click', handleNewBatsmanConfirm);
 
-  // End of over
+  // End of over — recent bowler chips
+  on('eos-recent-bowlers', 'click', e => {
+    const chip = e.target.closest('.eos-bowler-chip');
+    if (chip) document.getElementById('eos-next-bowler').value = chip.dataset.bowler;
+  });
   on('btn-eos-continue', 'click', handleEndOfOverContinue);
 
   // Innings break

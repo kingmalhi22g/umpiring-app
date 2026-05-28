@@ -131,6 +131,31 @@ function renderMatchList(containerEl) {
   });
 }
 
+// ── Bowling table (used in summary) ──────────────────────
+function renderBowlingTable(inn) {
+  const seen = new Set();
+  const bowlers = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])]
+    .filter(o => { if (seen.has(o.bowler)) return false; seen.add(o.bowler); return true; })
+    .map(o => o.bowler);
+  if (!bowlers.length) return '';
+  return `
+    <div class="divider mt-sm"></div>
+    <div class="text-xs text-2 mt-sm" style="font-weight:700;letter-spacing:0.5px">BOWLING</div>
+    <table class="scorecard-table mt-sm">
+      <thead><tr><th>Bowler</th><th>O</th><th>R</th><th>W</th><th>Ext</th></tr></thead>
+      <tbody>
+        ${bowlers.map(name => {
+          const s = getBowlerStats(inn, name);
+          return `<tr>
+            <td><div class="player-name">${esc(name)}</div></td>
+            <td>${s.overStr}</td><td class="sc-runs">${s.runs}</td>
+            <td>${s.wkts}</td><td>${s.extras}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
 // ── Match Summary ─────────────────────────────────────────
 function renderMatchSummary(match) {
   if (!match) return;
@@ -171,6 +196,7 @@ function renderMatchSummary(match) {
         Extras: ${totalExtras(inn)}
         (Wd ${inn.extras.wides}, NB ${inn.extras.noBalls}, B ${inn.extras.byes}, LB ${inn.extras.legByes})
       </div>
+      ${renderBowlingTable(inn)}
     </div>`;
   });
 
@@ -227,6 +253,21 @@ function renderOverSummary(match) {
       ...bowlingTeam.bowlers,
       ...getRoster(bowlingTeam.name)
     ]);
+  }
+
+  // Recent bowlers chips (current innings only)
+  const chipsEl = document.getElementById('eos-recent-bowlers');
+  if (chipsEl) {
+    const bowlerOvers = {};
+    inn.overs.forEach(o => { bowlerOvers[o.bowler] = (bowlerOvers[o.bowler] || 0) + 1; });
+    const names = Object.keys(bowlerOvers);
+    chipsEl.innerHTML = names.length
+      ? names.map(name =>
+          `<button class="eos-bowler-chip" type="button" data-bowler="${esc(name)}">
+            ${esc(name)}<span class="chip-overs">${bowlerOvers[name]}ov</span>
+          </button>`
+        ).join('')
+      : '';
   }
 }
 

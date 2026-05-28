@@ -254,27 +254,28 @@ function checkResult(match) {
   return { winner: null, margin: 0, marginType: 'tie' };
 }
 
-function getBowlerFigures(inn, bowlerName) {
+function getBowlerStats(inn, bowlerName) {
   const overs   = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])];
   const myOvers = overs.filter(o => o.bowler === bowlerName);
   const completedOvers = inn.overs.filter(o => o.bowler === bowlerName).length;
   const inOver = inn.currentOver && inn.currentOver.bowler === bowlerName
     ? inn.currentOver.balls.length : 0;
   const overStr = inOver ? completedOvers + '.' + inOver : String(completedOvers);
-  const runs    = myOvers.reduce((s, o) => s + o.runs, 0);
-  const wkts    = myOvers.reduce((s, o) => s + o.wickets, 0);
-
-  const oversDec = completedOvers + inOver / 6;
-  const eco = oversDec > 0 ? (runs / oversDec).toFixed(1) : '-';
-
+  const runs = myOvers.reduce((s, o) => s + o.runs, 0);
+  const wkts = myOvers.reduce((s, o) => s + o.wickets, 0);
   let wides = 0, noBalls = 0;
   myOvers.forEach(o => o.allDeliveries.forEach(d => {
     if (d.extras && d.extras.type === 'wide')    wides++;
     if (d.extras && d.extras.type === 'no_ball') noBalls++;
   }));
+  return { overStr, completedOvers, inOver, runs, wkts, extras: wides + noBalls };
+}
 
-  const extrasStr = (wides > 0 || noBalls > 0) ? ` · Wd:${wides} NB:${noBalls}` : '';
-  return `${overStr}-${runs}-${wkts} · eco:${eco}${extrasStr}`;
+function getBowlerFigures(inn, bowlerName) {
+  const s = getBowlerStats(inn, bowlerName);
+  return s.extras > 0
+    ? `${s.overStr}-${s.runs}-${s.wkts} · Ext:${s.extras}`
+    : `${s.overStr}-${s.runs}-${s.wkts}`;
 }
 
 function totalExtras(inn) {

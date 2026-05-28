@@ -81,6 +81,25 @@
 .bd-lb   { background: #E8EAF6; color: #283593; font-size: 9px; }
 .bd-w    { background: var(--c-wicket); color: white; }
 
+/* ── Bowler chips (end-of-over quick select) ── */
+.eos-bowler-chips {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.eos-bowler-chip {
+  background: #E8F5E9; color: var(--c-primary);
+  border: 1px solid var(--c-primary-light);
+  border-radius: 16px; padding: 6px 12px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: background 0.12s;
+}
+.eos-bowler-chip:active { background: #C8E6C9; }
+.chip-overs {
+  font-size: 11px; color: var(--c-primary-mid);
+  font-weight: 400; background: rgba(0,0,0,.06);
+  border-radius: 8px; padding: 1px 5px;
+}
+
 /* ── Cards ── */
 .card {
   background: var(--c-surface);
