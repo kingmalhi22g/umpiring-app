@@ -147,7 +147,10 @@ function setupLive() {
 
 function setupEndOfOver() {
   const m = getMatch(state.matchId);
-  if (m) renderOverSummary(m);
+  if (!m) return;
+  const inp = document.getElementById('eos-next-bowler');
+  if (inp) inp.value = '';
+  renderOverSummary(m);
 }
 
 function setupInningsBreak() {
