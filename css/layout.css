@@ -1,0 +1,120 @@
+/* ── Header ── */
+#app-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: calc(var(--header-h) + var(--safe-t));
+  padding-top: var(--safe-t);
+  background: var(--c-primary);
+  color: var(--c-text-inv);
+  display: flex;
+  align-items: center;
+  padding-left: 4px;
+  padding-right: 4px;
+  z-index: 200;
+  box-shadow: var(--sh-md);
+}
+
+#screen-title {
+  flex: 1;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-icon {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; background: transparent; color: white;
+  font-size: 22px; cursor: pointer; border-radius: 50%;
+  transition: background 0.15s; flex-shrink: 0;
+}
+.btn-icon:active { background: rgba(255,255,255,.22); }
+.btn-icon[hidden] { visibility: hidden; pointer-events: none; }
+
+/* ── Main content area ── */
+#app-main {
+  position: fixed;
+  top: calc(var(--header-h) + var(--safe-t));
+  left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+}
+
+/* ── Screens ── */
+.screen {
+  position: absolute; inset: 0;
+  background: var(--c-bg);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--sp-md);
+  padding-bottom: calc(var(--sp-xl) + var(--safe-b));
+  display: none;
+}
+.screen.active { display: block; }
+
+.screen-inner {
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+}
+
+/* ── Modal overlay ── */
+#modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 300;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: var(--safe-b);
+}
+
+.modal {
+  background: var(--c-surface);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  padding: var(--sp-lg);
+  width: 100%;
+  max-width: 480px;
+  max-height: 80vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-shadow: var(--sh-lg);
+}
+
+.modal-handle {
+  width: 40px; height: 4px;
+  background: #DDD;
+  border-radius: 2px;
+  margin: 0 auto var(--sp-md);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: var(--sp-lg);
+}
+
+/* ── Toast ── */
+#toast {
+  position: fixed;
+  bottom: calc(var(--sp-xl) + var(--safe-b));
+  left: 50%; transform: translateX(-50%);
+  background: #323232;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 14px;
+  z-index: 500;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+#toast.show { opacity: 1; }
