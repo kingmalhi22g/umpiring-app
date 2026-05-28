@@ -308,20 +308,21 @@ function handleWicketButton() {
 }
 
 function handleWicketConfirm() {
-  if (!state.selectedWicketType) { showToast('Select dismissal type'); return; }
   let m     = getMatch(state.matchId);
   const inn = m.innings[m.currentInnings];
 
-  if (inn.freeHitNext && state.selectedWicketType !== 'run_out') {
+  const wType = state.selectedWicketType;
+
+  if (inn.freeHitNext && wType && wType !== 'run_out') {
     showToast('Free hit — only run-out is valid'); return;
   }
 
   const striker = inn.batsmen[inn.strikerIdx];
   const wicket  = {
-    type:        state.selectedWicketType,
+    type:        wType || 'out',
     batsmanOut:  striker.name,
     fielder:     val('wicket-fielder') || null,
-    bowlerCredit:!['run_out','obstructing'].includes(state.selectedWicketType)
+    bowlerCredit: wType ? !['run_out','obstructing'].includes(wType) : true
   };
 
   m = recordBall(m, { runs: 0, extras: { type: null, runs: 0 }, isWicket: true, wicket });
@@ -345,15 +346,15 @@ function handleWicketConfirm() {
   ].filter(n => !taken.has(n)));
 
   document.getElementById('new-batsman-name').value = '';
-  setEl('new-batsman-info', wicket.batsmanOut + ' out · ' + wicket.type.replace(/_/g,' '));
+  const howLabel = wType ? wType.replace(/_/g,' ') : 'out';
+  setEl('new-batsman-info', wicket.batsmanOut + ' out · ' + howLabel);
   openModal('modal-new-batsman');
 }
 
 function handleNewBatsmanConfirm() {
-  const name = val('new-batsman-name');
-  if (!name) { showToast('Enter new batsman name'); return; }
   let m = getMatch(state.matchId);
   const inn = m.innings[m.currentInnings];
+  const name = val('new-batsman-name') || ('Batsman ' + (inn.batsmen.length + 1));
   addBatsman(inn, name);
   addPlayerToRoster(inn.battingTeam, name);
   saveMatch(m);
