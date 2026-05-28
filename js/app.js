@@ -250,7 +250,7 @@ function handleBallRun(runs) {
 function handleBallExtra(type) {
   state.pendingExtrasType = type;
   const cfg = {
-    wide:    { title: 'Wide — total runs?',     runs: [1,2,3,4,5] },
+    wide:    { title: 'Wide — extra runs?',      runs: [0,1,2,3,4] },
     no_ball: { title: 'No Ball — runs off bat?', runs: [0,1,2,3,4,6] },
     bye:     { title: 'Bye — how many runs?',   runs: [1,2,3,4] },
     leg_bye: { title: 'Leg Bye — how many runs?', runs: [1,2,3,4] }
@@ -276,9 +276,7 @@ function handleExtrasRuns(runs) {
   // For wide/no_ball, 'runs' in the modal means different things:
   // wide: total wides (so extra penalty runs = runs - 1)
   // no_ball: runs off bat (penalty 1 is added automatically in match.js)
-  const extras = type === 'wide'
-    ? { type, runs: runs - 1 }   // eRuns = penalty extras beyond the 1
-    : { type, runs };            // for no_ball: runs off bat; for bye/lb: run count
+  const extras = { type, runs }; // wide: extra runs beyond the 1-run penalty; no_ball: bat runs; bye/lb: run count
 
   const ballRuns = (type === 'bye' || type === 'leg_bye') ? 0 : (type === 'no_ball' ? runs : 0);
 
