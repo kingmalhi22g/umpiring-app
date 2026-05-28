@@ -24,7 +24,7 @@
 /* ── Ball buttons (live scoring) ── */
 .ball-btns {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 6px;
 }
 .ball-btns-extras {
@@ -50,9 +50,10 @@
 .ball-btn-nb { background: #FFEBEE; color: var(--c-noball); }
 .ball-btn-b  { background: #EDE7F6; color: var(--c-bye); }
 .ball-btn-lb { background: #E8EAF6; color: #283593; }
+.ball-btn-undo { background: #EEEEEE; color: var(--c-text); font-size: 20px; }
 .ball-btn-w  {
   background: var(--c-danger); color: white;
-  grid-column: span 1; height: 58px;
+  width: 100%; height: 58px;
   font-size: 18px; letter-spacing: 0.5px;
 }
 

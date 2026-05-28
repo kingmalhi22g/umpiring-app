@@ -70,7 +70,8 @@ function wireButtons() {
   on('ball-btn-b',  'click', () => handleBallExtra('bye'));
   on('ball-btn-lb', 'click', () => handleBallExtra('leg_bye'));
   on('ball-btn-w',  'click', handleWicketButton);
-  on('btn-undo',    'click', handleUndo);
+  on('btn-undo',        'click', handleUndo);
+  on('btn-end-innings', 'click', handleEndInningsEarly);
 
   // Extras modal
   document.querySelectorAll('.extras-run-btn').forEach(btn =>
@@ -407,6 +408,27 @@ function afterBall(m) {
   }
 
   renderLiveHeader(m);
+}
+
+function handleEndInningsEarly() {
+  const m = getMatch(state.matchId);
+  if (!m) return;
+  const inn = m.innings[m.currentInnings];
+  const runsLeft = inn ? (inn.totalRuns + ' / ' + inn.wickets) : '';
+  const confirmed = window.confirm(
+    'End innings now?\n\n' +
+    (runsLeft ? 'Current score: ' + runsLeft + '\n' : '') +
+    'Remaining wickets and overs will not be used.'
+  );
+  if (!confirmed) return;
+  // Close any open over into completed overs before ending
+  if (inn.currentOver && inn.currentOver.balls.length > 0) {
+    inn.currentOver.completed = true;
+    inn.overs.push(inn.currentOver);
+    inn.currentOver = null;
+  }
+  saveMatch(m);
+  endInnings(m);
 }
 
 function endInnings(m) {
