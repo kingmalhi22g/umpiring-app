@@ -192,8 +192,8 @@ function renderMatchSummary(match) {
     if (!inn) return;
     html += `<div class="card mt-md">
       <div class="section-head">${esc(inn.battingTeam)} — Innings ${i+1}</div>
-      <div class="score-main text-primary" style="font-size:28px;color:var(--c-primary-mid);font-weight:900;margin:8px 0">
-        ${inn.totalRuns}/${inn.wickets} <span style="font-size:16px;font-weight:600;color:var(--c-text-2)">(${getOverDisplay(inn)} ov)</span>
+      <div class="score-main text-primary" style="font-size:22px;color:var(--c-primary-mid);font-weight:900;margin:6px 0">
+        ${inn.totalRuns}/${inn.wickets} <span style="font-size:13px;font-weight:600;color:var(--c-text-2)">(${getOverDisplay(inn)} ov)</span>
       </div>
       <table class="scorecard-table">
         <thead><tr><th>Batsman</th><th>R</th><th>B</th><th>4s</th><th>6s</th></tr></thead>

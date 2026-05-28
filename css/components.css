@@ -1,9 +1,9 @@
 /* ── Buttons ── */
 .btn {
   display: flex; align-items: center; justify-content: center;
-  width: 100%; padding: 14px var(--sp-md);
+  width: 100%; padding: 11px var(--sp-md);
   border: none; border-radius: var(--r-md);
-  font-size: 17px; font-weight: 700; cursor: pointer;
+  font-size: 14px; font-weight: 700; cursor: pointer;
   transition: opacity 0.12s, transform 0.08s;
   -webkit-appearance: none; appearance: none;
   letter-spacing: 0.2px;
@@ -18,8 +18,8 @@
 .btn-ghost    { background: rgba(0,0,0,.06); color: var(--c-text); }
 .btn-accent   { background: var(--c-accent); color: var(--c-primary); }
 
-.btn-sm { padding: 10px var(--sp-md); font-size: 15px; }
-.btn-lg { padding: 18px var(--sp-md); font-size: 19px; }
+.btn-sm { padding: 8px var(--sp-md); font-size: 12px; }
+.btn-lg { padding: 14px var(--sp-md); font-size: 15px; }
 
 /* ── Ball buttons (live scoring) ── */
 .ball-btns {
@@ -35,9 +35,9 @@
 
 .ball-btn {
   display: flex; align-items: center; justify-content: center;
-  height: 52px;
+  height: 42px;
   border: none; border-radius: var(--r-md);
-  font-size: 17px; font-weight: 800; cursor: pointer;
+  font-size: 14px; font-weight: 800; cursor: pointer;
   transition: opacity 0.1s, transform 0.08s;
   background: #E8F5E9; color: var(--c-text);
   -webkit-appearance: none;
@@ -50,11 +50,11 @@
 .ball-btn-nb { background: #FFEBEE; color: var(--c-noball); }
 .ball-btn-b  { background: #EDE7F6; color: var(--c-bye); }
 .ball-btn-lb { background: #E8EAF6; color: #283593; }
-.ball-btn-undo { background: #EEEEEE; color: var(--c-text); font-size: 20px; }
+.ball-btn-undo { background: #EEEEEE; color: var(--c-text); font-size: 16px; }
 .ball-btn-w  {
   background: var(--c-danger); color: white;
-  width: 100%; height: 58px;
-  font-size: 18px; letter-spacing: 0.5px;
+  width: 100%; height: 46px;
+  font-size: 14px; letter-spacing: 0.5px;
 }
 
 /* ── Ball dots ── */
@@ -64,10 +64,10 @@
   min-height: 36px;
 }
 .ball-dot {
-  width: 32px; height: 32px;
+  width: 26px; height: 26px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 800;
+  font-size: 10px; font-weight: 800;
   flex-shrink: 0;
 }
 .bd-dot  { background: #EEEEEE; color: var(--c-dot); }
@@ -76,10 +76,10 @@
 .bd-3    { background: #E8F5E9; color: #1B5E20; }
 .bd-4    { background: var(--c-4); color: white; }
 .bd-6    { background: var(--c-6); color: white; }
-.bd-wd   { background: var(--c-wide); color: white; font-size: 9px; width: auto; min-width: 32px; border-radius: 10px; padding: 0 5px; }
-.bd-nb   { background: var(--c-noball); color: white; font-size: 9px; width: auto; min-width: 32px; border-radius: 10px; padding: 0 5px; }
-.bd-bye  { background: #EDE7F6; color: var(--c-bye); font-size: 10px; }
-.bd-lb   { background: #E8EAF6; color: #283593; font-size: 9px; }
+.bd-wd   { background: var(--c-wide); color: white; font-size: 8px; width: auto; min-width: 26px; border-radius: 8px; padding: 0 4px; }
+.bd-nb   { background: var(--c-noball); color: white; font-size: 8px; width: auto; min-width: 26px; border-radius: 8px; padding: 0 4px; }
+.bd-bye  { background: #EDE7F6; color: var(--c-bye); font-size: 8px; }
+.bd-lb   { background: #E8EAF6; color: #283593; font-size: 8px; }
 .bd-w    { background: var(--c-wicket); color: white; }
 
 /* ── Bowler chips (end-of-over quick select) ── */
@@ -89,18 +89,18 @@
 .eos-bowler-chip {
   background: #E8F5E9; color: var(--c-primary);
   border: 1px solid var(--c-primary-light);
-  border-radius: 16px; padding: 6px 12px;
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: 13px; padding: 5px 10px;
+  font-size: 10px; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 4px;
   transition: background 0.12s;
 }
 .eos-bowler-chip:active { background: #C8E6C9; }
 .eos-chip-used { opacity: 0.38; cursor: not-allowed; background: #EEEEEE; color: #999; border-color: #DDD; }
-.chip-max { font-size: 9px; font-weight: 700; background: rgba(0,0,0,.12); border-radius: 6px; padding: 1px 4px; letter-spacing: 0.3px; }
+.chip-max { font-size: 8px; font-weight: 700; background: rgba(0,0,0,.12); border-radius: 5px; padding: 1px 3px; letter-spacing: 0.3px; }
 .chip-overs {
-  font-size: 11px; color: var(--c-primary-mid);
+  font-size: 9px; color: var(--c-primary-mid);
   font-weight: 400; background: rgba(0,0,0,.06);
-  border-radius: 8px; padding: 1px 5px;
+  border-radius: 6px; padding: 1px 4px;
 }
 
 /* ── Cards ── */
@@ -120,30 +120,30 @@
   padding: var(--sp-md) var(--sp-lg);
   text-align: center;
 }
-.score-main { font-size: 38px; font-weight: 900; letter-spacing: -1px; }
-.score-team { font-size: 13px; opacity: 0.85; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
-.score-overs { font-size: 16px; opacity: 0.8; }
-.score-target { font-size: 18px; font-weight: 700; opacity: 0.95; margin-top: 4px; }
-.score-rates  { font-size: 13px; opacity: 0.75; margin-top: 2px; }
+.score-main { font-size: 30px; font-weight: 900; letter-spacing: -1px; }
+.score-team { font-size: 10px; opacity: 0.85; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+.score-overs { font-size: 13px; opacity: 0.8; }
+.score-target { font-size: 14px; font-weight: 700; opacity: 0.95; margin-top: 3px; }
+.score-rates  { font-size: 10px; opacity: 0.75; margin-top: 2px; }
 
 /* ── Batsman / bowler info ── */
 .player-row {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px var(--sp-md);
+  padding: 8px var(--sp-md);
   border-bottom: 1px solid var(--c-border);
 }
 .player-row:last-child { border-bottom: none; }
-.player-name { font-weight: 600; font-size: 15px; }
-.player-score { font-size: 15px; color: var(--c-text-2); }
+.player-name { font-weight: 600; font-size: 12px; }
+.player-score { font-size: 12px; color: var(--c-text-2); }
 .player-on-strike .player-name::after { content: ' *'; color: var(--c-primary-light); }
 
 /* ── Form elements ── */
 .form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-label { font-size: 13px; font-weight: 600; color: var(--c-text-2); text-transform: uppercase; letter-spacing: 0.4px; }
+.form-label { font-size: 10px; font-weight: 600; color: var(--c-text-2); text-transform: uppercase; letter-spacing: 0.4px; }
 .form-input {
-  width: 100%; padding: 13px var(--sp-md);
+  width: 100%; padding: 10px var(--sp-md);
   border: 2px solid var(--c-border); border-radius: var(--r-md);
-  font-size: 16px; background: var(--c-surface); color: var(--c-text);
+  font-size: 13px; background: var(--c-surface); color: var(--c-text);
   outline: none; transition: border-color 0.15s;
   -webkit-appearance: none; appearance: none;
 }
@@ -158,9 +158,9 @@
 }
 .player-entry .form-input { flex: 1; }
 .btn-remove {
-  width: 36px; height: 36px; flex-shrink: 0;
+  width: 29px; height: 29px; flex-shrink: 0;
   border: none; background: var(--c-danger-bg); color: var(--c-danger);
-  border-radius: 50%; font-size: 20px; cursor: pointer; display: flex;
+  border-radius: 50%; font-size: 16px; cursor: pointer; display: flex;
   align-items: center; justify-content: center;
 }
 .btn-remove:active { opacity: 0.7; }
@@ -176,7 +176,7 @@
 
 /* ── Section heading ── */
 .section-head {
-  font-size: 13px; font-weight: 700;
+  font-size: 10px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.6px;
   color: var(--c-primary-mid);
   padding: var(--sp-sm) 0 var(--sp-xs);
@@ -198,9 +198,9 @@
 .match-item:active { opacity: 0.8; }
 .match-item.in-progress { border-left-color: var(--c-accent); }
 .match-info { flex: 1; min-width: 0; }
-.match-teams { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.match-meta { font-size: 13px; color: var(--c-text-2); }
-.match-result { font-size: 13px; font-weight: 600; color: var(--c-primary-mid); text-align: right; flex-shrink: 0; }
+.match-teams { font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.match-meta { font-size: 10px; color: var(--c-text-2); }
+.match-result { font-size: 10px; font-weight: 600; color: var(--c-primary-mid); text-align: right; flex-shrink: 0; }
 
 /* ── Toss / Decision buttons ── */
 .choice-btns {
@@ -216,8 +216,8 @@
 .choice-btn:active, .choice-btn.selected {
   border-color: var(--c-primary-light); background: #E8F5E9;
 }
-.choice-icon { font-size: 36px; }
-.choice-label { font-size: 17px; font-weight: 700; }
+.choice-icon { font-size: 29px; }
+.choice-label { font-size: 14px; font-weight: 700; }
 
 /* ── Wicket type grid ── */
 .wicket-grid {
@@ -225,9 +225,9 @@
   gap: var(--sp-sm);
 }
 .wicket-btn {
-  padding: 14px; border: 2px solid var(--c-border);
+  padding: 11px; border: 2px solid var(--c-border);
   border-radius: var(--r-md); background: var(--c-surface);
-  font-size: 15px; font-weight: 700; cursor: pointer; text-align: center;
+  font-size: 12px; font-weight: 700; cursor: pointer; text-align: center;
   transition: all 0.1s;
 }
 .wicket-btn:active, .wicket-btn.selected {
@@ -235,13 +235,13 @@
 }
 
 /* ── Scorecard table ── */
-.scorecard-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.scorecard-table { width: 100%; border-collapse: collapse; font-size: 11px; }
 .scorecard-table th {
-  text-align: left; padding: 6px 4px;
+  text-align: left; padding: 5px 3px;
   border-bottom: 2px solid var(--c-border);
-  font-size: 12px; text-transform: uppercase; color: var(--c-text-2);
+  font-size: 10px; text-transform: uppercase; color: var(--c-text-2);
 }
-.scorecard-table td { padding: 8px 4px; border-bottom: 1px solid var(--c-border); }
+.scorecard-table td { padding: 6px 3px; border-bottom: 1px solid var(--c-border); }
 .scorecard-table tr:last-child td { border-bottom: none; }
 .sc-runs { font-weight: 700; }
 .sc-out { color: var(--c-text-2); font-size: 13px; }
@@ -254,20 +254,20 @@
   padding: var(--sp-lg);
   text-align: center;
   font-weight: 900;
-  font-size: 20px;
+  font-size: 16px;
 }
-.result-banner .result-sub { font-size: 14px; font-weight: 600; margin-top: 4px; }
+.result-banner .result-sub { font-size: 11px; font-weight: 600; margin-top: 3px; }
 
 /* ── Roster chip list ── */
 .roster-chips { display: flex; flex-wrap: wrap; gap: var(--sp-sm); }
 .roster-chip {
-  display: flex; align-items: center; gap: 6px;
-  background: #E8F5E9; border-radius: 20px;
-  padding: 6px 12px; font-size: 14px; font-weight: 600;
+  display: flex; align-items: center; gap: 5px;
+  background: #E8F5E9; border-radius: 16px;
+  padding: 5px 10px; font-size: 11px; font-weight: 600;
 }
 .roster-chip button {
   border: none; background: none; color: var(--c-danger);
-  font-size: 16px; cursor: pointer; padding: 0 2px; line-height: 1;
+  font-size: 13px; cursor: pointer; padding: 0 2px; line-height: 1;
 }
 
 /* ── Over summary ── */
@@ -278,15 +278,15 @@
   text-align: center; padding: var(--sp-xl) var(--sp-md);
   color: var(--c-text-2);
 }
-.empty-state .empty-icon { font-size: 48px; margin-bottom: var(--sp-md); }
-.empty-state p { font-size: 15px; }
+.empty-state .empty-icon { font-size: 38px; margin-bottom: var(--sp-md); }
+.empty-state p { font-size: 12px; }
 
 /* ── Free hit badge ── */
 .free-hit-badge {
   background: #FFF9C4; color: #F57F17;
   border: 2px solid #F9A825;
-  border-radius: var(--r-md); padding: 6px var(--sp-md);
-  font-weight: 700; font-size: 14px; text-align: center;
+  border-radius: var(--r-md); padding: 5px var(--sp-md);
+  font-weight: 700; font-size: 11px; text-align: center;
 }
 
 /* ── Divider ── */

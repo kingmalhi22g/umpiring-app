@@ -21,23 +21,23 @@
   --c-dot:          #9E9E9E;
   --c-wicket:       #B71C1C;
 
-  --r-sm:  8px;
-  --r-md:  12px;
-  --r-lg:  16px;
-  --r-xl:  24px;
+  --r-sm:  6px;
+  --r-md:  10px;
+  --r-lg:  13px;
+  --r-xl:  19px;
   --r-full:50%;
 
   --sh-sm: 0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.08);
   --sh-md: 0 4px 8px rgba(0,0,0,.12),0 2px 4px rgba(0,0,0,.08);
   --sh-lg: 0 8px 24px rgba(0,0,0,.15);
 
-  --sp-xs: 4px;
-  --sp-sm: 8px;
-  --sp-md: 16px;
-  --sp-lg: 24px;
-  --sp-xl: 32px;
+  --sp-xs: 3px;
+  --sp-sm: 6px;
+  --sp-md: 13px;
+  --sp-lg: 19px;
+  --sp-xl: 26px;
 
-  --header-h: 56px;
+  --header-h: 45px;
   --safe-b: env(safe-area-inset-bottom, 0px);
   --safe-t: env(safe-area-inset-top, 0px);
 }
@@ -46,7 +46,7 @@ html, body { height: 100%; overflow: hidden; }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  font-size: 16px;
+  font-size: 13px;
   line-height: 1.5;
   color: var(--c-text);
   background: var(--c-bg);
@@ -61,11 +61,11 @@ input, textarea, select { user-select: auto; font-family: inherit; font-size: in
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
 /* Typography helpers */
-.text-sm   { font-size: 14px; }
-.text-xs   { font-size: 12px; }
-.text-lg   { font-size: 20px; }
-.text-xl   { font-size: 24px; }
-.text-2xl  { font-size: 32px; }
+.text-sm   { font-size: 11px; }
+.text-xs   { font-size: 10px; }
+.text-lg   { font-size: 16px; }
+.text-xl   { font-size: 19px; }
+.text-2xl  { font-size: 26px; }
 .text-bold { font-weight: 700; }
 .text-med  { font-weight: 600; }
 .text-2    { color: var(--c-text-2); }
