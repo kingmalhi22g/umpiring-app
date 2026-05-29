@@ -42,13 +42,13 @@
 .ball-dots {
   display: flex; gap: 6px; align-items: center;
   justify-content: center; flex-wrap: wrap;
-  min-height: 36px;
+  min-height: 40px;
 }
 .ball-dot {
-  width: 26px; height: 26px;
+  width: 32px; height: 32px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 800;
+  font-size: 13px; font-weight: 800;
   flex-shrink: 0;
 }
 .bd-dot  { background: #EEEEEE; color: var(--c-dot); }
@@ -57,10 +57,10 @@
 .bd-3    { background: #E8F5E9; color: #1B5E20; }
 .bd-4    { background: var(--c-4); color: white; }
 .bd-6    { background: var(--c-6); color: white; }
-.bd-wd   { background: var(--c-wide); color: white; font-size: 8px; width: auto; min-width: 26px; border-radius: 8px; padding: 0 4px; }
-.bd-nb   { background: var(--c-noball); color: white; font-size: 8px; width: auto; min-width: 26px; border-radius: 8px; padding: 0 4px; }
-.bd-bye  { background: #EDE7F6; color: var(--c-bye); font-size: 8px; }
-.bd-lb   { background: #E8EAF6; color: #283593; font-size: 8px; }
+.bd-wd   { background: var(--c-wide); color: white; font-size: 10px; width: auto; min-width: 32px; border-radius: 10px; padding: 0 5px; }
+.bd-nb   { background: var(--c-noball); color: white; font-size: 10px; width: auto; min-width: 32px; border-radius: 10px; padding: 0 5px; }
+.bd-bye  { background: #EDE7F6; color: var(--c-bye); font-size: 10px; }
+.bd-lb   { background: #E8EAF6; color: #283593; font-size: 10px; }
 .bd-w    { background: var(--c-wicket); color: white; }
 
 /* ── Bowler chips (end-of-over quick select) ── */
