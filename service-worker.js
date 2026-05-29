@@ -6,21 +6,25 @@
 // manual CACHE_NAME bump on every change (the old cache-first strategy served
 // stale code indefinitely until the version string was hand-edited).
 
-const CACHE_NAME = 'cricket-umpire-v12';
+const CACHE_NAME = 'cricket-umpire-v13';
 
+// Relative paths so the app works whether it's served from the domain root
+// (e.g. a custom domain) or a sub-folder (e.g. GitHub Pages /umpiring-app/).
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/css/style.css',
-  '/css/layout.css',
-  '/css/components.css',
-  '/js/storage.js',
-  '/js/match.js',
-  '/js/router.js',
-  '/js/ui.js',
-  '/js/app.js',
-  '/js/html2canvas.min.js'
+  './',
+  './index.html',
+  './manifest.json',
+  './css/style.css',
+  './css/layout.css',
+  './css/components.css',
+  './js/storage.js',
+  './js/match.js',
+  './js/router.js',
+  './js/ui.js',
+  './js/app.js',
+  './js/html2canvas.min.js',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -69,7 +73,7 @@ self.addEventListener('fetch', event => {
     const response = await network;
     if (response) return response;
     if (req.mode === 'navigate') {
-      const shell = await cache.match('/index.html');
+      const shell = await cache.match('./index.html');
       if (shell) return shell;
     }
     return new Response('', { status: 504, statusText: 'Offline' });
