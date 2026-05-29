@@ -18,6 +18,7 @@
 .btn-accent   { background: var(--c-accent); color: var(--c-primary); }
 
 .btn-sm { padding: 8px var(--sp-md); font-size: 12px; }
+#btn-live-stats svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; color: var(--c-primary-mid); }
 .btn-lg { padding: 14px var(--sp-md); font-size: 15px; }
 
 /* ── Ball buttons (extras modal run grid) ── */
