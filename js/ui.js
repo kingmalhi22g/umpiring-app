@@ -307,7 +307,7 @@ function renderOverSummary(match) {
           const disabled = isJust || isMaxed;
           const badge = isMaxed
             ? '<span class="chip-max">MAX</span>'
-            : isJust ? '<span class="chip-max">JUST</span>' : '';
+            : isJust ? '<span class="chip-just">JUST</span>' : '';
           return `<button class="eos-bowler-chip${disabled ? ' eos-chip-used' : ''}"
             type="button" ${disabled ? 'disabled' : `data-bowler="${esc(name)}"`}>
             ${esc(name)}<span class="chip-overs">${bowlerOvers[name]}ov</span>${badge}
@@ -356,11 +356,11 @@ function renderStatsModal(match) {
 
   // Batting table
   const batRows = inn.batsmen.map((b, i) => {
-    const isStriker = i === inn.strikerIdx;
+    const isStriker = i === inn.strikerIdx && !b.isOut;
     const sr = b.balls > 0 ? (b.runs / b.balls * 100).toFixed(0) : '—';
-    return `<tr>
-      <td><div class="player-name">${esc(b.name)}${isStriker ? ' *' : ''}</div>
-          <div class="sc-out" style="font-size:9px">${b.isOut ? esc(b.how) : 'batting'}</div></td>
+    return `<tr${isStriker ? ' class="sc-active"' : ''}>
+      <td><div class="player-name">${esc(b.name)}${isStriker ? ' <span class="sc-strike">on strike</span>' : ''}</div>
+          <div class="sc-out">${b.isOut ? esc(b.how) : 'batting'}</div></td>
       <td class="sc-runs">${b.runs}</td><td>${b.balls}</td>
       <td>${b.fours}</td><td>${b.sixes}</td><td>${sr}</td>
     </tr>`;
@@ -377,13 +377,21 @@ function renderStatsModal(match) {
     const balls = s.completedOvers * 6 + s.inOver;
     const econ = balls > 0 ? (s.runs / (balls / 6)).toFixed(1) : '—';
     const isCurrent = inn.currentOver && inn.currentOver.bowler === name;
-    return `<tr${isCurrent ? ' style="font-weight:700"' : ''}>
-      <td><div class="player-name">${esc(name)}${isCurrent ? ' ▶' : ''}</div></td>
+    return `<tr${isCurrent ? ' class="sc-active"' : ''}>
+      <td><div class="player-name">${esc(name)}${isCurrent ? ' <span class="sc-strike">bowling</span>' : ''}</div></td>
       <td>${s.overStr}</td><td>${s.runs}</td><td>${s.wkts}</td><td>${econ}</td>
     </tr>`;
   }).join('');
 
+  const ballsBowled = inn.overs.length * 6 + (inn.currentOver ? inn.currentOver.balls.length : 0);
+  const crr = ballsBowled > 0 ? (inn.totalRuns / (ballsBowled / 6)).toFixed(2) : '—';
+
   el.innerHTML = `
+    <div class="stats-hero">
+      <div class="stats-hero-team">${esc(inn.battingTeam)}</div>
+      <div class="stats-hero-score">${inn.totalRuns}<span>/${inn.wickets}</span></div>
+      <div class="stats-hero-meta">${getOverDisplay(inn)} overs &middot; CRR ${crr}</div>
+    </div>
     <div class="section-head">BATTING — ${esc(inn.battingTeam)}</div>
     <table class="scorecard-table mt-sm">
       <thead><tr><th>Batsman</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead>

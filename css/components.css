@@ -77,8 +77,14 @@
   transition: background 0.12s;
 }
 .eos-bowler-chip:active { background: #C8E6C9; }
-.eos-chip-used { opacity: 0.38; cursor: not-allowed; background: #EEEEEE; color: #999; border-color: #DDD; }
-.chip-max { font-size: 10px; font-weight: 700; background: rgba(0,0,0,.12); border-radius: 5px; padding: 1px 4px; letter-spacing: 0.3px; }
+.eos-chip-used { cursor: not-allowed; background: #E0E0E0; color: #5A5A5A; border-color: #BDBDBD; }
+.eos-chip-used .chip-overs { color: #5A5A5A; background: rgba(0,0,0,.10); }
+.chip-max, .chip-just {
+  font-size: 10px; font-weight: 800; color: #fff;
+  border-radius: 5px; padding: 1px 5px; letter-spacing: 0.3px;
+}
+.chip-max  { background: var(--c-danger); }
+.chip-just { background: var(--c-wide); }
 .chip-overs {
   font-size: 11px; color: var(--c-primary-mid);
   font-weight: 400; background: rgba(0,0,0,.06);
@@ -253,6 +259,38 @@
 .sc-runs { font-weight: 700; }
 .sc-out { color: var(--c-text-2); font-size: 11px; }
 
+/* ── Live Stats modal polish ── */
+.stats-hero {
+  background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-mid) 55%, var(--c-primary-light) 135%);
+  color: #fff;
+  border-radius: var(--r-lg);
+  padding: 14px 16px;
+  text-align: center;
+  box-shadow: var(--sh-sm);
+  margin-bottom: var(--sp-md);
+}
+.stats-hero-team {
+  font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px;
+  opacity: .85;
+}
+.stats-hero-score { font-size: 36px; font-weight: 900; line-height: 1.05; margin: 2px 0; }
+.stats-hero-score span { font-size: 22px; font-weight: 700; opacity: .8; }
+.stats-hero-meta { font-size: 12px; opacity: .92; }
+
+.scorecard-table tr.sc-active td { background: rgba(76,175,80,.13); }
+.scorecard-table tr.sc-active td:first-child { box-shadow: inset 3px 0 0 var(--c-primary-light); }
+.scorecard-table tr.sc-active .sc-runs { color: var(--c-primary-mid); }
+.sc-strike {
+  display: inline-block;
+  font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .4px;
+  color: var(--c-primary-mid);
+  background: rgba(76,175,80,.18);
+  border-radius: 4px; padding: 1px 5px; margin-left: 5px;
+  vertical-align: middle;
+}
+
 /* ── Result banner ── */
 .result-banner {
   background: var(--c-accent);
@@ -310,6 +348,8 @@ body.dark-mode .choice-btn       { background:var(--c-surface); border-color:var
 body.dark-mode .choice-btn.selected { background:#1B3020; border-color:var(--c-primary-light); }
 body.dark-mode .wicket-btn       { background:var(--c-surface); border-color:var(--c-border); color:var(--c-text); }
 body.dark-mode .eos-bowler-chip  { background:#1B3020; border-color:#2E4030; color:#81C784; }
+body.dark-mode .eos-chip-used    { background:#23302A; border-color:#33433A; color:#9FB0A0; }
+body.dark-mode .eos-chip-used .chip-overs { color:#9FB0A0; background:rgba(255,255,255,.08); }
 body.dark-mode .extra-btn        { background:var(--c-surface); border-color:var(--c-border); color:#AAA; }
 
 @media (prefers-color-scheme: dark) {
@@ -320,6 +360,8 @@ body.dark-mode .extra-btn        { background:var(--c-surface); border-color:var
   body:not(.light-mode) .choice-btn.selected { background:#1B3020; border-color:var(--c-primary-light); }
   body:not(.light-mode) .wicket-btn       { background:var(--c-surface); border-color:var(--c-border); color:var(--c-text); }
   body:not(.light-mode) .eos-bowler-chip  { background:#1B3020; border-color:#2E4030; color:#81C784; }
+  body:not(.light-mode) .eos-chip-used    { background:#23302A; border-color:#33433A; color:#9FB0A0; }
+  body:not(.light-mode) .eos-chip-used .chip-overs { color:#9FB0A0; background:rgba(255,255,255,.08); }
   body:not(.light-mode) .extra-btn        { background:var(--c-surface); border-color:var(--c-border); color:#AAA; }
 }
 
