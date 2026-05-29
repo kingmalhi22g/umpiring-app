@@ -106,6 +106,17 @@ function renderLiveHeader(match) {
   // Free hit badge
   const fhEl = document.getElementById('live-freehit');
   if (fhEl) fhEl.classList.toggle('hidden', !inn.freeHitNext);
+
+  // Screen-reader announcement of the live score (the visual hero is
+  // aria-hidden, so this single polite region carries the spoken update).
+  const announceEl = document.getElementById('live-score-announce');
+  if (announceEl) {
+    let msg = inn.battingTeam + ' ' + inn.totalRuns + ' for ' + inn.wickets +
+              ', ' + getOverDisplay(inn) + ' overs';
+    if (target) msg += ', need ' + Math.max(0, target - inn.totalRuns) + ' to win';
+    if (inn.freeHitNext) msg += '. Free hit';
+    announceEl.textContent = msg;
+  }
 }
 
 function renderBatsmanRow(elId, batsman, isStriker) {
