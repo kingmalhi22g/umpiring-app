@@ -44,12 +44,14 @@ function initApp() {
   // Apply saved dark mode preference on startup
   applyDarkMode(getDarkMode());
 
-  init(); // router
-
-  // Resume active match if one exists
+  // Resume active match if one exists (before the router activates a screen,
+  // so a cold load straight onto #live has its matchId ready)
   const activeId = getActiveMatchId();
   if (activeId && getMatch(activeId)) state.matchId = activeId;
 
+  // Register screen handlers BEFORE init() so the initial screen activation
+  // fires its setup handler on a cold load (otherwise e.g. the home match
+  // list renders blank until you navigate away and back).
   onScreenChange(screen => {
     const handlers = {
       'home':          setupHome,
@@ -65,6 +67,8 @@ function initApp() {
     if (handlers[screen]) handlers[screen]();
   });
 
+  init(); // router — activates the current screen and fires its handler
+
   wireButtons();
 }
 
@@ -78,6 +82,28 @@ function wireButtons() {
   // Home
   on('btn-new-match', 'click', () => { state.matchId = null; navigateTo('match-setup'); });
   on('match-list', 'click', e => {
+    // Delete affordance takes priority over opening the match
+    const del = e.target.closest('.match-delete');
+    if (del) {
+      e.stopPropagation();
+      const m = getMatch(del.dataset.del);
+      if (!m) return;
+      const label = m.teams[0].name + ' vs ' + m.teams[1].name;
+      const delId = del.dataset.del;
+      showConfirm({
+        title: 'Delete match?',
+        message: '"' + label + '"\n\nThis permanently removes the match and cannot be undone.',
+        confirmText: 'Delete',
+        onConfirm: () => {
+          deleteMatch(delId);
+          if (state.matchId === delId)     state.matchId = null;
+          if (state.viewMatchId === delId) state.viewMatchId = null;
+          renderMatchList(document.getElementById('match-list'));
+          showToast('Match deleted');
+        }
+      });
+      return;
+    }
     const item = e.target.closest('.match-item');
     if (!item) return;
     const m = getMatch(item.dataset.id);
@@ -108,6 +134,15 @@ function wireButtons() {
   on('btn-switch-strike', 'click', handleSwitchStrike);
   on('btn-live-stats',   'click', handleOpenStats);
   on('btn-stats-close',  'click', closeModal);
+
+  // Generic confirm dialog
+  on('btn-confirm-cancel', 'click', () => { _confirmCallback = null; closeModal(); });
+  on('btn-confirm-ok', 'click', () => {
+    const cb = _confirmCallback;
+    _confirmCallback = null;
+    closeModal();
+    if (cb) cb();
+  });
   on('btn-export-card',  'click', handleExportCard);
   // Dark mode 3-way toggle
   [['dm-auto', null], ['dm-on', true], ['dm-off', false]].forEach(([id, val]) => {
@@ -177,9 +212,12 @@ function wireButtons() {
   });
   on('btn-go-rosters', 'click', () => navigateTo('rosters'));
   on('btn-clear-data', 'click', () => {
-    if (confirm('Delete all matches and rosters? This cannot be undone.')) {
-      clearAll(); navigateTo('home'); showToast('All data cleared');
-    }
+    showConfirm({
+      title: 'Clear all data?',
+      message: 'Delete all matches and rosters? This cannot be undone.',
+      confirmText: 'Clear all',
+      onConfirm: () => { clearAll(); navigateTo('home'); showToast('All data cleared'); }
+    });
   });
 }
 
@@ -559,20 +597,22 @@ function handleEndInningsEarly() {
   if (!m) return;
   const inn = m.innings[m.currentInnings];
   const runsLeft = inn ? (inn.totalRuns + ' / ' + inn.wickets) : '';
-  const confirmed = window.confirm(
-    'End innings now?\n\n' +
-    (runsLeft ? 'Current score: ' + runsLeft + '\n' : '') +
-    'Remaining wickets and overs will not be used.'
-  );
-  if (!confirmed) return;
-  // Close any open over into completed overs before ending
-  if (inn.currentOver && inn.currentOver.balls.length > 0) {
-    inn.currentOver.completed = true;
-    inn.overs.push(inn.currentOver);
-    inn.currentOver = null;
-  }
-  saveMatch(m);
-  endInnings(m);
+  showConfirm({
+    title: 'End innings now?',
+    message: (runsLeft ? 'Current score: ' + runsLeft + '\n' : '') +
+             'Remaining wickets and overs will not be used.',
+    confirmText: 'End innings',
+    onConfirm: () => {
+      // Close any open over into completed overs before ending
+      if (inn.currentOver && inn.currentOver.balls.length > 0) {
+        inn.currentOver.completed = true;
+        inn.overs.push(inn.currentOver);
+        inn.currentOver = null;
+      }
+      saveMatch(m);
+      endInnings(m);
+    }
+  });
 }
 
 function endInnings(m) {
@@ -637,6 +677,20 @@ function openModal(id) {
 function closeModal() {
   document.getElementById('modal-overlay').classList.add('hidden');
   document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+}
+
+// In-app replacement for window.confirm — runs onConfirm when the user accepts.
+let _confirmCallback = null;
+function showConfirm(opts) {
+  const o = opts || {};
+  setEl('confirm-title', o.title || 'Are you sure?');
+  document.getElementById('confirm-message').textContent = o.message || '';
+  const ok = document.getElementById('btn-confirm-ok');
+  ok.textContent = o.confirmText || 'Confirm';
+  ok.className = 'btn ' + (o.danger === false ? 'btn-primary' : 'btn-danger');
+  setEl('btn-confirm-cancel', o.cancelText || 'Cancel');
+  _confirmCallback = typeof o.onConfirm === 'function' ? o.onConfirm : null;
+  openModal('modal-confirm');
 }
 
 // Exposed for inline onclick in rosters

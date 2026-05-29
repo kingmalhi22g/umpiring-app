@@ -14,22 +14,16 @@
 
 .btn-primary  { background: var(--c-primary-mid); color: white; }
 .btn-danger   { background: var(--c-danger);       color: white; }
-.btn-outline  { background: transparent; border: 2px solid var(--c-primary-mid); color: var(--c-primary-mid); }
 .btn-ghost    { background: rgba(0,0,0,.06); color: var(--c-text); }
 .btn-accent   { background: var(--c-accent); color: var(--c-primary); }
 
 .btn-sm { padding: 8px var(--sp-md); font-size: 12px; }
 .btn-lg { padding: 14px var(--sp-md); font-size: 15px; }
 
-/* ── Ball buttons (live scoring) ── */
+/* ── Ball buttons (extras modal run grid) ── */
 .ball-btns {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
-}
-.ball-btns-extras {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: 7px;
 }
 
@@ -43,35 +37,6 @@
   -webkit-appearance: none;
 }
 .ball-btn:active { opacity: 0.75; transform: scale(0.95); }
-
-/* 0-3: neutral grey (no colour fighting for attention) */
-.ball-btn-0, .ball-btn-1, .ball-btn-2, .ball-btn-3 { background: #EEEEEE; color: #1A1A1A; }
-
-/* 4 and 6: accent colours, slightly bigger text */
-.ball-btn-4  { background: #DCEEFB; color: var(--c-4); font-size: 24px; }
-.ball-btn-6  { background: #EDE0F5; color: var(--c-6); font-size: 24px; }
-
-/* Extras: flat grey, clearly secondary */
-.ball-btn-wd, .ball-btn-nb, .ball-btn-b, .ball-btn-lb {
-  height: 44px; font-size: 12px; font-weight: 700;
-  background: #EEEEEE; color: #555;
-}
-
-/* WICKET: deep red, unmistakable */
-.ball-btn-w {
-  background: #B71C1C; color: white;
-  width: 100%; height: 50px;
-  font-size: 16px; font-weight: 900; letter-spacing: 1.5px;
-}
-
-/* Undo: small circle in score banner */
-.live-undo-btn {
-  position: absolute; top: 10px; right: 10px;
-  width: 30px; height: 30px; border-radius: 50%;
-  border: none; background: rgba(255,255,255,.2); color: white;
-  font-size: 15px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-}
 
 /* ── Ball dots ── */
 .ball-dots {
@@ -105,18 +70,19 @@
 .eos-bowler-chip {
   background: #E8F5E9; color: var(--c-primary);
   border: 1px solid var(--c-primary-light);
-  border-radius: 13px; padding: 5px 10px;
-  font-size: 10px; font-weight: 600; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 16px; padding: 8px 12px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px;
+  min-height: 36px;
   transition: background 0.12s;
 }
 .eos-bowler-chip:active { background: #C8E6C9; }
 .eos-chip-used { opacity: 0.38; cursor: not-allowed; background: #EEEEEE; color: #999; border-color: #DDD; }
-.chip-max { font-size: 8px; font-weight: 700; background: rgba(0,0,0,.12); border-radius: 5px; padding: 1px 3px; letter-spacing: 0.3px; }
+.chip-max { font-size: 10px; font-weight: 700; background: rgba(0,0,0,.12); border-radius: 5px; padding: 1px 4px; letter-spacing: 0.3px; }
 .chip-overs {
-  font-size: 9px; color: var(--c-primary-mid);
+  font-size: 11px; color: var(--c-primary-mid);
   font-weight: 400; background: rgba(0,0,0,.06);
-  border-radius: 6px; padding: 1px 4px;
+  border-radius: 6px; padding: 1px 5px;
 }
 
 /* ── Cards ── */
@@ -128,19 +94,8 @@
 }
 .card-sm { padding: var(--sp-sm) var(--sp-md); }
 
-/* ── Score banner ── */
-.score-banner {
-  background: var(--c-primary);
-  color: white;
-  border-radius: var(--r-lg);
-  padding: var(--sp-md) var(--sp-lg);
-  text-align: center;
-}
+/* ── Score figure (match summary) ── */
 .score-main { font-size: 56px; font-weight: 900; letter-spacing: -2px; line-height: 1; font-variant-numeric: tabular-nums; }
-.score-team { font-size: 10px; opacity: 0.85; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
-.score-overs { font-size: 13px; opacity: 0.8; }
-.score-target { font-size: 14px; font-weight: 700; opacity: 0.95; margin-top: 3px; }
-.score-rates  { font-size: 10px; opacity: 0.75; margin-top: 2px; }
 
 /* ── Batsman / bowler info ── */
 .player-row {
@@ -152,8 +107,8 @@
 
 /* Switch strike button — sits on the right edge between the two batsman rows */
 .btn-switch-strike {
-  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-  width: 28px; height: 28px; border-radius: 50%;
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 44px; height: 44px; border-radius: 50%;
   border: 1.5px solid var(--c-border);
   background: var(--c-surface); color: var(--c-primary-mid);
   font-size: 16px; cursor: pointer; display: flex;
@@ -173,7 +128,7 @@
 
 /* ── Form elements ── */
 .form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-label { font-size: 10px; font-weight: 600; color: var(--c-text-2); text-transform: uppercase; letter-spacing: 0.4px; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--c-text-2); text-transform: uppercase; letter-spacing: 0.4px; }
 .form-input {
   width: 100%; padding: 10px var(--sp-md);
   border: 2px solid var(--c-border); border-radius: var(--r-md);
@@ -184,33 +139,9 @@
 .form-input:focus { border-color: var(--c-primary-light); }
 .form-input.error { border-color: var(--c-danger); }
 
-/* ── Player list (add/remove rows) ── */
-.player-list { display: flex; flex-direction: column; gap: var(--sp-sm); }
-
-.player-entry {
-  display: flex; align-items: center; gap: var(--sp-sm);
-}
-.player-entry .form-input { flex: 1; }
-.btn-remove {
-  width: 29px; height: 29px; flex-shrink: 0;
-  border: none; background: var(--c-danger-bg); color: var(--c-danger);
-  border-radius: 50%; font-size: 16px; cursor: pointer; display: flex;
-  align-items: center; justify-content: center;
-}
-.btn-remove:active { opacity: 0.7; }
-
-.btn-add-player {
-  display: flex; align-items: center; gap: var(--sp-sm);
-  padding: 10px var(--sp-md);
-  border: 2px dashed var(--c-border); border-radius: var(--r-md);
-  background: transparent; color: var(--c-primary-mid);
-  font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
-}
-.btn-add-player:active { background: rgba(0,0,0,.04); }
-
 /* ── Section heading ── */
 .section-head {
-  font-size: 10px; font-weight: 700;
+  font-size: 11px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.6px;
   color: var(--c-primary-mid);
   padding: var(--sp-sm) 0 var(--sp-xs);
@@ -232,9 +163,21 @@
 .match-item:active { opacity: 0.8; }
 .match-item.in-progress { border-left-color: var(--c-accent); }
 .match-info { flex: 1; min-width: 0; }
-.match-teams { font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.match-meta { font-size: 10px; color: var(--c-text-2); }
-.match-result { font-size: 10px; font-weight: 600; color: var(--c-primary-mid); text-align: right; flex-shrink: 0; }
+.match-teams { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.match-meta { font-size: 12px; color: var(--c-text-2); }
+.match-result { font-size: 12px; font-weight: 600; color: var(--c-primary-mid); text-align: right; flex-shrink: 0; }
+.match-delete {
+  flex-shrink: 0; width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; background: transparent; color: var(--c-text-2);
+  cursor: pointer; border-radius: 50%; margin-right: -6px;
+  -webkit-appearance: none; appearance: none;
+}
+.match-delete svg {
+  width: 18px; height: 18px; fill: none; stroke: currentColor;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+.match-delete:active { background: var(--c-danger-bg); color: var(--c-danger); }
 
 /* ── Toss / Decision buttons ── */
 .choice-btns {
@@ -252,6 +195,20 @@
 }
 .choice-icon { font-size: 29px; }
 .choice-label { font-size: 14px; font-weight: 700; }
+.choice-svg {
+  width: 34px; height: 34px;
+  fill: none; stroke: var(--c-primary-mid); stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.choice-btn.selected .choice-svg, .choice-btn:active .choice-svg { stroke: var(--c-primary); }
+
+/* Toss coin */
+.toss-coin {
+  width: 52px; height: 52px; margin: 0 auto 8px; display: block;
+  fill: none; stroke: var(--c-accent); stroke-width: 1.6;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.toss-coin path { stroke-width: 2; }
 
 /* ── Wicket type grid ── */
 .wicket-grid {
@@ -285,16 +242,16 @@
 }
 
 /* ── Scorecard table ── */
-.scorecard-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.scorecard-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .scorecard-table th {
-  text-align: left; padding: 5px 3px;
+  text-align: left; padding: 6px 3px;
   border-bottom: 2px solid var(--c-border);
-  font-size: 10px; text-transform: uppercase; color: var(--c-text-2);
+  font-size: 11px; text-transform: uppercase; color: var(--c-text-2);
 }
-.scorecard-table td { padding: 6px 3px; border-bottom: 1px solid var(--c-border); }
+.scorecard-table td { padding: 7px 3px; border-bottom: 1px solid var(--c-border); }
 .scorecard-table tr:last-child td { border-bottom: none; }
 .sc-runs { font-weight: 700; }
-.sc-out { color: var(--c-text-2); font-size: 13px; }
+.sc-out { color: var(--c-text-2); font-size: 11px; }
 
 /* ── Result banner ── */
 .result-banner {
@@ -313,15 +270,15 @@
 .roster-chip {
   display: flex; align-items: center; gap: 5px;
   background: #E8F5E9; border-radius: 16px;
-  padding: 5px 10px; font-size: 11px; font-weight: 600;
+  padding: 6px 12px; font-size: 12px; font-weight: 600;
 }
 .roster-chip button {
   border: none; background: none; color: var(--c-danger);
-  font-size: 13px; cursor: pointer; padding: 0 2px; line-height: 1;
+  font-size: 16px; cursor: pointer; line-height: 1;
+  min-width: 44px; min-height: 44px;
+  margin: -10px -8px -10px 0;
+  display: inline-flex; align-items: center; justify-content: center;
 }
-
-/* ── Over summary ── */
-.over-summary-balls { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin: var(--sp-md) 0; }
 
 /* ── Empty state ── */
 .empty-state {
@@ -335,41 +292,35 @@
 .free-hit-badge {
   background: #FFF9C4; color: #F57F17;
   border: 2px solid #F9A825;
-  border-radius: var(--r-md); padding: 5px var(--sp-md);
-  font-weight: 700; font-size: 11px; text-align: center;
+  border-radius: var(--r-md); padding: 6px var(--sp-md);
+  font-weight: 700; font-size: 12px; text-align: center;
 }
 
 /* ── Divider ── */
 .divider { height: 1px; background: var(--c-border); margin: var(--sp-sm) 0; }
 
 /* ── Dark mode overrides for hardcoded colours ── */
-/* Applied via body.dark-mode (manual) or prefers-color-scheme (auto) */
-body.dark-mode .ball-btn-0, body.dark-mode .ball-btn-1,
-body.dark-mode .ball-btn-2, body.dark-mode .ball-btn-3   { background:#2E2E2E; color:#E8E8E8; }
-body.dark-mode .ball-btn-4                                { background:#1A2E3F; color:#90CAF9; }
-body.dark-mode .ball-btn-6                                { background:#2A1A3F; color:#CE93D8; }
-body.dark-mode .ball-btn-wd, body.dark-mode .ball-btn-nb,
-body.dark-mode .ball-btn-b,  body.dark-mode .ball-btn-lb  { background:#2E2E2E; color:#AAA; }
+/* Applied via body.dark-mode (manual) or prefers-color-scheme (auto).
+   The shared declarations live in one place and are activated by either the
+   manual class or the system media query referencing the same selector list. */
+body.dark-mode .ball-btn         { background:#2E2E2E; color:#E8E8E8; }
 body.dark-mode #ball-input-area  { background:#162018; box-shadow:0 -3px 16px rgba(0,0,0,.5); }
 body.dark-mode .bd-dot           { background:#2E2E2E; }
 body.dark-mode .choice-btn       { background:var(--c-surface); border-color:var(--c-border); }
 body.dark-mode .choice-btn.selected { background:#1B3020; border-color:var(--c-primary-light); }
 body.dark-mode .wicket-btn       { background:var(--c-surface); border-color:var(--c-border); color:var(--c-text); }
 body.dark-mode .eos-bowler-chip  { background:#1B3020; border-color:#2E4030; color:#81C784; }
+body.dark-mode .extra-btn        { background:var(--c-surface); border-color:var(--c-border); color:#AAA; }
 
 @media (prefers-color-scheme: dark) {
-  body:not(.light-mode) .ball-btn-0, body:not(.light-mode) .ball-btn-1,
-  body:not(.light-mode) .ball-btn-2, body:not(.light-mode) .ball-btn-3   { background:#2E2E2E; color:#E8E8E8; }
-  body:not(.light-mode) .ball-btn-4                                       { background:#1A2E3F; color:#90CAF9; }
-  body:not(.light-mode) .ball-btn-6                                       { background:#2A1A3F; color:#CE93D8; }
-  body:not(.light-mode) .ball-btn-wd, body:not(.light-mode) .ball-btn-nb,
-  body:not(.light-mode) .ball-btn-b,  body:not(.light-mode) .ball-btn-lb  { background:#2E2E2E; color:#AAA; }
+  body:not(.light-mode) .ball-btn         { background:#2E2E2E; color:#E8E8E8; }
   body:not(.light-mode) #ball-input-area  { background:#162018; box-shadow:0 -3px 16px rgba(0,0,0,.5); }
   body:not(.light-mode) .bd-dot           { background:#2E2E2E; }
   body:not(.light-mode) .choice-btn       { background:var(--c-surface); border-color:var(--c-border); }
   body:not(.light-mode) .choice-btn.selected { background:#1B3020; border-color:var(--c-primary-light); }
   body:not(.light-mode) .wicket-btn       { background:var(--c-surface); border-color:var(--c-border); color:var(--c-text); }
   body:not(.light-mode) .eos-bowler-chip  { background:#1B3020; border-color:#2E4030; color:#81C784; }
+  body:not(.light-mode) .extra-btn        { background:var(--c-surface); border-color:var(--c-border); color:#AAA; }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -420,11 +371,11 @@ body.dark-mode .eos-bowler-chip  { background:#1B3020; border-color:#2E4030; col
   display: flex; flex-direction: column; gap: 1px;
 }
 .stat-label {
-  font-size: 7px; font-weight: 700; letter-spacing: 0.4px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
   text-transform: uppercase; color: var(--c-text-2);
 }
 .stat-val {
-  font-size: 11px; font-weight: 700; color: var(--c-text);
+  font-size: 14px; font-weight: 700; color: var(--c-text);
   font-variant-numeric: tabular-nums;
 }
 
@@ -443,6 +394,9 @@ body.dark-mode .eos-bowler-chip  { background:#1B3020; border-color:#2E4030; col
 /* ── Batsmen + bowler card ── */
 .play-card { padding: 0; }
 .bat-rows { position: relative; }
+/* Reserve space on the batsman rows so the score text clears the
+   centred switch-strike button (44px wide at right:8px). */
+.bat-rows .player-row { padding-right: 56px; }
 #live-striker { border-bottom: 1px solid var(--c-border); }
 #live-nonstriker { border-bottom: none; }
 .player-row-bowler { border-top: 1px solid var(--c-border); border-bottom: none; }
@@ -466,12 +420,27 @@ body.dark-mode .eos-bowler-chip  { background:#1B3020; border-color:#2E4030; col
   font-size: 26px; font-weight: 800; color: #fff; cursor: pointer;
   -webkit-appearance: none; appearance: none;
   box-shadow: inset 0 -2px 0 rgba(0,0,0,.12);
-  transition: transform 0.08s, filter 0.1s;
+  transition: transform 0.08s, filter 0.1s, box-shadow 0.1s;
 }
 .run-btn:active { transform: scale(0.96); filter: brightness(0.95); }
-.run-0, .run-1, .run-2, .run-3 { background: linear-gradient(180deg, #6CB733 0%, #5CA529 100%); }
-.run-4 { background: linear-gradient(180deg, #498F25 0%, #3D7C1E 100%); }
-.run-6 { background: linear-gradient(180deg, #346B1B 0%, #2A5713 100%); }
+
+/* 0 — a dot ball is not an event: muted, recedes */
+.run-0 { background: linear-gradient(180deg, #8FA58C 0%, #7C937A 100%); }
+/* 1-3 — singles/twos/threes: standard mid-green */
+.run-1, .run-2, .run-3 { background: linear-gradient(180deg, #6CB733 0%, #5CA529 100%); }
+/* 4 — boundary: blue, matching the ball-dot colour language */
+.run-4 {
+  background: linear-gradient(180deg, #2E84D8 0%, #1565C0 100%);
+  font-size: 28px;
+}
+/* 6 — maximum: purple, the most celebratory colour */
+.run-6 {
+  background: linear-gradient(180deg, #9234C4 0%, #6A1B9A 100%);
+  font-size: 28px;
+}
+/* Boundaries get a soft glow on tap to feel rewarding */
+.run-4:active { box-shadow: 0 0 0 3px rgba(21,101,192,.35), inset 0 -2px 0 rgba(0,0,0,.12); }
+.run-6:active { box-shadow: 0 0 0 3px rgba(106,27,154,.35), inset 0 -2px 0 rgba(0,0,0,.12); }
 
 /* ── Extras + wicket row ── */
 .extras-row {
@@ -481,7 +450,7 @@ body.dark-mode .eos-bowler-chip  { background:#1B3020; border-color:#2E4030; col
 }
 .extra-btn {
   display: flex; align-items: center; justify-content: center;
-  height: 42px; border: 1.5px solid #D6DBD6; border-radius: var(--r-md);
+  height: 46px; border: 1.5px solid #D6DBD6; border-radius: var(--r-md);
   background: var(--c-surface); color: #4A4A4A;
   font-size: 13px; font-weight: 700; cursor: pointer;
   -webkit-appearance: none; appearance: none;
@@ -490,7 +459,7 @@ body.dark-mode .eos-bowler-chip  { background:#1B3020; border-color:#2E4030; col
 .extra-btn:active { background: #F1F3F1; transform: scale(0.96); }
 .wicket-btn-main {
   display: flex; align-items: center; justify-content: center;
-  height: 42px; border: none; border-radius: var(--r-md);
+  height: 46px; border: none; border-radius: var(--r-md);
   background: var(--c-danger); color: #fff;
   font-size: 14px; font-weight: 900; letter-spacing: 1px; cursor: pointer;
   -webkit-appearance: none; appearance: none;

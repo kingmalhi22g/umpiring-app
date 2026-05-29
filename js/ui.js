@@ -149,7 +149,10 @@ function renderMatchList(containerEl) {
         <div class="match-teams">${esc(t1)} vs ${esc(t2)}</div>
         <div class="match-meta">${esc(m.date)} · ${esc(m.ground||'Unknown ground')}</div>
       </div>
-      <div class="match-result">${esc(resultText)}</div>`;
+      <div class="match-result">${esc(resultText)}</div>
+      <button class="match-delete" data-del="${esc(m.id)}" type="button" aria-label="Delete match">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+      </button>`;
     containerEl.appendChild(div);
   });
 }

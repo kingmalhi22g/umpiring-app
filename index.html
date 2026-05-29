@@ -85,7 +85,11 @@
   <section id="screen-toss" class="screen">
     <div class="screen-inner">
       <div class="card text-center">
-        <div style="font-size:48px;margin-bottom:8px">&#129689;</div>
+        <svg class="toss-coin" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"/>
+          <circle cx="12" cy="12" r="6"/>
+          <path d="M12 9v6M9.5 11h3.5a1.25 1.25 0 0 1 0 2.5H10"/>
+        </svg>
         <div class="section-head" style="border:none;text-align:center;font-size:16px">Toss</div>
         <div class="form-group mt-md">
           <label class="form-label" for="toss-winner">Who won the toss?</label>
@@ -94,12 +98,18 @@
         <p class="text-sm text-2 mt-md" style="margin-bottom:12px">Elected to:</p>
         <div class="choice-btns">
           <button id="btn-bat" class="choice-btn" type="button">
-            <span class="choice-icon">&#127951;</span>
+            <svg class="choice-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <line x1="14.5" y1="4" x2="19.5" y2="9"/>
+              <rect x="2.6" y="11.6" width="12.5" height="5" rx="2.5" transform="rotate(-45 8.85 14.1)"/>
+            </svg>
             <span class="choice-label">Bat</span>
           </button>
           <button id="btn-field" class="choice-btn" type="button">
-            <span class="choice-icon">⚾</span>
-            <span class="choice-label">Field</span>
+            <svg class="choice-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M7.5 4.5c2.5 3 2.5 12 0 15M16.5 4.5c-2.5 3-2.5 12 0 15"/>
+            </svg>
+            <span class="choice-label">Bowl</span>
           </button>
         </div>
       </div>
@@ -388,6 +398,17 @@
     </div>
     <button id="btn-new-batsman-ok" class="btn btn-primary btn-lg mt-md" type="button">&#9654; Continue</button>
     <datalist id="new-batsman-dl"></datalist>
+  </div>
+
+  <!-- Generic Confirm -->
+  <div id="modal-confirm" class="modal hidden" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="confirm-title">Are you sure?</div>
+    <p class="text-center text-2 mb-md" id="confirm-message" style="white-space:pre-line"></p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-sm);margin-top:var(--sp-md)">
+      <button id="btn-confirm-cancel" class="btn btn-ghost" type="button">Cancel</button>
+      <button id="btn-confirm-ok" class="btn btn-danger" type="button">Confirm</button>
+    </div>
   </div>
 
 </div>

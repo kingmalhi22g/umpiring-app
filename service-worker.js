@@ -1,6 +1,12 @@
-// service-worker.js — cache-first offline strategy
+// service-worker.js — stale-while-revalidate offline strategy
+//
+// Assets are served from cache for instant, offline-capable loads, but every
+// request also refreshes the cache in the background. This means deployed
+// updates reach users automatically on their next launch WITHOUT needing a
+// manual CACHE_NAME bump on every change (the old cache-first strategy served
+// stale code indefinitely until the version string was hand-edited).
 
-const CACHE_NAME = 'cricket-umpire-v10';
+const CACHE_NAME = 'cricket-umpire-v11';
 
 const ASSETS = [
   '/',
@@ -36,19 +42,36 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Only handle GET requests for same-origin assets
-  if (event.request.method !== 'GET') return;
-  event.respondWith(
-    caches.match(event.request)
-      .then(cached => cached || fetch(event.request)
-        .then(response => {
-          // Cache new assets on first fetch
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-          }
-          return response;
-        })
-      )
-  );
+  const req = event.request;
+  // Only handle same-origin GETs; let the browser deal with the rest.
+  if (req.method !== 'GET') return;
+  if (new URL(req.url).origin !== self.location.origin) return;
+
+  event.respondWith((async () => {
+    const cache  = await caches.open(CACHE_NAME);
+    const cached = await cache.match(req);
+
+    // Kick off a fresh fetch and update the cache in the background.
+    const network = fetch(req).then(response => {
+      if (response && response.ok) cache.put(req, response.clone());
+      return response;
+    }).catch(() => null);
+
+    // Serve cache instantly when we have it; the background fetch above keeps
+    // the cache current for the next load.
+    if (cached) {
+      event.waitUntil(network);
+      return cached;
+    }
+
+    // Nothing cached yet: wait for the network, with an app-shell fallback
+    // for navigations so the app still opens offline on a cold cache.
+    const response = await network;
+    if (response) return response;
+    if (req.mode === 'navigate') {
+      const shell = await cache.match('/index.html');
+      if (shell) return shell;
+    }
+    return new Response('', { status: 504, statusText: 'Offline' });
+  })());
 });
