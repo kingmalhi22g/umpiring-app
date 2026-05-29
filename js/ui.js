@@ -32,7 +32,7 @@ function ballDotLabel(delivery) {
   return String(delivery.runs);
 }
 
-function renderBallDots(containerEl, over) {
+function renderBallDots(containerEl, over, editable) {
   if (!containerEl) return;
   containerEl.innerHTML = '';
   if (!over) return;
@@ -41,10 +41,15 @@ function renderBallDots(containerEl, over) {
     containerEl.innerHTML = '<span class="text-2 text-sm">No balls bowled yet</span>';
     return;
   }
-  deliveries.forEach(d => {
-    const dot = document.createElement('div');
-    dot.className = 'ball-dot ' + ballDotClass(d);
+  deliveries.forEach((d, i) => {
+    const dot = document.createElement(editable ? 'button' : 'div');
+    dot.className = 'ball-dot ' + ballDotClass(d) + (editable ? ' ball-dot-edit' : '');
     dot.textContent = ballDotLabel(d);
+    if (editable) {
+      dot.type = 'button';
+      dot.dataset.idx = i;
+      dot.setAttribute('aria-label', 'Edit ball ' + (i + 1));
+    }
     containerEl.appendChild(dot);
   });
 }
@@ -55,7 +60,8 @@ function renderLiveHeader(match) {
   const inn = match.innings[match.currentInnings];
   if (!inn) return;
 
-  setEl('live-score-team', inn.battingTeam);
+  const isSuper = match.currentInnings >= 2;
+  setEl('live-score-team', (isSuper ? 'Super Over · ' : '') + inn.battingTeam);
   setEl('live-score-runs', inn.totalRuns);
   setEl('live-score-wkts', inn.wickets);
   setEl('live-score-overs', getOverDisplay(inn) + ' ov');
@@ -67,12 +73,13 @@ function renderLiveHeader(match) {
   const pship = getPartnership(inn);
   setEl('live-stat-pship', pship.runs + ' (' + pship.balls + ')');
 
-  const target = match.currentInnings === 1 ? getTarget(match) : null;
+  const chasing = match.currentInnings === 1 || match.currentInnings === 3;
+  const target = chasing ? getTarget(match) : null;
   const needEl   = document.getElementById('stat-need');
   const rrrEl    = document.getElementById('stat-rrr');
   const targetEl = document.getElementById('stat-target');
   if (target) {
-    const ballsLeft  = Math.max(0, match.overs * 6 - ballsBowled);
+    const ballsLeft  = Math.max(0, effectiveOvers(match) * 6 - ballsBowled);
     const runsNeeded = Math.max(0, target - inn.totalRuns);
     const rrr        = ballsLeft > 0 ? (runsNeeded / (ballsLeft / 6)).toFixed(2) : '—';
     setEl('live-stat-need',   runsNeeded + ' in ' + ballsLeft);
@@ -100,8 +107,8 @@ function renderLiveHeader(match) {
     setEl('live-bowler-fig',  getBowlerFigures(inn, bowler));
   }
 
-  // Ball dots
-  renderBallDots(document.getElementById('live-dots'), inn.currentOver);
+  // Ball dots (tappable to edit)
+  renderBallDots(document.getElementById('live-dots'), inn.currentOver, true);
 
   // Free hit badge
   const fhEl = document.getElementById('live-freehit');
@@ -204,17 +211,32 @@ function renderMatchSummary(match) {
   // Result banner
   if (match.result) {
     const r = match.result;
-    const txt = r.marginType === 'tie'
-      ? 'Match Tied!'
-      : (r.winner + ' won by ' + r.margin + ' ' + r.marginType);
-    html += `<div class="result-banner">${esc(txt)}</div>`;
+    const hadSuper = !!match.innings[2];
+    let txt;
+    if (r.marginType === 'super over') {
+      txt = r.winner + ' won the Super Over';
+    } else if (r.marginType === 'tie') {
+      txt = hadSuper ? 'Match Tied — Super Over also tied!' : 'Match Tied!';
+    } else {
+      txt = r.winner + ' won by ' + r.margin + ' ' + r.marginType;
+    }
+    const cls = 'result-banner' + (r.marginType === 'super over' ? ' result-super' : '');
+    html += `<div class="${cls}">${esc(txt)}</div>`;
+
+    // Offer a super over when the main match tied (and none played yet)
+    if (r.marginType === 'tie' && !hadSuper) {
+      html += `<button id="btn-super-over" class="btn btn-accent mt-md" type="button">&#9889; Start Super Over</button>`;
+    }
   }
 
   // Each innings
   match.innings.forEach((inn, i) => {
     if (!inn) return;
+    const label = i >= 2
+      ? (esc(inn.battingTeam) + ' — Super Over' + (i === 3 ? ' (Chase)' : ''))
+      : (esc(inn.battingTeam) + ' — Innings ' + (i + 1));
     html += `<div class="card mt-md">
-      <div class="section-head">${esc(inn.battingTeam)} — Innings ${i+1}</div>
+      <div class="section-head">${label}</div>
       <div class="score-main text-primary" style="font-size:22px;color:var(--c-primary-mid);font-weight:900;margin:6px 0">
         ${inn.totalRuns}/${inn.wickets} <span style="font-size:13px;font-weight:600;color:var(--c-text-2)">(${getOverDisplay(inn)} ov)</span>
       </div>
@@ -386,6 +408,32 @@ function renderStatsModal(match) {
   const ballsBowled = inn.overs.length * 6 + (inn.currentOver ? inn.currentOver.balls.length : 0);
   const crr = ballsBowled > 0 ? (inn.totalRuns / (ballsBowled / 6)).toFixed(2) : '—';
 
+  // Fall of wickets
+  const fow = getFallOfWickets(inn);
+  const fowHtml = fow.length ? `
+    <div class="divider mt-sm"></div>
+    <div class="section-head mt-sm">FALL OF WICKETS</div>
+    <div class="fow-list">
+      ${fow.map(f => `<div class="fow-item">
+        <span class="fow-score">${f.num}&ndash;${f.score}</span>
+        <span class="fow-bat">${esc(f.batsman)}</span>
+        <span class="fow-over">${f.over} ov</span>
+      </div>`).join('')}
+    </div>` : '';
+
+  // Powerplay strip
+  const pp  = getPowerplayOvers(match.overs);
+  const pps = getPowerplayStats(inn, pp);
+  const ppHtml = `
+    <div class="divider mt-sm"></div>
+    <div class="section-head mt-sm">POWERPLAY</div>
+    <div class="pp-strip">
+      ${Array.from({ length: match.overs }, (_, i) => i + 1).map(n =>
+        `<span class="pp-over${n <= pp ? ' pp' : ''}${n === pps.played && inn.currentOver ? ' pp-current' : ''}">${n}</span>`
+      ).join('')}
+    </div>
+    <div class="pp-legend">Overs 1&ndash;${pp} &middot; scored <strong>${pps.runs}/${pps.wkts}</strong></div>`;
+
   el.innerHTML = `
     <div class="stats-hero">
       <div class="stats-hero-team">${esc(inn.battingTeam)}</div>
@@ -408,6 +456,8 @@ function renderStatsModal(match) {
       <thead><tr><th>Bowler</th><th>O</th><th>R</th><th>W</th><th>Econ</th></tr></thead>
       <tbody>${bowlRows}</tbody>
     </table>` : ''}
+    ${fowHtml}
+    ${ppHtml}
   `;
 }
 
@@ -448,7 +498,7 @@ function renderExportCard(match) {
     body += `
       <div style="margin-bottom:16px">
         <div style="background:#1B5E20;color:white;padding:8px 12px;border-radius:6px 6px 0 0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">
-          ${esc(inn.battingTeam)} — Innings ${i+1}
+          ${esc(inn.battingTeam)} — ${i >= 2 ? 'Super Over' + (i === 3 ? ' (Chase)' : '') : 'Innings ' + (i + 1)}
         </div>
         <div style="background:white;border-radius:0 0 6px 6px;overflow:hidden">
           <div style="padding:10px 12px">
@@ -468,6 +518,21 @@ function renderExportCard(match) {
           <div style="padding:6px 12px;font-size:11px;color:#666;border-top:1px solid #E8F5E9">
             Extras: ${totalExtras(inn)} (Wd ${inn.extras.wides}, NB ${inn.extras.noBalls}, B ${inn.extras.byes}, LB ${inn.extras.legByes})
           </div>
+          ${(() => {
+            const fow = getFallOfWickets(inn);
+            if (!fow.length) return '';
+            return `<div style="padding:6px 12px;font-size:11px;color:#666;border-top:1px solid #E8F5E9">
+              <strong style="color:#1B5E20">Fall:</strong> ${fow.map(f => `${f.num}-${f.score} (${esc(f.batsman)}, ${f.over})`).join(' &nbsp; ')}
+            </div>`;
+          })()}
+          ${(() => {
+            const pp = getPowerplayOvers(match.overs);
+            const pps = getPowerplayStats(inn, pp);
+            if (!pps.played) return '';
+            return `<div style="padding:6px 12px;font-size:11px;color:#666;border-top:1px solid #E8F5E9">
+              <strong style="color:#1B5E20">Powerplay</strong> (ov 1-${pp}): ${pps.runs}/${pps.wkts}
+            </div>`;
+          })()}
           ${bowlRows ? `
           <table style="width:100%;border-collapse:collapse;font-size:12px;border-top:2px solid #E8F5E9">
             <thead><tr style="background:#F1F8E9">
@@ -484,7 +549,9 @@ function renderExportCard(match) {
 
   if (match.result) {
     const r = match.result;
-    const txt = r.marginType === 'tie' ? 'Match Tied!' : `${esc(r.winner)} won by ${r.margin} ${r.marginType}`;
+    const txt = r.marginType === 'super over' ? `${esc(r.winner)} won the Super Over`
+      : r.marginType === 'tie' ? (match.innings[2] ? 'Match Tied — Super Over also tied!' : 'Match Tied!')
+      : `${esc(r.winner)} won by ${r.margin} ${r.marginType}`;
     body += `<div style="background:#FFCA28;color:#1B5E20;padding:12px;border-radius:6px;text-align:center;font-weight:900;font-size:16px">${txt}</div>`;
   }
 

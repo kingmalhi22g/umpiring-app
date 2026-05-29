@@ -73,8 +73,18 @@
           <input id="ms-ground" class="form-input" type="text" placeholder="e.g. Victoria Park" autocomplete="off">
         </div>
         <div class="form-group mt-md">
+          <label class="form-label">Match Format</label>
+          <div class="preset-chips" id="ms-presets">
+            <button class="preset-chip" type="button" data-overs="10"><span class="pc-name">T10</span><span class="pc-sub">10 overs</span></button>
+            <button class="preset-chip" type="button" data-overs="20"><span class="pc-name">T20</span><span class="pc-sub">20 overs</span></button>
+            <button class="preset-chip" type="button" data-overs="50"><span class="pc-name">ODI</span><span class="pc-sub">50 overs</span></button>
+            <button class="preset-chip" type="button" data-overs="custom"><span class="pc-name">Custom</span><span class="pc-sub">set your own</span></button>
+          </div>
+        </div>
+        <div class="form-group mt-md">
           <label class="form-label" for="ms-overs">Overs Per Innings</label>
           <input id="ms-overs" class="form-input" type="number" value="20" min="1" max="50">
+          <div class="quota-hint" id="ms-quota"></div>
         </div>
       </div>
       <button id="btn-match-continue" class="btn btn-primary btn-lg mt-md">Continue &rarr;</button>
@@ -171,6 +181,7 @@
         </div>
         <!-- Ball dots -->
         <div class="ball-dots" id="live-dots"></div>
+        <div class="ball-dots-hint" id="live-dots-hint">Tap a ball to correct it</div>
         <!-- Stats button -->
         <button id="btn-live-stats" class="btn btn-ghost btn-sm" type="button" style="margin-top:4px">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-7M12 21V5M19 21v-10"/></svg>
@@ -357,6 +368,8 @@
       <button class="wicket-btn" data-type="run_out"     type="button">Run Out</button>
       <button class="wicket-btn" data-type="stumped"     type="button">Stumped</button>
       <button class="wicket-btn" data-type="hit_wicket"  type="button">Hit Wicket</button>
+      <button class="wicket-btn" data-type="retired_hurt" type="button">Retired Hurt</button>
+      <button class="wicket-btn" data-type="retired_out"  type="button">Retired Out</button>
     </div>
     <div id="wicket-runout-group" class="hidden mt-md">
       <label class="form-label">Runs completed before run-out</label>
@@ -402,6 +415,36 @@
     </div>
     <button id="btn-new-batsman-ok" class="btn btn-primary btn-lg mt-md" type="button">&#9654; Continue</button>
     <datalist id="new-batsman-dl"></datalist>
+  </div>
+
+  <!-- Edit Ball (feature A) -->
+  <div id="modal-edit-ball" class="modal hidden">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="edit-ball-title">Edit ball</div>
+    <p class="text-center text-2 text-sm mb-md" id="edit-ball-current"></p>
+    <div class="run-grid">
+      <button class="run-btn run-0" data-edit-run="0" type="button">0</button>
+      <button class="run-btn run-1" data-edit-run="1" type="button">1</button>
+      <button class="run-btn run-2" data-edit-run="2" type="button">2</button>
+      <button class="run-btn run-3" data-edit-run="3" type="button">3</button>
+      <button class="run-btn run-4" data-edit-run="4" type="button">4</button>
+      <button class="run-btn run-6" data-edit-run="6" type="button">6</button>
+    </div>
+    <div class="extras-row mt-sm" id="edit-extras-row">
+      <button class="extra-btn" data-edit-extra="wide"    type="button">WD</button>
+      <button class="extra-btn" data-edit-extra="no_ball" type="button">NB</button>
+      <button class="extra-btn" data-edit-extra="bye"     type="button">B</button>
+      <button class="extra-btn" data-edit-extra="leg_bye" type="button">LB</button>
+    </div>
+    <button class="edit-wkt-toggle mt-md" id="edit-wkt-toggle" type="button" aria-pressed="false">
+      <span>Mark as wicket</span>
+      <span class="ewt-switch"></span>
+    </button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-sm);margin-top:var(--sp-md)">
+      <button id="btn-edit-cancel" class="btn btn-ghost" type="button">Cancel</button>
+      <button id="btn-edit-save"   class="btn btn-primary" type="button">Save change</button>
+    </div>
+    <button id="btn-edit-delete" class="btn btn-danger btn-sm mt-sm" type="button">Delete this ball</button>
   </div>
 
   <!-- Generic Confirm -->

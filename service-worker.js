@@ -6,7 +6,7 @@
 // manual CACHE_NAME bump on every change (the old cache-first strategy served
 // stale code indefinitely until the version string was hand-edited).
 
-const CACHE_NAME = 'cricket-umpire-v11';
+const CACHE_NAME = 'cricket-umpire-v12';
 
 const ASSETS = [
   '/',

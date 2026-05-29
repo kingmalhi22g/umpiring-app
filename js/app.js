@@ -32,7 +32,14 @@ const state = {
   selectedWicketType: null,
   pendingExtrasType:  null,  // 'wide'|'no_ball'|'bye'|'leg_bye'
   runoutRuns:         0,     // runs completed before a run-out
-  runoutWho:          'striker'  // which batsman is run out: 'striker'|'nonstriker'
+  runoutWho:          'striker',  // which batsman is run out: 'striker'|'nonstriker'
+  // Edit-ball editor state
+  editIdx:            null,
+  editRuns:           0,
+  editExtra:          null,  // null|'wide'|'no_ball'|'bye'|'leg_bye'
+  editWicket:         false,
+  editOrigWicket:     null,
+  editBatsman:        ''
 };
 
 // ── Init ─────────────────────────────────────────────────
@@ -114,6 +121,18 @@ function wireButtons() {
 
   // Match setup
   on('btn-match-continue', 'click', handleMatchSetupContinue);
+  on('ms-presets', 'click', e => {
+    const chip = e.target.closest('.preset-chip');
+    if (!chip) return;
+    const overInput = document.getElementById('ms-overs');
+    if (chip.dataset.overs === 'custom') {
+      if (overInput) overInput.focus();
+    } else if (overInput) {
+      overInput.value = chip.dataset.overs;
+    }
+    syncPresetUI();
+  });
+  on('ms-overs', 'input', syncPresetUI);
 
   // Toss
   on('btn-bat',   'click', () => handleTossElect('bat'));
@@ -131,6 +150,25 @@ function wireButtons() {
   on('ball-btn-w',  'click', debounced(() => { haptic(); handleWicketButton(); }));
   on('btn-undo',          'click', handleUndo);
   on('btn-end-innings',   'click', handleEndInningsEarly);
+
+  // Edit any ball — tap a dot in the current over
+  on('live-dots', 'click', e => {
+    const dot = e.target.closest('.ball-dot-edit');
+    if (dot && dot.dataset.idx !== undefined) openEditBall(parseInt(dot.dataset.idx));
+  });
+  on('edit-extras-row', 'click', e => {
+    const btn = e.target.closest('[data-edit-extra]');
+    if (!btn) return;
+    // Toggle: tapping the active extra clears it back to a normal delivery.
+    state.editExtra = state.editExtra === btn.dataset.editExtra ? null : btn.dataset.editExtra;
+    renderEditSelection();
+  });
+  document.querySelectorAll('#modal-edit-ball [data-edit-run]').forEach(b =>
+    b.addEventListener('click', () => { state.editRuns = parseInt(b.dataset.editRun); renderEditSelection(); }));
+  on('edit-wkt-toggle', 'click', () => { state.editWicket = !state.editWicket; renderEditSelection(); });
+  on('btn-edit-save',   'click', handleEditSave);
+  on('btn-edit-delete', 'click', handleEditDelete);
+  on('btn-edit-cancel', 'click', () => { state.editIdx = null; closeModal(); });
   on('btn-switch-strike', 'click', handleSwitchStrike);
   on('btn-live-stats',   'click', handleOpenStats);
   on('btn-stats-close',  'click', closeModal);
@@ -203,6 +241,9 @@ function wireButtons() {
     setActiveMatchId(null); state.matchId = null; state.viewMatchId = null;
     navigateTo('home');
   });
+  on('summary-content', 'click', e => {
+    if (e.target.closest('#btn-super-over')) handleStartSuperOver();
+  });
 
   // Settings
   on('btn-save-settings', 'click', () => {
@@ -239,6 +280,25 @@ function setupMatchSetup() {
   if (dateInput) dateInput.value = new Date().toISOString().slice(0,10);
   const overInput = document.getElementById('ms-overs');
   if (overInput) overInput.value = getSettings().defaultOvers;
+  syncPresetUI();
+}
+
+// Highlight the preset chip matching the current overs value and refresh quota.
+function syncPresetUI() {
+  const overs = parseInt(val('ms-overs')) || 0;
+  const isStandard = ['10','20','50'].includes(String(overs));
+  document.querySelectorAll('#ms-presets .preset-chip').forEach(chip => {
+    const match = chip.dataset.overs === 'custom' ? (overs > 0 && !isStandard)
+                                                  : chip.dataset.overs === String(overs);
+    chip.classList.toggle('selected', match);
+  });
+  const hint = document.getElementById('ms-quota');
+  if (hint) {
+    hint.innerHTML = overs > 0
+      ? 'Bowler quota: max <strong>' + getMaxBowlerOvers(overs) + ' over' +
+        (getMaxBowlerOvers(overs) !== 1 ? 's' : '') + '</strong> each (auto)'
+      : '';
+  }
 }
 
 function setupToss() {
@@ -318,7 +378,12 @@ function showOpenersModal(m, innIdx) {
   document.getElementById('opener2').value       = '';
   document.getElementById('first-bowler').value  = '';
   const startBtn = document.getElementById('btn-start-innings');
-  if (startBtn) startBtn.textContent = innIdx === 0 ? 'Start Innings 1' : 'Start Innings 2';
+  if (startBtn) {
+    startBtn.textContent = innIdx === 0 ? 'Start Innings 1'
+      : innIdx === 1 ? 'Start Innings 2'
+      : innIdx === 2 ? 'Start Super Over' : 'Start Super Over Chase';
+  }
+  if (innIdx >= 2) setEl('openers-team', inn.battingTeam + ' — Super Over');
 
   populateDatalist('openers-dl', [
     ...(batTeam ? batTeam.batsmen : []),
@@ -438,6 +503,12 @@ function handleWicketConfirm() {
 
   const wType = state.selectedWicketType;
 
+  // Retirement is not a delivery — handle separately (no ball recorded).
+  if (wType === 'retired_hurt' || wType === 'retired_out') {
+    handleRetire(m, inn, wType);
+    return;
+  }
+
   if (inn.freeHitNext && wType && wType !== 'run_out') {
     showToast('Free hit — only run-out is valid'); return;
   }
@@ -461,7 +532,7 @@ function handleWicketConfirm() {
   closeModal();
 
   const updatedInn = m.innings[m.currentInnings];
-  if (updatedInn.wickets >= 10) {
+  if (updatedInn.wickets >= effectiveMaxWickets(m)) {
     saveMatch(m);
     endInnings(m);
     return;
@@ -481,6 +552,35 @@ function handleWicketConfirm() {
   const howLabel = wType ? wType.replace(/_/g,' ') : 'out';
   const runsNote = runoutRuns > 0 ? ' · ' + runoutRuns + ' run' + (runoutRuns > 1 ? 's' : '') + ' completed' : '';
   setEl('new-batsman-info', wicket.batsmanOut + ' out · ' + howLabel + runsNote);
+  openModal('modal-new-batsman');
+}
+
+// Retired hurt / out — mark the striker and bring in a replacement (no ball).
+function handleRetire(m, inn, type) {
+  const striker = inn.batsmen[inn.strikerIdx];
+  if (!striker) { closeModal(); return; }
+  const isOut = type === 'retired_out';
+  striker.retired = true;
+  striker.isOut   = isOut;
+  striker.how     = isOut ? 'retired out' : 'retired hurt';
+  if (isOut) inn.wickets++;
+  closeModal();
+
+  if (isOut && inn.wickets >= effectiveMaxWickets(m)) {
+    saveMatch(m);
+    endInnings(m);
+    return;
+  }
+  saveMatch(m);
+
+  const batTeam = m.teams.find(t => t.name === inn.battingTeam);
+  const taken   = new Set(inn.batsmen.map(b => b.name));
+  populateDatalist('new-batsman-dl', [
+    ...(batTeam ? batTeam.batsmen : []),
+    ...getRoster(inn.battingTeam)
+  ].filter(n => !taken.has(n)));
+  document.getElementById('new-batsman-name').value = '';
+  setEl('new-batsman-info', striker.name + ' ' + striker.how + ' · select replacement');
   openModal('modal-new-batsman');
 }
 
@@ -562,26 +662,131 @@ function handleUndo() {
   showToast('Last ball undone ↩');
 }
 
+// ── Edit any ball ─────────────────────────────────────────
+function openEditBall(idx) {
+  const m = getMatch(state.matchId);
+  if (!m) return;
+  const inn = m.innings[m.currentInnings];
+  const over = inn && inn.currentOver;
+  const d = over && over.allDeliveries[idx];
+  if (!d) return;
+
+  const eType = d.extras ? d.extras.type : null;
+  // Reconstruct the editor's run value from how the delivery stored it.
+  let runs;
+  if (eType === 'wide')      runs = d.extras.runs || 0;   // extra runs beyond penalty
+  else                       runs = d.runs || 0;          // normal / nb-bat / bye / leg-bye
+
+  state.editIdx        = idx;
+  state.editRuns       = runs;
+  state.editExtra      = eType;
+  state.editWicket     = !!d.isWicket;
+  state.editOrigWicket = d.wicket || null;
+  state.editBatsman    = d.batsman || (inn.batsmen[inn.strikerIdx] ? inn.batsmen[inn.strikerIdx].name : '');
+
+  setEl('edit-ball-title', 'Edit ball ' + (idx + 1) + ' · over ' + over.overNumber);
+  setEl('edit-ball-current', 'Currently recorded: ' + ballDotLabel(d).replace(/·/, 'dot ball'));
+  renderEditSelection();
+  openModal('modal-edit-ball');
+}
+
+function renderEditSelection() {
+  document.querySelectorAll('#modal-edit-ball [data-edit-run]').forEach(b =>
+    b.classList.toggle('selected', parseInt(b.dataset.editRun) === state.editRuns));
+  document.querySelectorAll('#modal-edit-ball [data-edit-extra]').forEach(b =>
+    b.classList.toggle('selected', b.dataset.editExtra === state.editExtra));
+  const wt = document.getElementById('edit-wkt-toggle');
+  if (wt) { wt.classList.toggle('on', state.editWicket); wt.setAttribute('aria-pressed', String(state.editWicket)); }
+}
+
+function buildEditPatch() {
+  const t = state.editExtra;
+  let runs, extras;
+  if (!t)                     { runs = state.editRuns; extras = { type: null, runs: 0 }; }
+  else if (t === 'wide')      { runs = 0;              extras = { type: 'wide', runs: state.editRuns }; }
+  else if (t === 'no_ball')   { runs = state.editRuns; extras = { type: 'no_ball', runs: 0 }; }
+  else                        { runs = state.editRuns; extras = { type: t, runs: state.editRuns }; }
+
+  let isWicket = false, wicket = null;
+  if (state.editWicket) {
+    isWicket = true;
+    const ow = state.editOrigWicket;
+    const baseType = (ow && ow.type) || 'out';
+    wicket = {
+      type: baseType,
+      batsmanOut: (ow && ow.batsmanOut) || state.editBatsman,
+      fielder: (ow && ow.fielder) || null,
+      bowlerCredit: ow ? ow.bowlerCredit : !['run_out','obstructing'].includes(baseType)
+    };
+  }
+  return { runs, extras, isWicket, wicket };
+}
+
+function handleEditSave() {
+  let m = getMatch(state.matchId);
+  if (!m || state.editIdx === null) { closeModal(); return; }
+  m = editCurrentBall(m, state.editIdx, buildEditPatch());
+  closeModal();
+  state.editIdx = null;
+  afterEdit(m);
+  showToast('Ball updated');
+}
+
+function handleEditDelete() {
+  let m = getMatch(state.matchId);
+  if (!m || state.editIdx === null) { closeModal(); return; }
+  const idx = state.editIdx;
+  closeModal();
+  state.editIdx = null;
+  showConfirm({
+    title: 'Delete this ball?',
+    message: 'The delivery is removed and the over re-scored.',
+    confirmText: 'Delete',
+    onConfirm: () => {
+      let mm = getMatch(state.matchId);
+      mm = deleteCurrentBall(mm, idx);
+      afterEdit(mm);
+      showToast('Ball deleted');
+    }
+  });
+}
+
+// Persist + route after an edit/delete (mirrors afterBall's end-state checks).
+function afterEdit(m) {
+  const inn = m.innings[m.currentInnings];
+  saveMatch(m);
+  if (m.currentInnings === 1) {
+    const target = getTarget(m);
+    if (target && inn.totalRuns >= target) { endInnings(m); return; }
+  }
+  if (inn.wickets >= 10) { endInnings(m); return; }
+  if (!inn.currentOver) {
+    if (isInningsComplete(inn, m.overs)) { endInnings(m); return; }
+    navigateTo('end-of-over'); return;
+  }
+  renderLiveHeader(m);
+}
+
 // ── After ball ────────────────────────────────────────────
 function afterBall(m) {
   const inn = m.innings[m.currentInnings];
   if (!inn) return;
 
-  // Target reached in 2nd innings?
-  if (m.currentInnings === 1) {
+  // Target reached when chasing (2nd innings, or 2nd super-over innings)?
+  if (m.currentInnings === 1 || m.currentInnings === 3) {
     const target = getTarget(m);
     if (target && inn.totalRuns >= target) { endInnings(m); return; }
   }
 
-  // 10 wickets?
-  if (inn.wickets >= 10) { endInnings(m); return; }
+  // All out?
+  if (inn.wickets >= effectiveMaxWickets(m)) { endInnings(m); return; }
 
   // Over complete?
   if (isOverComplete(inn.currentOver)) {
     m = completeOver(m);
     const updatedInn = m.innings[m.currentInnings];
     saveMatch(m);
-    if (isInningsComplete(updatedInn, m.overs)) {
+    if (isInningsComplete(updatedInn, effectiveOvers(m), effectiveMaxWickets(m))) {
       endInnings(m);
     } else {
       navigateTo('end-of-over');
@@ -617,19 +822,53 @@ function handleEndInningsEarly() {
 
 function endInnings(m) {
   m.innings[m.currentInnings].completed = true;
+
   if (m.currentInnings === 0) {
     saveMatch(m);
     navigateTo('innings-break');
+    return;
+  }
+
+  if (m.currentInnings === 2) {
+    // First super-over innings done → start the chase
+    const i2 = m.innings[2];
+    m.innings[3]     = createInnings(i2.bowlingTeam, i2.battingTeam);
+    m.currentInnings = 3;
+    saveMatch(m);
+    showOpenersModal(m, 3);
+    return;
+  }
+
+  if (m.currentInnings === 3) {
+    // Super over complete
+    m.result = checkSuperOverResult(m);
   } else {
     m.result = checkResult(m);
-    m.status = 'completed';
-    setActiveMatchId(null);
-    state.viewMatchId = m.id;
-    state.matchId     = null;
-    savePlayersFromMatch(m);
-    saveMatch(m);
-    navigateTo('summary');
   }
+
+  m.status = 'completed';
+  setActiveMatchId(null);
+  state.viewMatchId = m.id;
+  state.matchId     = null;
+  savePlayersFromMatch(m);
+  saveMatch(m);
+  navigateTo('summary');
+}
+
+function handleStartSuperOver() {
+  const m = getMatch(state.viewMatchId) || getMatch(state.matchId);
+  if (!m) return;
+  const i1 = m.innings[1];
+  // Super over: team that bowled 2nd innings now bats first
+  m.innings[2]      = createInnings(i1.bowlingTeam, i1.battingTeam);
+  m.currentInnings  = 2;
+  m.result          = null;
+  m.status          = 'in_progress';
+  state.matchId     = m.id;
+  state.viewMatchId = null;
+  setActiveMatchId(m.id);
+  saveMatch(m);
+  showOpenersModal(m, 2);
 }
 
 // ── End of over ───────────────────────────────────────────

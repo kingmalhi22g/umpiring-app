@@ -241,15 +241,96 @@ function undoLastBall(match) {
   return match;
 }
 
+// ── Edit any ball (replay engine) ─────────────────────────
+// Rebuild the entire innings from its stored deliveries. Used after a
+// delivery is edited or deleted so totals, strike, over count, wickets and
+// bowler figures all recompute consistently — no piecemeal reversal.
+function replayInnings(match) {
+  const inn = match.innings[match.currentInnings];
+  if (!inn) return match;
+
+  const groups = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])]
+    .map(o => ({ bowler: o.bowler, deliveries: o.allDeliveries.slice() }));
+
+  // Retirement is not a delivery, so it would be lost on replay — snapshot it.
+  const retired = inn.batsmen.filter(b => b.retired)
+    .map(b => ({ name: b.name, how: b.how, isOut: b.isOut }));
+
+  // Batting order = order each name first appears across the deliveries.
+  const order = []; const seen = new Set();
+  groups.forEach(g => g.deliveries.forEach(d => {
+    [d.batsman, d.nonStriker].forEach(n => { if (n && !seen.has(n)) { seen.add(n); order.push(n); } });
+  }));
+
+  inn.totalRuns = 0; inn.wickets = 0;
+  inn.extras = { wides: 0, noBalls: 0, byes: 0, legByes: 0 };
+  inn.batsmen = []; inn.overs = []; inn.currentOver = null; inn.freeHitNext = false;
+
+  if (order.length === 0) return match;
+  setOpeners(inn, order[0], order[1] || 'Batsman 2');
+  let nextBat = 2;
+
+  groups.forEach(g => {
+    inn.currentOver = createOver(inn.overs.length + 1, g.bowler);
+    g.deliveries.forEach(d => {
+      const before = inn.wickets;
+      recordBall(match, {
+        runs:   d.runs,
+        extras: { type: d.extras ? d.extras.type : null, runs: d.extras ? (d.extras.runs || 0) : 0 },
+        isWicket: d.isWicket,
+        wicket:   d.wicket
+      });
+      if (inn.wickets > before && inn.wickets < 10) {
+        addBatsman(inn, order[nextBat++] || ('Batsman ' + (inn.batsmen.length + 1)));
+      }
+    });
+    if (inn.currentOver && inn.currentOver.balls.length >= 6) completeOver(match);
+  });
+
+  retired.forEach(r => {
+    const b = inn.batsmen.find(x => x.name === r.name);
+    if (b) { b.retired = true; b.how = r.how; if (r.isOut && !b.isOut) { b.isOut = true; inn.wickets++; } }
+  });
+
+  return match;
+}
+
+function editCurrentBall(match, idx, patch) {
+  const inn = match.innings[match.currentInnings];
+  const over = inn && inn.currentOver;
+  if (!over || !over.allDeliveries[idx]) return match;
+  const d = over.allDeliveries[idx];
+  d.runs    = patch.runs || 0;
+  d.extras  = patch.extras || { type: null, runs: 0 };
+  d.isWicket = !!patch.isWicket;
+  d.wicket  = patch.wicket || null;
+  return replayInnings(match);
+}
+
+function deleteCurrentBall(match, idx) {
+  const inn = match.innings[match.currentInnings];
+  const over = inn && inn.currentOver;
+  if (!over || !over.allDeliveries[idx]) return match;
+  over.allDeliveries.splice(idx, 1);
+  return replayInnings(match);
+}
+
 // ── Queries ──────────────────────────────────────────────
 function isOverComplete(over) { return over && over.balls.length >= 6; }
 
-function isInningsComplete(inn, totalOvers) {
+function isInningsComplete(inn, totalOvers, maxWkts) {
+  maxWkts = maxWkts || 10;
   if (!inn) return false;
-  if (inn.wickets >= 10) return true;
+  if (inn.wickets >= maxWkts) return true;
   if (inn.overs.length >= totalOvers && !inn.currentOver) return true;
   return false;
 }
+
+// ── Super over context ───────────────────────────────────
+// Super-over innings live at indices 2 and 3: one over, two wickets each.
+function isSuperOver(match)          { return match.currentInnings >= 2; }
+function effectiveOvers(match)       { return isSuperOver(match) ? 1 : match.overs; }
+function effectiveMaxWickets(match)  { return isSuperOver(match) ? 2 : 10; }
 
 function getOverDisplay(inn) {
   if (!inn) return '0.0';
@@ -259,8 +340,17 @@ function getOverDisplay(inn) {
 }
 
 function getTarget(match) {
-  const i0 = match.innings[0];
-  return i0 ? i0.totalRuns + 1 : null;
+  // Chasing innings 1 chases innings 0; super-over chase (3) chases super-over 1st (2).
+  const base = match.currentInnings >= 2 ? match.innings[2] : match.innings[0];
+  return base ? base.totalRuns + 1 : null;
+}
+
+function checkSuperOverResult(match) {
+  const a = match.innings[2], b = match.innings[3];
+  if (!a || !b) return null;
+  if (b.totalRuns > a.totalRuns) return { winner: b.battingTeam, margin: 0, marginType: 'super over' };
+  if (a.totalRuns > b.totalRuns) return { winner: a.battingTeam, margin: 0, marginType: 'super over' };
+  return { winner: null, margin: 0, marginType: 'tie' };
 }
 
 function checkResult(match) {
@@ -319,6 +409,51 @@ function getPartnership(inn) {
 
 function getMaxBowlerOvers(totalOvers) {
   return Math.max(1, Math.floor(totalOvers / 5));
+}
+
+// Per-delivery team runs (penalty + bat + extras), matching the scoring in recordBall.
+function deliveryTeamRuns(d) {
+  const eType = d.extras ? d.extras.type : null;
+  const eRuns = d.extras ? (d.extras.runs || 0) : 0;
+  if (eType === 'wide')    return 1 + eRuns;
+  if (eType === 'no_ball') return 1 + (d.runs || 0) + eRuns;
+  return d.runs || 0;
+}
+
+// Fall-of-wickets: one entry per counted dismissal, with the score and over it fell.
+function getFallOfWickets(inn) {
+  const overs = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])];
+  let total = 0, legalBalls = 0, wktNum = 0;
+  const fow = [];
+  overs.forEach(o => o.allDeliveries.forEach(d => {
+    total += deliveryTeamRuns(d);
+    const eType = d.extras ? d.extras.type : null;
+    if (eType !== 'wide' && eType !== 'no_ball') legalBalls++;
+    const counts = d.isWicket && d.wicket && (!d.freeHit || d.wicket.type === 'run_out');
+    if (counts) {
+      wktNum++;
+      fow.push({
+        num: wktNum, score: total,
+        batsman: d.wicket.batsmanOut,
+        over: Math.floor(legalBalls / 6) + '.' + (legalBalls % 6)
+      });
+    }
+  }));
+  return fow;
+}
+
+// Powerplay = first ~30% of overs (6 of 20, 15 of 50), minimum 1.
+function getPowerplayOvers(totalOvers) {
+  return Math.max(1, Math.round(totalOvers * 0.3));
+}
+
+function getPowerplayStats(inn, ppOvers) {
+  const overs = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])];
+  let runs = 0, wkts = 0, played = 0;
+  overs.forEach(o => {
+    if (o.overNumber <= ppOvers) { runs += o.runs; wkts += o.wickets; played++; }
+  });
+  return { runs, wkts, played };
 }
 
 function totalExtras(inn) {
