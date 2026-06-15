@@ -416,16 +416,51 @@ function renderInningsAccordion(match, inn, i, open) {
 
 function renderSummaryPanel(match, innList) {
   let h = '';
-  if (match.result) {
-    const isSuper = match.result.marginType === 'super over';
-    h += `<div class="sum-result${isSuper ? ' is-super' : ''}" style="margin-top:12px">🏆 ${esc(matchResultText(match))}</div>`;
-  }
-  innList.forEach(({ inn, i }) => {
-    const top = [...inn.batsmen].sort((a, b) => b.runs - a.runs)[0];
-    h += `<div class="stat-block"><h4>${esc(inn.battingTeam)}${i >= 2 ? ' · Super Over' : ''}</h4>
-      <div class="stat-line"><span>Score</span><b>${inn.totalRuns}/${inn.wickets} (${getOverDisplay(inn)} ov)</b></div>
-      <div class="stat-line"><span>Run rate</span><b>${runRate(inn)}</b></div>
-      ${top ? `<div class="stat-line"><span>Top scorer</span><b>${esc(top.name)} — ${top.runs} (${top.balls})</b></div>` : ''}
+  innList.forEach(({ inn, i }, idx) => {
+    const label = i >= 2 ? (inn.battingTeam + ' · Super Over') : inn.battingTeam;
+
+    // Top 3 batsmen by runs (then fewer balls).
+    const topBats = inn.batsmen
+      .filter(b => b.balls > 0 || b.runs > 0 || b.isOut)
+      .sort((a, b) => (b.runs - a.runs) || (a.balls - b.balls))
+      .slice(0, 3);
+
+    // Top 3 bowlers by wickets (then fewer runs).
+    const seen = new Set();
+    const bowlers = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])]
+      .filter(o => { if (seen.has(o.bowler)) return false; seen.add(o.bowler); return true; })
+      .map(o => {
+        const s = getBowlerStats(inn, o.bowler);
+        const balls = oversToBalls(s.overStr);
+        return { name: o.bowler, o: s.overStr, r: s.runs, w: s.wkts, econ: balls ? (s.runs / (balls / 6)).toFixed(1) : '0.0' };
+      })
+      .sort((a, b) => (b.w - a.w) || (a.r - b.r))
+      .slice(0, 3);
+
+    const batRows = topBats.length ? topBats.map(b => `
+      <div class="perf-row">
+        <div class="perf-name">${avatarHtml(b.name, 'bt-av')}<span>${esc(b.name)}${b.isOut ? '' : ' <span class="perf-no">*</span>'}</span></div>
+        <div class="perf-val">${b.runs} <span class="perf-sub">(${b.balls})</span></div>
+      </div>`).join('') : '<div class="perf-empty">No batting yet</div>';
+
+    const bowlRows = bowlers.length ? bowlers.map(b => `
+      <div class="perf-row">
+        <div class="perf-name">${avatarHtml(b.name, 'bt-av')}<span>${esc(b.name)}</span></div>
+        <div class="perf-val">${b.w}/${b.r} <span class="perf-sub">(${b.o} ov)</span></div>
+      </div>`).join('') : '<div class="perf-empty">No bowling yet</div>';
+
+    h += `<div class="inn-acc${idx === 0 ? ' open' : ''}">
+      <div class="inn-head">
+        <span class="inn-nm">${esc(label)}</span>
+        <span><span class="inn-sc">${inn.totalRuns}/${inn.wickets}</span>
+          <span class="sum-tov">${getOverDisplay(inn)} ov</span>
+          <svg class="inn-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+      </div>
+      <div class="inn-body">
+        <div class="bt-sec">Top Batsmen</div>${batRows}
+        <div class="bt-sec">Top Bowlers</div>${bowlRows}
+        <div class="sum-total"><span>Total&nbsp;&nbsp;${inn.totalRuns}/${inn.wickets}</span><span class="rr">RR ${runRate(inn)}</span></div>
+      </div>
     </div>`;
   });
   return h || '<div class="stat-block">No innings yet.</div>';

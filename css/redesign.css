@@ -126,6 +126,18 @@
 .bt-sec { font-size: 10px; font-weight: 800; color: var(--c-text-2);
   text-transform: uppercase; letter-spacing: .4px; padding: 9px 12px 1px; }
 
+/* Summary panel — top performers */
+.perf-row { display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 12px; border-bottom: 1px solid var(--c-bg); }
+.perf-row:last-child { border-bottom: none; }
+.perf-name { display: flex; align-items: center; gap: 8px; min-width: 0;
+  font-weight: 700; font-size: 12.5px; overflow: hidden; }
+.perf-name > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.perf-val { font-weight: 800; font-size: 13px; flex-shrink: 0; }
+.perf-sub { font-weight: 600; font-size: 11px; color: var(--c-text-2); }
+.perf-no { color: var(--c-ok); font-weight: 800; }
+.perf-empty { padding: 8px 12px; color: var(--c-text-2); font-size: 12px; }
+
 /* Stats panel blocks */
 .stat-block { background: var(--c-surface); border: 1px solid var(--c-border);
   border-radius: 12px; padding: 12px; margin-top: 8px; }
