@@ -73,8 +73,8 @@ function renderLiveHeader(match) {
   const pship = getPartnership(inn);
   setEl('live-stat-pship', pship.runs + ' (' + pship.balls + ')');
 
-  // Runs in the current over.
-  setEl('live-stat-thisover', inn.currentOver ? inn.currentOver.runs : 0);
+  // Runs in the current over (shown with the live ball-by-ball dots).
+  setEl('live-over-runs', inn.currentOver ? inn.currentOver.runs : 0);
 
   const chasing = match.currentInnings === 1 || match.currentInnings === 3;
   const target = chasing ? getTarget(match) : null;
@@ -86,12 +86,12 @@ function renderLiveHeader(match) {
     setEl('live-stat-proj', ballsBowled > 0 ? Math.round(inn.totalRuns / ballsBowled * totalBalls) : inn.totalRuns);
   }
 
-  // Stat slots — keep it to four, no scrolling:
-  //   1st innings: CRR · This Over · Proj · P'ship
-  //   chasing:     This Over · Need · RRR · Target
+  // Stat slots — partnership shows in both innings now:
+  //   1st innings: CRR · Proj · P'ship
+  //   chasing:     Need · RRR · Target · P'ship
   show('stat-crr',    !chasing);
   show('stat-proj',   !chasing);
-  show('stat-pship',  !chasing);
+  show('stat-pship',  true);
   show('stat-need',   !!target);
   show('stat-rrr',    !!target);
   show('stat-target', !!target);

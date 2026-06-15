@@ -10,10 +10,10 @@
   <title>Cricket Umpire</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=38">
-  <link rel="stylesheet" href="css/layout.css?v=38">
-  <link rel="stylesheet" href="css/components.css?v=38">
-  <link rel="stylesheet" href="css/redesign.css?v=38">
+  <link rel="stylesheet" href="css/style.css?v=39">
+  <link rel="stylesheet" href="css/layout.css?v=39">
+  <link rel="stylesheet" href="css/components.css?v=39">
+  <link rel="stylesheet" href="css/redesign.css?v=39">
   <style>
     /* Live screen fixed-bottom input panel */
     #screen-live { padding: 0; background: var(--c-bg); }
@@ -157,7 +157,6 @@
           <div class="sr-only" id="live-score-announce" aria-live="polite" aria-atomic="true"></div>
           <div class="score-hero-stats">
             <div class="stat" id="stat-crr"><span class="stat-label">CRR</span><span class="stat-val" id="live-stat-crr">&mdash;</span></div>
-            <div class="stat" id="stat-thisover"><span class="stat-label">This Over</span><span class="stat-val" id="live-stat-thisover">0</span></div>
             <div class="stat" id="stat-proj"><span class="stat-label">Proj</span><span class="stat-val" id="live-stat-proj">&mdash;</span></div>
             <div class="stat" id="stat-pship"><span class="stat-label">P'ship</span><span class="stat-val" id="live-stat-pship">&mdash;</span></div>
             <div class="stat hidden" id="stat-need"><span class="stat-label">Need</span><span class="stat-val" id="live-stat-need">&mdash;</span></div>
@@ -208,8 +207,14 @@
             <div class="bt-n" id="live-bowler2-w">0</div><div class="bt-n" id="live-bowler2-econ">0.0</div>
           </div>
         </div>
-        <!-- Ball dots -->
-        <div class="ball-dots" id="live-dots"></div>
+        <!-- This over (live ball-by-ball) -->
+        <div class="over-strip">
+          <div class="over-strip-head">
+            <span class="over-strip-label">This over</span>
+            <span class="over-strip-runs"><b id="live-over-runs">0</b> runs</span>
+          </div>
+          <div class="ball-dots" id="live-dots"></div>
+        </div>
       </div>
     </div>
     <!-- Sticky ball input -->
@@ -535,11 +540,11 @@
 <datalist id="bowler-datalist"></datalist>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/storage.js?v=38"></script>
-<script src="js/match.js?v=38"></script>
-<script src="js/router.js?v=38"></script>
-<script src="js/ui.js?v=38"></script>
-<script src="js/app.js?v=38"></script>
+<script src="js/storage.js?v=39"></script>
+<script src="js/match.js?v=39"></script>
+<script src="js/router.js?v=39"></script>
+<script src="js/ui.js?v=39"></script>
+<script src="js/app.js?v=39"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
