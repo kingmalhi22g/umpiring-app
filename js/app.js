@@ -184,6 +184,24 @@ function wireButtons() {
 
   // Openers modal
   on('btn-start-innings', 'click', handleStartInnings);
+  // Back to toss from the openers modal (first innings only) — closing the
+  // modal returns to the still-active toss screen so bat/bowl can be re-picked.
+  on('btn-openers-back', 'click', closeModal);
+
+  // Quick-edit a player's name by tapping it on the live screen.
+  on('live-scroll', 'click', e => {
+    const nameEl = e.target.closest('.live-card .bt-name');
+    if (nameEl) openEditName(nameEl.textContent.trim());
+  });
+  on('btn-edit-name-save',   'click', handleEditNameSave);
+  on('btn-edit-name-cancel', 'click', closeModal);
+
+  // Clear the subtle required-field highlight as soon as the user types.
+  document.addEventListener('input', e => {
+    if (e.target && e.target.classList && e.target.classList.contains('field-error')) {
+      e.target.classList.remove('field-error');
+    }
+  });
 
   // Ball buttons — debounced + haptic
   [0,1,2,3,4,6].forEach(r => on('ball-btn-' + r, 'click', debounced(() => { haptic(); handleBallRun(r); })));
@@ -415,6 +433,53 @@ function setupSummary() {
   renderMatchSummary(getMatch(state.viewMatchId || state.matchId));
 }
 
+// Subtle red outline on an empty/invalid required field (cleared on input).
+function flagRequired(id, isError) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('field-error', !!isError);
+}
+
+// ── Quick-edit a player's name mid-innings ────────────────
+function openEditName(oldName) {
+  if (!oldName || oldName === '—') return;
+  const m = getMatch(state.matchId);
+  if (!m || !m.innings[m.currentInnings]) return;
+  state.editNameOld = oldName;
+  const inp = document.getElementById('edit-name-input');
+  if (inp) inp.value = oldName;
+  openModal('modal-edit-name');
+}
+
+function handleEditNameSave() {
+  const m = getMatch(state.matchId);
+  const oldName = state.editNameOld;
+  const newName = (val('edit-name-input') || '').trim();
+  if (!m || !oldName) { closeModal(); return; }
+  if (!newName || newName === oldName) { closeModal(); return; }
+  const inn = m.innings[m.currentInnings];
+  renamePlayerInInnings(inn, oldName, newName);
+  addPlayerToRoster(inn.battingTeam, newName);
+  addPlayerToRoster(inn.bowlingTeam, newName);
+  saveMatch(m);
+  state.editNameOld = null;
+  closeModal();
+  renderLiveHeader(m);
+  showToast('Renamed to ' + newName);
+}
+
+// Rename a player everywhere in the current innings (batsmen, bowler, deliveries).
+function renamePlayerInInnings(inn, oldName, newName) {
+  inn.batsmen.forEach(b => { if (b.name === oldName) b.name = newName; });
+  [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])].forEach(o => {
+    if (o.bowler === oldName) o.bowler = newName;
+    o.allDeliveries.forEach(d => {
+      if (d.batsman === oldName)    d.batsman = newName;
+      if (d.nonStriker === oldName) d.nonStriker = newName;
+      if (d.wicket && d.wicket.batsmanOut === oldName) d.wicket.batsmanOut = newName;
+    });
+  });
+}
+
 // ── Match setup ───────────────────────────────────────────
 function handleMatchSetupContinue() {
   const t1     = val('ms-team1');
@@ -423,8 +488,15 @@ function handleMatchSetupContinue() {
   const ground = val('ms-ground');
   const overs  = parseInt(val('ms-overs')) || 20;
 
-  if (!t1 || !t2) { showToast('Enter both team names'); return; }
-  if (t1.toLowerCase() === t2.toLowerCase()) { showToast('Team names must be different'); return; }
+  if (!t1 || !t2) {
+    flagRequired('ms-team1', !t1); flagRequired('ms-team2', !t2);
+    showToast('Enter both team names'); return;
+  }
+  if (t1.toLowerCase() === t2.toLowerCase()) {
+    flagRequired('ms-team2', true);
+    showToast('Team names must be different'); return;
+  }
+  flagRequired('ms-team1', false); flagRequired('ms-team2', false);
 
   const m = createMatch({ team1:{name:t1}, team2:{name:t2}, date, ground, overs });
   state.matchId = m.id;
@@ -467,6 +539,10 @@ function showOpenersModal(m, innIdx) {
   }
   if (innIdx >= 2) setEl('openers-team', inn.battingTeam + ' — Super Over');
 
+  // "Back to toss" only makes sense for the very first innings.
+  const backBtn = document.getElementById('btn-openers-back');
+  if (backBtn) backBtn.style.display = innIdx === 0 ? '' : 'none';
+
   populateDatalist('openers-dl', [
     ...(batTeam ? batTeam.batsmen : []),
     ...getRoster(inn.battingTeam)
@@ -487,7 +563,8 @@ function handleStartInnings() {
   const bwl = val('first-bowler');
 
   if (op1 === op2)   { showToast('Openers must be different players'); return; }
-  if (!bwl)          { showToast('Enter first bowler name'); return; }
+  if (!bwl)          { flagRequired('first-bowler', true); showToast('Enter first bowler name'); return; }
+  flagRequired('first-bowler', false);
 
   setOpeners(inn, op1, op2);
   inn.currentOver = createOver(1, bwl);

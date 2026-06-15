@@ -10,10 +10,10 @@
   <title>Cricket Umpire</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=34">
-  <link rel="stylesheet" href="css/layout.css?v=34">
-  <link rel="stylesheet" href="css/components.css?v=34">
-  <link rel="stylesheet" href="css/redesign.css?v=34">
+  <link rel="stylesheet" href="css/style.css?v=35">
+  <link rel="stylesheet" href="css/layout.css?v=35">
+  <link rel="stylesheet" href="css/components.css?v=35">
+  <link rel="stylesheet" href="css/redesign.css?v=35">
   <style>
     /* Live screen fixed-bottom input panel */
     #screen-live { padding: 0; background: var(--c-bg); }
@@ -371,7 +371,22 @@
       <input id="first-bowler" class="form-input" type="text" placeholder="Bowler name" list="bowler-datalist" autocomplete="off">
     </div>
     <button id="btn-start-innings" class="btn btn-primary btn-lg mt-md" type="button">Start Innings</button>
+    <button id="btn-openers-back" class="btn btn-ghost btn-sm mt-sm" type="button">&#8592; Back to toss</button>
     <datalist id="openers-dl"></datalist>
+  </div>
+
+  <!-- Edit player name (mid-innings) -->
+  <div id="modal-edit-name" class="modal hidden">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Edit player name</div>
+    <div class="form-group">
+      <label class="form-label">Name</label>
+      <input id="edit-name-input" class="form-input" type="text" autocomplete="off">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-sm);margin-top:var(--sp-md)">
+      <button id="btn-edit-name-cancel" class="btn btn-ghost" type="button">Cancel</button>
+      <button id="btn-edit-name-save" class="btn btn-primary" type="button">Save</button>
+    </div>
   </div>
 
   <!-- Extras detail -->
@@ -518,11 +533,11 @@
 <datalist id="bowler-datalist"></datalist>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/storage.js?v=34"></script>
-<script src="js/match.js?v=34"></script>
-<script src="js/router.js?v=34"></script>
-<script src="js/ui.js?v=34"></script>
-<script src="js/app.js?v=34"></script>
+<script src="js/storage.js?v=35"></script>
+<script src="js/match.js?v=35"></script>
+<script src="js/router.js?v=35"></script>
+<script src="js/ui.js?v=35"></script>
+<script src="js/app.js?v=35"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
