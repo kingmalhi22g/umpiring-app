@@ -78,6 +78,9 @@ function renderLiveHeader(match) {
   const needEl   = document.getElementById('stat-need');
   const rrrEl    = document.getElementById('stat-rrr');
   const targetEl = document.getElementById('stat-target');
+  const pshipEl  = document.getElementById('stat-pship');
+  // When chasing, surface Need/RRR/Target instead of partnership.
+  if (pshipEl) pshipEl.classList.toggle('hidden', !!target);
   if (target) {
     const ballsLeft  = Math.max(0, effectiveOvers(match) * 6 - ballsBowled);
     const runsNeeded = Math.max(0, target - inn.totalRuns);
