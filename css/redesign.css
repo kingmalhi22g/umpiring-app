@@ -244,6 +244,12 @@
   background: linear-gradient(135deg, #EE5A50, var(--c-danger)); }
 .opt-note { font-weight: 600; font-size: 11px; color: var(--c-text-2); }
 
+/* Clearly highlight the selected dismissal (wins over the dark-mode base) */
+.wicket-grid .wicket-btn.selected {
+  background: var(--c-danger); border-color: var(--c-danger); color: #fff; font-weight: 800;
+  box-shadow: 0 2px 8px rgba(226,69,59,.35);
+}
+
 /* ── Over-by-over sheet preview overlay ──────────────────── */
 .osp-overlay {
   position: fixed; inset: 0; z-index: 650; background: #2a2f36;
