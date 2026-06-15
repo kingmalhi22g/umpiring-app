@@ -10,10 +10,10 @@
   <title>Cricket Umpire</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=35">
-  <link rel="stylesheet" href="css/layout.css?v=35">
-  <link rel="stylesheet" href="css/components.css?v=35">
-  <link rel="stylesheet" href="css/redesign.css?v=35">
+  <link rel="stylesheet" href="css/style.css?v=36">
+  <link rel="stylesheet" href="css/layout.css?v=36">
+  <link rel="stylesheet" href="css/components.css?v=36">
+  <link rel="stylesheet" href="css/redesign.css?v=36">
   <style>
     /* Live screen fixed-bottom input panel */
     #screen-live { padding: 0; background: var(--c-bg); }
@@ -163,6 +163,8 @@
             <div class="stat hidden" id="stat-target"><span class="stat-label">Target</span><span class="stat-val" id="live-stat-target">&mdash;</span></div>
           </div>
         </div>
+        <!-- Last-action confirmation -->
+        <div id="live-last-action" class="live-last-action" aria-hidden="true"></div>
         <!-- Free hit -->
         <div class="free-hit-bar hidden" id="live-freehit">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h12l-2.5 4L17 12H5"/></svg>
@@ -533,11 +535,11 @@
 <datalist id="bowler-datalist"></datalist>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/storage.js?v=35"></script>
-<script src="js/match.js?v=35"></script>
-<script src="js/router.js?v=35"></script>
-<script src="js/ui.js?v=35"></script>
-<script src="js/app.js?v=35"></script>
+<script src="js/storage.js?v=36"></script>
+<script src="js/match.js?v=36"></script>
+<script src="js/router.js?v=36"></script>
+<script src="js/ui.js?v=36"></script>
+<script src="js/app.js?v=36"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">

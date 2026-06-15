@@ -182,6 +182,35 @@ function fillBatRow(prefix, batsman) {
   }
 }
 
+// ── Last-action confirmation ──────────────────────────────
+function deliveryOutcomeText(d) {
+  const e = d.extras || {}; const t = e.type;
+  if (d.isWicket) return 'WICKET';
+  if (t === 'wide')    return 'Wide'    + (e.runs ? ' +' + e.runs : '');
+  if (t === 'no_ball') return 'No ball' + (d.runs ? ' +' + d.runs : '');
+  if (t === 'bye')     return d.runs + ' bye' + (d.runs > 1 ? 's' : '');
+  if (t === 'leg_bye') return d.runs + ' leg bye' + (d.runs > 1 ? 's' : '');
+  if (d.runs === 4) return 'FOUR';
+  if (d.runs === 6) return 'SIX';
+  if (d.runs === 0) return 'Dot ball';
+  return d.runs + ' run' + (d.runs > 1 ? 's' : '');
+}
+
+// Briefly confirm the ball just recorded, on the live screen.
+function showLastAction(inn) {
+  const el = document.getElementById('live-last-action');
+  if (!el || !inn) return;
+  const over = inn.currentOver;
+  const d = over && over.allDeliveries.length ? over.allDeliveries[over.allDeliveries.length - 1] : null;
+  if (!d) return;
+  const who = d.batsman ? ' · ' + esc(d.batsman) : '';
+  el.innerHTML = '<span class="la-tick">✓</span><span>' + esc(deliveryOutcomeText(d)) + who +
+                 ' · ' + inn.totalRuns + '/' + inn.wickets + '</span>';
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 1900);
+}
+
 // ── Redesign helpers ──────────────────────────────────────
 function formatLabel(o) { return o === 10 ? 'T10' : o === 20 ? 'T20' : o === 50 ? 'ODI' : (o + ' ov'); }
 
@@ -538,27 +567,53 @@ function renderOverSummary(match) {
 
   // Recent bowlers chips (current innings only) — grey out last bowler and quota-reached bowlers
   const chipsEl = document.getElementById('eos-recent-bowlers');
+  const maxOv = getMaxBowlerOvers(match.overs);
+  const justBowled = lastOver.bowler;
+  const suggested = suggestNextBowler(inn, maxOv);
+
   if (chipsEl) {
     const bowlerOvers = {};
     inn.overs.forEach(o => { bowlerOvers[o.bowler] = (bowlerOvers[o.bowler] || 0) + 1; });
     const names = Object.keys(bowlerOvers);
-    const justBowled = lastOver.bowler;
-    const maxOv = getMaxBowlerOvers(match.overs);
     chipsEl.innerHTML = names.length
       ? names.map(name => {
           const isJust  = name === justBowled;
           const isMaxed = bowlerOvers[name] >= maxOv;
           const disabled = isJust || isMaxed;
+          const isSugg = !disabled && name === suggested;
           const badge = isMaxed
             ? '<span class="chip-max">MAX</span>'
-            : isJust ? '<span class="chip-just">JUST</span>' : '';
-          return `<button class="eos-bowler-chip${disabled ? ' eos-chip-used' : ''}"
+            : isJust ? '<span class="chip-just">JUST</span>'
+            : isSugg ? '<span class="chip-sugg">✨</span>' : '';
+          return `<button class="eos-bowler-chip${disabled ? ' eos-chip-used' : ''}${isSugg ? ' eos-chip-sugg' : ''}"
             type="button" ${disabled ? 'disabled' : `data-bowler="${esc(name)}"`}>
             ${esc(name)}<span class="chip-overs">${bowlerOvers[name]}ov</span>${badge}
           </button>`;
         }).join('')
       : '';
   }
+
+  // Pre-fill the next-bowler field with the suggestion (umpire usually just taps Continue).
+  const inp = document.getElementById('eos-next-bowler');
+  if (inp && suggested && !inp.value) inp.value = suggested;
+}
+
+// Likely next bowler: someone off-quota who didn't just bowl. Prefer the
+// bowler from 2 overs ago (natural alternation), else the one with fewest overs.
+function suggestNextBowler(inn, maxOv) {
+  const overs = inn.overs;
+  if (!overs.length) return '';
+  const last = overs[overs.length - 1].bowler;
+  const count = {};
+  overs.forEach(o => { count[o.bowler] = (count[o.bowler] || 0) + 1; });
+  if (overs.length >= 2) {
+    const twoAgo = overs[overs.length - 2].bowler;
+    if (twoAgo !== last && count[twoAgo] < maxOv) return twoAgo;
+  }
+  const avail = Object.keys(count).filter(b => b !== last && count[b] < maxOv);
+  if (!avail.length) return '';
+  avail.sort((a, b) => count[a] - count[b]);
+  return avail[0];
 }
 
 // ── Innings break ─────────────────────────────────────────
