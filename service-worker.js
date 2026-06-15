@@ -6,7 +6,7 @@
 // manual CACHE_NAME bump on every change (the old cache-first strategy served
 // stale code indefinitely until the version string was hand-edited).
 
-const CACHE_NAME = 'cricket-umpire-v14';
+const CACHE_NAME = 'cricket-umpire-v15';
 
 // Relative paths so the app works whether it's served from the domain root
 // (e.g. a custom domain) or a sub-folder (e.g. GitHub Pages /umpiring-app/).

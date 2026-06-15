@@ -142,10 +142,12 @@ function recordBall(match, { runs, extras, isWicket, wicket }) {
   }
 
   // ── Strike rotation ──────────────────────────────────────
-  if (!isWide) {
-    const runsForStrike = (isBye || isLB) ? delivery.runs : (delivery.runs || 0) + (isNB ? eRuns : 0);
-    if (runsForStrike % 2 === 1) _swapStrike(inn);
-  }
+  // Batsmen can run byes on a wide too, so rotate on the runs physically run
+  // (the extra runs beyond the wide penalty).
+  const runsForStrike = isWide ? eRuns
+    : (isBye || isLB) ? delivery.runs
+    : (delivery.runs || 0) + (isNB ? eRuns : 0);
+  if (runsForStrike % 2 === 1) _swapStrike(inn);
 
   return match;
 }
@@ -204,11 +206,11 @@ function undoLastBall(match) {
     }
   }
 
-  // 2) Reverse strike rotation
-  if (!isWide) {
-    const runsForStrike = (isBye || isLB) ? delivery.runs : (delivery.runs || 0) + (isNB ? eRuns : 0);
-    if (runsForStrike % 2 === 1) _swapStrike(inn);
-  }
+  // 2) Reverse strike rotation (same rule as recordBall, incl. byes run on wides)
+  const runsForStrike = isWide ? eRuns
+    : (isBye || isLB) ? delivery.runs
+    : (delivery.runs || 0) + (isNB ? eRuns : 0);
+  if (runsForStrike % 2 === 1) _swapStrike(inn);
 
   // 3) Reverse wicket marking
   if (delivery.isWicket && delivery.wicket) {
