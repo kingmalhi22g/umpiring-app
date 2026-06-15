@@ -748,6 +748,78 @@ function renderExportCard(match) {
   if (ecBody) ecBody.innerHTML = body;
 }
 
+// ── Over-by-over umpiring sheet (shareable image) ─────────
+// One ball's shorthand for the "Over Analysis" column.
+function deliverySymbol(d) {
+  const e = d.extras || {};
+  const t = e.type;
+  if (t === 'wide')    return 'Wd' + (e.runs ? '+' + e.runs : '');
+  if (t === 'no_ball') return 'Nb' + (d.runs ? '+' + d.runs : '');
+  if (t === 'bye')     return 'B' + d.runs;
+  if (t === 'leg_bye') return 'Lb' + d.runs;
+  if (d.isWicket)      return d.runs ? d.runs + '+W' : 'W';
+  return d.runs === 0 ? '•' : String(d.runs);
+}
+
+function renderOverSheet(match) {
+  const el = document.getElementById('oversheet-body');
+  if (!el || !match) return;
+  const th = 'padding:5px 6px;border:1px solid #888;font-size:11px;text-transform:uppercase;background:#1F6FB2;color:#fff;font-weight:800';
+  const td = 'padding:5px 6px;border:1px solid #aaa;font-size:12px;color:#111';
+  let html = '';
+
+  match.innings.forEach((inn, idx) => {
+    if (!inn) return;
+    const overs = [...inn.overs, ...(inn.currentOver && inn.currentOver.allDeliveries.length ? [inn.currentOver] : [])];
+    let cumR = 0, cumW = 0;
+    const rows = overs.map(ov => {
+      cumR += ov.runs; cumW += ov.wickets;
+      const balls = ov.allDeliveries.map(d => {
+        const s = deliverySymbol(d);
+        const wkt = d.isWicket;
+        return `<span style="display:inline-block;min-width:18px;text-align:center;margin:1px 2px;padding:1px 3px;border-radius:3px;font-size:11px;font-weight:700;${wkt?'background:#E2453B;color:#fff':'background:#eef2f5;color:#111'}">${esc(s)}</span>`;
+      }).join('');
+      return `<tr>
+        <td style="${td};text-align:center;font-weight:800">${ov.overNumber}</td>
+        <td style="${td}">${esc(ov.bowler)}</td>
+        <td style="${td}">${balls}</td>
+        <td style="${td};text-align:center;font-weight:800">${ov.runs}</td>
+        <td style="${td};text-align:center;color:#E2453B;font-weight:800">${ov.wickets || ''}</td>
+        <td style="${td};text-align:center;font-weight:800">${cumR}/${cumW}</td>
+      </tr>`;
+    }).join('');
+
+    const label = idx >= 2 ? 'Super Over' : 'Innings ' + (idx + 1);
+    html += `<div style="padding:${idx ? '22' : '18'}px 18px 0">
+      <div style="text-align:center;border-bottom:2px solid #1F6FB2;padding-bottom:8px;margin-bottom:10px">
+        <div style="font-size:16px;font-weight:900;letter-spacing:.5px;color:#111">UMPIRING SCORING SHEET</div>
+        <div style="font-size:13px;font-weight:700;color:#1F6FB2;margin-top:3px">${esc(inn.battingTeam)} &mdash; ${label}</div>
+        <div style="font-size:11px;color:#555;margin-top:2px">
+          Bowling: ${esc(inn.bowlingTeam)}${match.date ? ' &middot; ' + esc(match.date) : ''}${match.ground ? ' &middot; ' + esc(match.ground) : ''}
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed">
+        <thead><tr>
+          <th style="${th};width:44px">Over</th>
+          <th style="${th};width:110px">Bowler</th>
+          <th style="${th}">Over Analysis</th>
+          <th style="${th};width:50px">Runs</th>
+          <th style="${th};width:46px">Wkts</th>
+          <th style="${th};width:70px">Total</th>
+        </tr></thead>
+        <tbody>${rows || `<tr><td colspan="6" style="${td};text-align:center;color:#888">No overs bowled</td></tr>`}</tbody>
+        <tfoot><tr>
+          <td colspan="3" style="${td};text-align:right;font-weight:800;background:#F1F5F9">FINAL SCORE</td>
+          <td colspan="3" style="${td};text-align:center;font-weight:900;background:#F1F5F9">${inn.totalRuns}/${inn.wickets} (${getOverDisplay(inn)} ov)</td>
+        </tr></tfoot>
+      </table>
+    </div>`;
+  });
+
+  html += `<div style="text-align:center;padding:12px 0 16px;font-size:10px;color:#999">Made with Cricket Umpire App</div>`;
+  el.innerHTML = html;
+}
+
 function showToast(msg, duration) {
   const el = document.getElementById('toast');
   if (!el) return;

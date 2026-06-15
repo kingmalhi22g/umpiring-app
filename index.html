@@ -10,10 +10,10 @@
   <title>Cricket Umpire</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=25">
-  <link rel="stylesheet" href="css/layout.css?v=25">
-  <link rel="stylesheet" href="css/components.css?v=25">
-  <link rel="stylesheet" href="css/redesign.css?v=25">
+  <link rel="stylesheet" href="css/style.css?v=26">
+  <link rel="stylesheet" href="css/layout.css?v=26">
+  <link rel="stylesheet" href="css/components.css?v=26">
+  <link rel="stylesheet" href="css/redesign.css?v=26">
   <style>
     /* Live screen fixed-bottom input panel */
     #screen-live { padding: 0; background: var(--c-bg); }
@@ -138,9 +138,6 @@
             <button class="hero-icon" id="btn-live-home" type="button" title="Home" aria-label="Home">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg>
             </button>
-            <div class="score-hero-team" aria-hidden="true">
-              <span id="live-score-team">Team A</span> &middot; <span id="live-score-overs">0.0 ov</span>
-            </div>
             <div class="hero-actions">
               <button class="hero-btn" id="btn-live-stats" type="button" title="Full scoreboard">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-7M12 21V5M19 21v-10"/></svg>
@@ -150,6 +147,9 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
               </button>
             </div>
+          </div>
+          <div class="score-hero-team" aria-hidden="true">
+            <span id="live-score-team">Team A</span> &middot; <span id="live-score-overs">0.0 ov</span>
           </div>
           <div class="score-hero-main" aria-hidden="true">
             <span id="live-score-runs">0</span><span class="score-hero-wkts">/<span id="live-score-wkts">0</span></span>
@@ -293,6 +293,7 @@
     <div class="screen-inner">
       <div id="summary-content"></div>
       <button id="btn-export-card" class="btn btn-accent mt-md btn-sm" type="button">📤 Share Scorecard</button>
+      <button id="btn-export-oversheet" class="btn btn-ghost btn-sm mt-sm" type="button">📋 Share Over-by-Over Sheet</button>
       <button id="btn-summary-home" class="btn btn-ghost mt-sm">&#8962; Home</button>
     </div>
   </section>
@@ -497,11 +498,11 @@
 <datalist id="bowler-datalist"></datalist>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/storage.js?v=25"></script>
-<script src="js/match.js?v=25"></script>
-<script src="js/router.js?v=25"></script>
-<script src="js/ui.js?v=25"></script>
-<script src="js/app.js?v=25"></script>
+<script src="js/storage.js?v=26"></script>
+<script src="js/match.js?v=26"></script>
+<script src="js/router.js?v=26"></script>
+<script src="js/ui.js?v=26"></script>
+<script src="js/app.js?v=26"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
@@ -511,6 +512,11 @@
     <div id="ec-meta" style="font-size:12px;opacity:.75"></div>
   </div>
   <div id="ec-body" style="background:#F1F8E9;padding:20px 20px 24px;border-radius:0 0 0 0"></div>
+</div>
+
+<!-- Over-by-over umpiring sheet — hidden off-screen, captured by html2canvas -->
+<div id="oversheet-card" style="position:fixed;left:-9999px;top:0;width:680px;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+  <div id="oversheet-body"></div>
 </div>
 
 <script src="js/html2canvas.min.js"></script>
