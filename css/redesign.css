@@ -159,18 +159,30 @@
 .match-delete svg { width: 16px; height: 16px; stroke: var(--c-danger); fill: none; stroke-width: 2; }
 .match-delete:active { background: var(--c-danger-bg); opacity: 1; }
 
-/* ── Live scoring: hero + run pad polish ─────────────────── */
+/* ── Live scoring: compact teal hero + run pad ───────────── */
 .score-hero {
   background: linear-gradient(150deg, var(--c-primary-mid), var(--c-primary-dark));
-  border-radius: 18px; box-shadow: 0 8px 22px rgba(14,140,130,.28);
+  border-radius: 16px; box-shadow: 0 6px 18px rgba(14,140,130,.26);
+  color: #fff; padding: 12px 15px;
 }
+.score-hero-team { color: rgba(255,255,255,.9); font-size: 11.5px; }
+.score-hero-main { font-size: 32px; letter-spacing: -1px; color: #fff; margin: 3px 0 9px; }
+.score-hero-wkts { color: rgba(255,255,255,.78); }
+.score-hero-stats { border-top-color: rgba(255,255,255,.22); padding-top: 8px; }
+.score-hero-stats .stat-label { color: rgba(255,255,255,.8); }
+.score-hero-stats .stat-val { color: #fff; font-size: 14px; }
+.undo-btn { color: #fff; border-color: rgba(255,255,255,.45); background: rgba(255,255,255,.12); }
+
+/* Run pad — tighter, less bubbly */
+.run-btn { border-radius: 12px; height: 48px; font-size: 21px; }
+.run-grid { gap: 7px; }
 .run-grid .run-4, .run-grid .run-6 { color: #fff; border: none; }
 .run-grid .run-4 { background: linear-gradient(135deg, #F6B24A, var(--c-accent-deep));
-  box-shadow: 0 4px 12px rgba(224,123,46,.32); }
+  box-shadow: 0 3px 10px rgba(224,123,46,.30); }
 .run-grid .run-6 { background: linear-gradient(135deg, #E0853A, #D2691E);
-  box-shadow: 0 4px 12px rgba(210,105,30,.32); }
-.run-btn { border-radius: 13px; }
-.wicket-btn-main { border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(210,105,30,.30); }
+.extra-btn { font-size: 13px; }
+.wicket-btn-main { border-radius: 12px; font-size: 14px;
   background: linear-gradient(135deg, #EE5A50, var(--c-danger)); }
 
 /* ── Update banner ───────────────────────────────────────── */
