@@ -1039,7 +1039,6 @@ function afterBall(m) {
   const inn = m.innings[m.currentInnings];
   if (!inn) return;
 
-  showLastAction(inn);
   checkMilestones(m);
 
   // Target reached when chasing (2nd innings, or 2nd super-over innings)?

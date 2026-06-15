@@ -182,15 +182,6 @@
 /* Pin the score hero so score, RRR, target and Scoreboard are always visible */
 .score-hero { position: sticky; top: 0; z-index: 6; }
 
-/* Last-action confirmation strip (briefly shown after each ball) */
-.live-last-action { display: none; align-items: center; gap: 9px;
-  background: rgba(43,168,82,.16); border: 1px solid rgba(43,168,82,.45); color: var(--c-ok);
-  border-radius: 12px; padding: 9px 13px; font-size: 13px; font-weight: 800; }
-.live-last-action.show { display: flex; animation: la-in .18s ease; }
-.la-tick { width: 18px; height: 18px; border-radius: 50%; background: var(--c-ok); color: #fff;
-  display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
-@keyframes la-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
-
 /* Suggested next bowler chip */
 .eos-chip-sugg { border-color: var(--c-accent) !important; box-shadow: 0 0 0 1px var(--c-accent); }
 .chip-sugg { margin-left: 4px; }
