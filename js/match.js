@@ -176,8 +176,19 @@ function startNewOver(match, bowlerName) {
 
 function undoLastBall(match) {
   const inn  = match.innings[match.currentInnings];
-  const over = inn.currentOver;
-  if (!over || over.allDeliveries.length === 0) return match;
+  let over = inn.currentOver;
+
+  // Nothing left in the current over? Step back into the previous completed
+  // over so undo keeps walking backwards through the innings (not just the
+  // current over). Reverse the end-of-over strike swap when we reopen it.
+  if (!over || over.allDeliveries.length === 0) {
+    if (inn.overs.length === 0) return match;   // start of innings — stop
+    const prev = inn.overs.pop();
+    prev.completed = false;
+    inn.currentOver = prev;
+    over = prev;
+    _swapStrike(inn);
+  }
 
   const delivery = over.allDeliveries.pop();
   if (delivery.legalBallNumber !== null) over.balls.pop();

@@ -10,10 +10,10 @@
   <title>Cricket Umpire</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=20">
-  <link rel="stylesheet" href="css/layout.css?v=20">
-  <link rel="stylesheet" href="css/components.css?v=20">
-  <link rel="stylesheet" href="css/redesign.css?v=20">
+  <link rel="stylesheet" href="css/style.css?v=21">
+  <link rel="stylesheet" href="css/layout.css?v=21">
+  <link rel="stylesheet" href="css/components.css?v=21">
+  <link rel="stylesheet" href="css/redesign.css?v=21">
   <style>
     /* Live screen fixed-bottom input panel */
     #screen-live { padding: 0; background: var(--c-bg); }
@@ -195,7 +195,6 @@
         </div>
         <!-- Ball dots -->
         <div class="ball-dots" id="live-dots"></div>
-        <div class="ball-dots-hint" id="live-dots-hint">Tap a ball to correct it</div>
         <!-- Stats button -->
         <button id="btn-live-stats" class="btn btn-ghost btn-sm" type="button" style="margin-top:4px">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-7M12 21V5M19 21v-10"/></svg>
@@ -375,6 +374,9 @@
     <div id="wicket-freehit-warning" class="free-hit-badge hidden mb-md">
       &#9889; Free Hit — only run-out is valid
     </div>
+    <p class="text-center text-2 text-sm" style="margin-bottom:10px">
+      How was the batsman out? <span class="opt-note">(optional — or just tap Confirm Out)</span>
+    </p>
     <div class="wicket-grid">
       <button class="wicket-btn" data-type="bowled"      type="button">Bowled</button>
       <button class="wicket-btn" data-type="caught"      type="button">Caught</button>
@@ -423,9 +425,9 @@
     <div class="modal-title">New Batsman</div>
     <p class="text-center text-2 text-sm mb-md" id="new-batsman-info"></p>
     <div class="form-group">
-      <label class="form-label">Batsman Name</label>
+      <label class="form-label">Batsman Name <span class="opt-note">(optional)</span></label>
       <input id="new-batsman-name" class="form-input" type="text"
-             placeholder="Next batsman" list="new-batsman-dl" autocomplete="off">
+             placeholder="Next batsman (optional)" list="new-batsman-dl" autocomplete="off">
     </div>
     <button id="btn-new-batsman-ok" class="btn btn-primary btn-lg mt-md" type="button">&#9654; Continue</button>
     <datalist id="new-batsman-dl"></datalist>
@@ -487,11 +489,11 @@
 <datalist id="bowler-datalist"></datalist>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/storage.js?v=20"></script>
-<script src="js/match.js?v=20"></script>
-<script src="js/router.js?v=20"></script>
-<script src="js/ui.js?v=20"></script>
-<script src="js/app.js?v=20"></script>
+<script src="js/storage.js?v=21"></script>
+<script src="js/match.js?v=21"></script>
+<script src="js/router.js?v=21"></script>
+<script src="js/ui.js?v=21"></script>
+<script src="js/app.js?v=21"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
