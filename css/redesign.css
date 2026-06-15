@@ -170,6 +170,22 @@
 .wicket-btn-main { border-radius: 13px;
   background: linear-gradient(135deg, #EE5A50, var(--c-danger)); }
 
+/* ── Update banner ───────────────────────────────────────── */
+.update-banner {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(16px + var(--safe-b)); z-index: 600;
+  display: flex; align-items: center; gap: 12px;
+  background: var(--c-primary-dark); color: #fff;
+  padding: 9px 9px 9px 16px; border-radius: 24px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.28); font-size: 13px; font-weight: 600;
+  max-width: calc(100% - 24px);
+}
+.update-banner button {
+  background: #fff; color: var(--c-primary-dark); border: none;
+  border-radius: 18px; padding: 8px 16px; font-weight: 800; font-size: 13px; cursor: pointer;
+}
+.update-banner button:active { background: #eee; }
+
 /* ── Dark-mode adjustments for new components ────────────── */
 body.dark-mode .sum-chip { background: #0C1A18; color: var(--c-primary-light); }
 body.dark-mode .sum-result,

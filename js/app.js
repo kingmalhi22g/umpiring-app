@@ -42,10 +42,32 @@ const state = {
   editBatsman:        ''
 };
 
+// Show the "new version available" banner (wired to reload on tap).
+function showUpdateBanner() {
+  const b = document.getElementById('update-banner');
+  if (b) b.classList.remove('hidden');
+}
+
 // ── Init ─────────────────────────────────────────────────
 function initApp() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    navigator.serviceWorker.register('service-worker.js').then(reg => {
+      // Re-check for a new version whenever the app regains focus.
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) reg.update().catch(() => {});
+      });
+      // When a new worker finishes installing and one was already in control,
+      // a fresh version is ready — surface the in-app refresh banner.
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateBanner();
+          }
+        });
+      });
+    }).catch(() => {});
   }
 
   // Apply saved dark mode preference on startup
@@ -235,6 +257,9 @@ function wireButtons() {
 
   // Innings break
   on('btn-start-2nd', 'click', handleStart2ndInnings);
+
+  // Update banner
+  on('btn-update-refresh', 'click', () => window.location.reload());
 
   // Summary
   on('btn-summary-home', 'click', () => {

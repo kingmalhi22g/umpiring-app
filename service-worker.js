@@ -6,7 +6,7 @@
 // cached copy, with the app shell served for navigations so the app still
 // opens. The precache (cache.addAll on install) seeds the offline fallback.
 
-const CACHE_NAME = 'cricket-umpire-v16';
+const CACHE_NAME = 'cricket-umpire-v17';
 
 // Relative paths so the app works whether it's served from the domain root
 // (e.g. a custom domain) or a sub-folder (e.g. GitHub Pages /umpiring-app/).
