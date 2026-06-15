@@ -42,6 +42,27 @@ const state = {
   editBatsman:        ''
 };
 
+// ── Wake Lock — stop the screen sleeping while scoring ────
+let _wakeLock = null;
+async function acquireWakeLock() {
+  try {
+    if ('wakeLock' in navigator && !_wakeLock) {
+      _wakeLock = await navigator.wakeLock.request('screen');
+      _wakeLock.addEventListener('release', () => { _wakeLock = null; });
+    }
+  } catch (e) { /* not supported / denied — ignore */ }
+}
+function releaseWakeLock() {
+  try { if (_wakeLock) { _wakeLock.release(); _wakeLock = null; } } catch (e) {}
+}
+// Re-acquire when returning to the app mid-match (locks drop on tab switch).
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    const s = document.body.dataset.screen;
+    if (s === 'live' || s === 'end-of-over') acquireWakeLock();
+  }
+});
+
 // Show the "new version available" banner (wired to reload on tap).
 function showUpdateBanner() {
   const b = document.getElementById('update-banner');
@@ -74,6 +95,9 @@ function initApp() {
   // fires its setup handler on a cold load (otherwise e.g. the home match
   // list renders blank until you navigate away and back).
   onScreenChange(screen => {
+    // Keep the screen awake while actively scoring a match.
+    if (screen === 'live' || screen === 'end-of-over') acquireWakeLock();
+    else releaseWakeLock();
     const handlers = {
       'home':          setupHome,
       'match-setup':   setupMatchSetup,
@@ -295,6 +319,13 @@ function wireButtons() {
     showToast('Settings saved');
   });
   on('btn-go-rosters', 'click', () => navigateTo('rosters'));
+  on('btn-export-data', 'click', handleExportData);
+  on('btn-import-data', 'click', () => document.getElementById('import-file').click());
+  on('import-file', 'change', e => {
+    const f = e.target.files && e.target.files[0];
+    handleImportData(f);
+    e.target.value = '';
+  });
   on('btn-clear-data', 'click', () => {
     showConfirm({
       title: 'Clear all data?',
@@ -711,6 +742,38 @@ function _downloadFile(url, name) {
   showToast('Sheet saved!');
 }
 
+// ── Backup & restore ──────────────────────────────────────
+function handleExportData() {
+  const blob = new Blob([JSON.stringify(exportAllData(), null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'cricket-umpire-backup.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+  showToast('Backup saved!');
+}
+
+function handleImportData(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try { data = JSON.parse(reader.result); } catch (e) { showToast('Invalid backup file'); return; }
+    showConfirm({
+      title: 'Restore this backup?',
+      message: (Array.isArray(data.matches) ? data.matches.length : 0) + ' matches will replace your current data.',
+      confirmText: 'Restore',
+      onConfirm: () => {
+        if (!importAllData(data)) { showToast('Not a valid backup'); return; }
+        const ml = document.getElementById('match-list');
+        if (ml) renderMatchList(ml);
+        showToast('Backup restored');
+      }
+    });
+  };
+  reader.readAsText(file);
+}
+
 function handleSwitchStrike() {
   const m = getMatch(state.matchId);
   if (!m) return;
@@ -728,13 +791,19 @@ function handleUndo() {
   let m = getMatch(state.matchId);
   if (!m) return;
   const inn = m.innings[m.currentInnings];
-  if (!inn || !inn.currentOver || inn.currentOver.allDeliveries.length === 0) {
-    showToast('Nothing to undo'); return;
-  }
+  const canUndo = inn && ((inn.currentOver && inn.currentOver.allDeliveries.length) ||
+                          (inn.overs && inn.overs.length));
+  if (!canUndo) { showToast('Nothing to undo'); return; }
+
+  // Peek the delivery that's about to be removed (may be in a previous over).
+  let over = inn.currentOver;
+  if ((!over || !over.allDeliveries.length) && inn.overs.length) over = inn.overs[inn.overs.length - 1];
+  const last = over && over.allDeliveries.length ? over.allDeliveries[over.allDeliveries.length - 1] : null;
+
   m = undoLastBall(m);
   saveMatch(m);
   renderLiveHeader(m);
-  showToast('Last ball undone ↩');
+  showToast(last ? ('Undid ' + deliverySymbol(last) + (last.batsman ? ' · ' + last.batsman : '')) : 'Ball undone');
 }
 
 // ── Edit any ball ─────────────────────────────────────────
@@ -843,9 +912,34 @@ function afterEdit(m) {
 }
 
 // ── After ball ────────────────────────────────────────────
+// ── Milestones & celebrations ─────────────────────────────
+function showMilestone(text) {
+  const el = document.getElementById('milestone-banner');
+  if (!el) return;
+  el.textContent = text;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2800);
+  if (typeof haptic === 'function') haptic();
+}
+
+function checkMilestones(m) {
+  const inn = m.innings[m.currentInnings];
+  if (!inn) return;
+  const s = inn.batsmen[inn.strikerIdx];
+  if (s) {
+    if (s.runs >= 100 && !s._m100) { s._m100 = true; s._m50 = true; showMilestone('💯 ' + s.name + ' — Century!'); return; }
+    if (s.runs >= 50 && !s._m50)   { s._m50 = true; showMilestone('🎉 ' + s.name + ' — Fifty!'); return; }
+  }
+  const tm = Math.floor(inn.totalRuns / 50) * 50;     // team 50/100/150…
+  if (tm >= 50 && tm > (inn._teamMs || 0)) { inn._teamMs = tm; showMilestone('🏏 ' + inn.battingTeam + ' — ' + tm + ' up!'); }
+}
+
 function afterBall(m) {
   const inn = m.innings[m.currentInnings];
   if (!inn) return;
+
+  checkMilestones(m);
 
   // Target reached when chasing (2nd innings, or 2nd super-over innings)?
   if (m.currentInnings === 1 || m.currentInnings === 3) {
@@ -858,8 +952,12 @@ function afterBall(m) {
 
   // Over complete?
   if (isOverComplete(inn.currentOver)) {
+    const finishingOver = inn.currentOver;
     m = completeOver(m);
     const updatedInn = m.innings[m.currentInnings];
+    if (finishingOver && finishingOver.runs === 0 && finishingOver.balls.length >= 6) {
+      showMilestone('🎯 Maiden over — ' + finishingOver.bowler + '!');
+    }
     saveMatch(m);
     if (isInningsComplete(updatedInn, effectiveOvers(m), effectiveMaxWickets(m))) {
       endInnings(m);

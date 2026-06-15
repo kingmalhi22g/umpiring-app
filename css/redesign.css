@@ -230,6 +230,18 @@
   background: linear-gradient(135deg, #EE5A50, var(--c-danger)); }
 .opt-note { font-weight: 600; font-size: 11px; color: var(--c-text-2); }
 
+/* ── Milestone celebration banner ────────────────────────── */
+#milestone-banner {
+  position: fixed; top: calc(var(--safe-t) + 64px); left: 50%; z-index: 700;
+  transform: translateX(-50%) translateY(-14px) scale(.92);
+  background: linear-gradient(135deg, #F6B24A, var(--c-accent-deep));
+  color: #fff; font-size: 15px; font-weight: 800; letter-spacing: .2px;
+  padding: 12px 20px; border-radius: 24px; box-shadow: 0 10px 28px rgba(224,123,46,.5);
+  white-space: nowrap; max-width: calc(100% - 24px); overflow: hidden; text-overflow: ellipsis;
+  opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease;
+}
+#milestone-banner.show { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+
 /* ── Update banner ───────────────────────────────────────── */
 .update-banner {
   position: fixed; left: 50%; transform: translateX(-50%);

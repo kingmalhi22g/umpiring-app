@@ -82,6 +82,23 @@ function saveSettings(s) { _set(KEYS.SETTINGS, s); }
 function getDarkMode() { return _get(KEYS.DARK_MODE, null); }
 function saveDarkMode(v) { _set(KEYS.DARK_MODE, v); }
 
+// ── Backup & restore ─────────────────────────────────────
+function exportAllData() {
+  return {
+    app: 'cricket-umpire', version: 1, exportedAt: new Date().toISOString(),
+    matches:  getMatches(),
+    rosters:  getAllRosters(),
+    settings: getSettings()
+  };
+}
+function importAllData(data) {
+  if (!data || typeof data !== 'object' || !Array.isArray(data.matches)) return false;
+  _set(KEYS.MATCHES, data.matches);
+  if (data.rosters && typeof data.rosters === 'object') _set(KEYS.ROSTERS, data.rosters);
+  if (data.settings && typeof data.settings === 'object') _set(KEYS.SETTINGS, data.settings);
+  return true;
+}
+
 // ── Clear all ────────────────────────────────────────────
 function clearAll() {
   Object.values(KEYS).forEach(k => localStorage.removeItem(k));

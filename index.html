@@ -10,10 +10,10 @@
   <title>Cricket Umpire</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=27">
-  <link rel="stylesheet" href="css/layout.css?v=27">
-  <link rel="stylesheet" href="css/components.css?v=27">
-  <link rel="stylesheet" href="css/redesign.css?v=27">
+  <link rel="stylesheet" href="css/style.css?v=28">
+  <link rel="stylesheet" href="css/layout.css?v=28">
+  <link rel="stylesheet" href="css/components.css?v=28">
+  <link rel="stylesheet" href="css/redesign.css?v=28">
   <style>
     /* Live screen fixed-bottom input panel */
     #screen-live { padding: 0; background: var(--c-bg); }
@@ -333,6 +333,13 @@
         <p class="text-sm text-2 mt-sm">View and manage saved player names.</p>
         <button id="btn-go-rosters" class="btn btn-ghost btn-sm mt-md" type="button">&#128100; Manage Rosters</button>
       </div>
+      <div class="card mt-sm">
+        <div class="section-head">Backup &amp; Restore</div>
+        <p class="text-sm text-2 mt-sm">Your matches live only on this device. Save a backup file you can restore later or move to another phone.</p>
+        <button id="btn-export-data" class="btn btn-ghost btn-sm mt-md" type="button">&#11015; Export Backup</button>
+        <button id="btn-import-data" class="btn btn-ghost btn-sm mt-sm" type="button">&#11014; Import Backup</button>
+        <input id="import-file" type="file" accept="application/json,.json" style="display:none">
+      </div>
       <div class="card" style="border-left:4px solid var(--c-danger)">
         <div class="section-head" style="color:var(--c-danger)">Danger Zone</div>
         <p class="text-sm text-2 mt-sm">Permanently delete all matches and saved rosters.</p>
@@ -488,6 +495,9 @@
 <!-- ── Toast ── -->
 <div id="toast"></div>
 
+<!-- ── Milestone celebration banner ── -->
+<div id="milestone-banner"></div>
+
 <!-- ── Update banner ── -->
 <div id="update-banner" class="update-banner hidden" role="status">
   <span>&#10024; New version available</span>
@@ -498,11 +508,11 @@
 <datalist id="bowler-datalist"></datalist>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/storage.js?v=27"></script>
-<script src="js/match.js?v=27"></script>
-<script src="js/router.js?v=27"></script>
-<script src="js/ui.js?v=27"></script>
-<script src="js/app.js?v=27"></script>
+<script src="js/storage.js?v=28"></script>
+<script src="js/match.js?v=28"></script>
+<script src="js/router.js?v=28"></script>
+<script src="js/ui.js?v=28"></script>
+<script src="js/app.js?v=28"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
