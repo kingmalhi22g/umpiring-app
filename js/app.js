@@ -50,24 +50,16 @@ function showUpdateBanner() {
 
 // ── Init ─────────────────────────────────────────────────
 function initApp() {
+  // The app no longer uses a service worker — offline caching caused stale
+  // builds that needed manual cache-clearing to update. Proactively remove any
+  // worker left over from older versions so the site always loads fresh.
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js').then(reg => {
-      // Re-check for a new version whenever the app regains focus.
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) reg.update().catch(() => {});
-      });
-      // When a new worker finishes installing and one was already in control,
-      // a fresh version is ready — surface the in-app refresh banner.
-      reg.addEventListener('updatefound', () => {
-        const nw = reg.installing;
-        if (!nw) return;
-        nw.addEventListener('statechange', () => {
-          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-            showUpdateBanner();
-          }
-        });
-      });
-    }).catch(() => {});
+    navigator.serviceWorker.getRegistrations()
+      .then(regs => regs.forEach(r => r.unregister()))
+      .catch(() => {});
+    if (window.caches) {
+      caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(() => {});
+    }
   }
 
   // Apply saved dark mode preference on startup
