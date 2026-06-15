@@ -10,10 +10,10 @@
   <title>Cricket Umpire</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=24">
-  <link rel="stylesheet" href="css/layout.css?v=24">
-  <link rel="stylesheet" href="css/components.css?v=24">
-  <link rel="stylesheet" href="css/redesign.css?v=24">
+  <link rel="stylesheet" href="css/style.css?v=25">
+  <link rel="stylesheet" href="css/layout.css?v=25">
+  <link rel="stylesheet" href="css/components.css?v=25">
+  <link rel="stylesheet" href="css/redesign.css?v=25">
   <style>
     /* Live screen fixed-bottom input panel */
     #screen-live { padding: 0; background: var(--c-bg); }
@@ -135,6 +135,9 @@
         <!-- Score hero -->
         <div class="score-hero">
           <div class="score-hero-top">
+            <button class="hero-icon" id="btn-live-home" type="button" title="Home" aria-label="Home">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg>
+            </button>
             <div class="score-hero-team" aria-hidden="true">
               <span id="live-score-team">Team A</span> &middot; <span id="live-score-overs">0.0 ov</span>
             </div>
@@ -143,9 +146,8 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-7M12 21V5M19 21v-10"/></svg>
                 Scoreboard
               </button>
-              <button class="hero-btn" id="btn-undo" type="button" title="Undo last ball">
+              <button class="hero-icon" id="btn-undo" type="button" title="Undo last ball" aria-label="Undo">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
-                Undo
               </button>
             </div>
           </div>
@@ -197,6 +199,11 @@
             <div class="bt-bp"><span class="bt-av" id="live-bowler-av"></span><div class="bt-name" id="live-bowler-name">&mdash;</div></div>
             <div class="bt-n" id="live-bowler-o">0</div><div class="bt-n bt-r" id="live-bowler-r">0</div>
             <div class="bt-n" id="live-bowler-w">0</div><div class="bt-n" id="live-bowler-econ">0.0</div>
+          </div>
+          <div class="bt-row bowl prev-bowler hidden" id="live-bowler2">
+            <div class="bt-bp"><span class="bt-av" id="live-bowler2-av"></span><div class="bt-name" id="live-bowler2-name">&mdash;</div></div>
+            <div class="bt-n" id="live-bowler2-o">0</div><div class="bt-n bt-r" id="live-bowler2-r">0</div>
+            <div class="bt-n" id="live-bowler2-w">0</div><div class="bt-n" id="live-bowler2-econ">0.0</div>
           </div>
         </div>
         <!-- Ball dots -->
@@ -490,11 +497,11 @@
 <datalist id="bowler-datalist"></datalist>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/storage.js?v=24"></script>
-<script src="js/match.js?v=24"></script>
-<script src="js/router.js?v=24"></script>
-<script src="js/ui.js?v=24"></script>
-<script src="js/app.js?v=24"></script>
+<script src="js/storage.js?v=25"></script>
+<script src="js/match.js?v=25"></script>
+<script src="js/router.js?v=25"></script>
+<script src="js/ui.js?v=25"></script>
+<script src="js/app.js?v=25"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">

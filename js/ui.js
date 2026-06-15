@@ -101,7 +101,7 @@ function renderLiveHeader(match) {
   fillBatRow('striker',    inn.batsmen[inn.strikerIdx]);
   fillBatRow('nonstriker', inn.batsmen[inn.nonStrikerIdx]);
 
-  // Bowler
+  // Bowler (current)
   if (inn.currentOver) {
     const bowler = inn.currentOver.bowler;
     const bs = getBowlerStats(inn, bowler);
@@ -113,6 +113,25 @@ function renderLiveHeader(match) {
     setEl('live-bowler-r',   bs.runs);
     setEl('live-bowler-w',   bs.wkts);
     setEl('live-bowler-econ', econ);
+  }
+
+  // Previous bowler (whoever just bowled the last completed over)
+  const row2 = document.getElementById('live-bowler2');
+  const prevOver = inn.overs.length ? inn.overs[inn.overs.length - 1] : null;
+  const curBowler = inn.currentOver ? inn.currentOver.bowler : null;
+  if (row2 && prevOver && prevOver.bowler && prevOver.bowler !== curBowler) {
+    const bs2 = getBowlerStats(inn, prevOver.bowler);
+    const balls2 = oversToBalls(bs2.overStr);
+    const econ2 = balls2 ? (bs2.runs / (balls2 / 6)).toFixed(1) : '0.0';
+    setAvatar('live-bowler2-av', prevOver.bowler);
+    setEl('live-bowler2-name', prevOver.bowler);
+    setEl('live-bowler2-o',   bs2.overStr);
+    setEl('live-bowler2-r',   bs2.runs);
+    setEl('live-bowler2-w',   bs2.wkts);
+    setEl('live-bowler2-econ', econ2);
+    row2.classList.remove('hidden');
+  } else if (row2) {
+    row2.classList.add('hidden');
   }
 
   // Ball dots (tappable to edit)

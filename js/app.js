@@ -186,6 +186,8 @@ function wireButtons() {
   on('btn-switch-strike', 'click', handleSwitchStrike);
   on('btn-live-stats',   'click', handleOpenStats);
   on('btn-stats-close',  'click', closeModal);
+  // Home from the live screen — keep the match active so it can be resumed.
+  on('btn-live-home',    'click', () => navigateTo('home'));
 
   // Generic confirm dialog
   on('btn-confirm-cancel', 'click', () => { _confirmCallback = null; closeModal(); });
