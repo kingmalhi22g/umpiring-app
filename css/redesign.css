@@ -144,6 +144,8 @@
   box-shadow: 0 2px 8px rgba(20,60,50,.05); cursor: pointer;
 }
 .match-item.in-progress { border-left: 4px solid var(--c-danger); }
+/* keep the status pill clear of the absolutely-positioned delete button */
+.match-item .sum-rowb { padding-right: 34px; }
 .mc-team { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 .mc-name { font-weight: 700; font-size: 13px; flex: 1; }
 .mc-score { font-weight: 800; font-size: 14px; }
