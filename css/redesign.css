@@ -1,0 +1,184 @@
+/* ============================================================
+   redesign.css — CricClubs-inspired layout in the app's own
+   teal/green + amber identity. Loaded last so it overrides the
+   base component styles.
+   ============================================================ */
+:root { --header-h: 54px; }
+
+/* ── App bar ─────────────────────────────────────────────── */
+#app-header {
+  background: linear-gradient(135deg, var(--c-primary-mid), var(--c-primary-dark));
+  box-shadow: 0 2px 12px rgba(10,90,80,.25);
+  padding-left: 8px; padding-right: 8px;
+}
+#screen-title { font-size: 17px; font-weight: 800; letter-spacing: .2px; }
+.btn-icon {
+  width: 38px; height: 38px; font-size: 19px;
+  background: rgba(255,255,255,.14); margin: 0 3px;
+}
+.btn-icon:active { background: rgba(255,255,255,.30); }
+
+/* ── Generic card softening ──────────────────────────────── */
+.card { border-radius: 18px; border: 1px solid var(--c-border); box-shadow: 0 2px 10px rgba(20,60,50,.06); }
+
+/* ── Pills / chips ───────────────────────────────────────── */
+.sum-chip {
+  font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px;
+  background: var(--c-bg); color: var(--c-primary-dark);
+  letter-spacing: .4px; text-transform: uppercase; white-space: nowrap;
+}
+.sum-pill {
+  font-size: 11px; font-weight: 800; padding: 4px 11px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: .4px; white-space: nowrap;
+}
+.sum-pill-ok   { background: rgba(39,165,82,.15);  color: #1c8a40; }
+.sum-pill-live { background: rgba(226,69,59,.15);  color: var(--c-danger);
+                 display: inline-flex; align-items: center; gap: 5px; }
+.sum-pill-setup{ background: rgba(107,122,116,.16); color: var(--c-text-2); }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c-danger); display: inline-block; }
+
+/* ── Team / player avatars ───────────────────────────────── */
+.sum-logo, .bt-av {
+  border-radius: 50%; flex-shrink: 0; color: #fff; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.sum-logo { width: 38px; height: 38px; font-size: 14px; }
+.bt-av    { width: 30px; height: 30px; font-size: 11px; }
+
+/* ── Match summary status card ───────────────────────────── */
+.sum-card { background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: 18px; padding: 16px; box-shadow: 0 2px 10px rgba(20,60,50,.06); }
+.sum-rowb { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sum-sub  { font-size: 12px; color: var(--c-text-2); margin-top: 6px; }
+.sum-team { display: flex; align-items: center; gap: 11px; margin-top: 14px; }
+.sum-tname  { font-weight: 700; font-size: 15px; flex: 1; }
+.sum-tscore { font-weight: 800; font-size: 16px; }
+.sum-tov    { font-size: 12px; color: var(--c-text-2); font-weight: 600; margin-left: 4px; }
+.sum-result {
+  margin-top: 14px; border-radius: 12px; padding: 10px 14px; text-align: center;
+  font-weight: 800; font-size: 13.5px; color: var(--c-primary-dark);
+  background: linear-gradient(135deg, rgba(19,169,156,.14), rgba(14,140,130,.10));
+}
+.sum-result.is-super { color: #fff; background: linear-gradient(135deg, var(--c-primary-mid), var(--c-primary-dark)); }
+
+/* ── Tab bar ─────────────────────────────────────────────── */
+.sc-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 2px; margin-top: 14px; }
+.sc-tabs::-webkit-scrollbar { display: none; }
+.sc-tab {
+  font-size: 13px; font-weight: 700; padding: 9px 16px; border-radius: 22px;
+  background: var(--c-surface); color: var(--c-text-2);
+  border: 1px solid var(--c-border); white-space: nowrap; cursor: pointer;
+}
+.sc-tab.active {
+  background: linear-gradient(135deg, var(--c-primary-mid), var(--c-primary));
+  color: #fff; border-color: transparent; box-shadow: 0 4px 12px rgba(14,140,130,.30);
+}
+.sc-panel { display: none; }
+.sc-panel.active { display: block; }
+
+/* ── Innings accordion ───────────────────────────────────── */
+.inn-acc { background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: 14px; margin-top: 10px; overflow: hidden; }
+.inn-head { display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 15px; cursor: pointer; }
+.inn-acc.open .inn-head { background: var(--c-bg); }
+.inn-nm { font-weight: 800; font-size: 14px; }
+.inn-sc { font-weight: 800; font-size: 14px; }
+.inn-chev { width: 14px; height: 14px; stroke: var(--c-text-2); fill: none; stroke-width: 2.5;
+  margin-left: 8px; transition: transform .2s; }
+.inn-acc.open .inn-chev { transform: rotate(180deg); }
+.inn-body { display: none; }
+.inn-acc.open .inn-body { display: block; }
+
+/* ── Scorecard tables (avatar rows) ──────────────────────── */
+.bt-head, .bt-row { display: grid; grid-template-columns: 1fr 34px 30px 26px 26px 52px; gap: 2px; }
+.bt-head.bowl, .bt-row.bowl { grid-template-columns: 1fr 40px 34px 30px 42px; }
+.bt-head {
+  padding: 9px 15px; font-size: 10.5px; font-weight: 800; color: var(--c-text-2);
+  text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--c-border);
+}
+.bt-head span:not(:first-child) { text-align: center; }
+.bt-row { padding: 11px 15px; align-items: center; border-bottom: 1px solid var(--c-bg); }
+.bt-row:last-child { border-bottom: none; }
+.bt-bp { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.bt-name { font-weight: 700; font-size: 13.5px; line-height: 1.2; }
+.bt-role { font-size: 9px; font-weight: 800; color: var(--c-primary);
+  background: rgba(19,169,156,.14); padding: 1px 5px; border-radius: 5px; margin-left: 5px; }
+.bt-dis { font-size: 11px; color: var(--c-text-2); margin-top: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bt-dis.notout { color: var(--c-ok); font-weight: 700; }
+.bt-n { text-align: center; font-size: 13px; font-weight: 700; }
+.bt-r { font-weight: 800; }
+.bt-sr { text-align: center; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 3px; }
+.bt-sr svg { width: 13px; height: 9px; stroke: var(--c-accent-deep); fill: none; stroke-width: 2; }
+
+.sum-extras { display: flex; justify-content: space-between; padding: 11px 15px;
+  background: var(--c-bg); font-size: 12.5px; border-top: 1px solid var(--c-border); }
+.sum-extras .mut { color: var(--c-text-2); }
+.sum-total { display: flex; justify-content: space-between; padding: 12px 15px;
+  font-weight: 800; font-size: 14px; }
+.sum-total .rr { color: var(--c-primary); }
+
+.bt-sec { font-size: 11px; font-weight: 800; color: var(--c-text-2);
+  text-transform: uppercase; letter-spacing: .5px; padding: 14px 15px 2px; }
+
+/* Stats panel blocks */
+.stat-block { background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: 14px; padding: 14px; margin-top: 10px; }
+.stat-block h4 { font-size: 11px; font-weight: 800; color: var(--c-text-2);
+  text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.stat-line { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0;
+  border-bottom: 1px solid var(--c-bg); }
+.stat-line:last-child { border-bottom: none; }
+.stat-line b { color: var(--c-primary-dark); }
+
+/* ── Home match cards (re-style .match-item) ─────────────── */
+#match-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.match-item {
+  position: relative; display: block; background: var(--c-surface);
+  border: 1px solid var(--c-border); border-radius: 16px; padding: 14px;
+  box-shadow: 0 2px 8px rgba(20,60,50,.05); cursor: pointer;
+}
+.match-item.in-progress { border-left: 4px solid var(--c-danger); }
+.mc-team { display: flex; align-items: center; gap: 9px; margin-top: 10px; }
+.mc-name { font-weight: 700; font-size: 14px; flex: 1; }
+.mc-score { font-weight: 800; font-size: 15px; }
+.mc-foot { margin-top: 10px; font-size: 12.5px; color: var(--c-text-2); }
+.mc-foot.win { font-weight: 800; color: var(--c-primary-dark);
+  background: linear-gradient(135deg, rgba(19,169,156,.12), rgba(14,140,130,.08));
+  border-radius: 10px; padding: 8px 12px; text-align: center; }
+.match-delete {
+  position: absolute; top: 8px; right: 8px; width: 34px; height: 34px;
+  border: none; background: transparent; border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; opacity: .55;
+}
+.match-delete svg { width: 17px; height: 17px; stroke: var(--c-danger); fill: none; stroke-width: 2; }
+.match-delete:active { background: var(--c-danger-bg); opacity: 1; }
+
+/* ── Live scoring: hero + run pad polish ─────────────────── */
+.score-hero {
+  background: linear-gradient(150deg, var(--c-primary-mid), var(--c-primary-dark));
+  border-radius: 20px; box-shadow: 0 8px 22px rgba(14,140,130,.28);
+}
+.run-grid .run-4, .run-grid .run-6 { color: #fff; border: none; }
+.run-grid .run-4 { background: linear-gradient(135deg, #F6B24A, var(--c-accent-deep));
+  box-shadow: 0 4px 12px rgba(224,123,46,.32); }
+.run-grid .run-6 { background: linear-gradient(135deg, #E0853A, #D2691E);
+  box-shadow: 0 4px 12px rgba(210,105,30,.32); }
+.run-btn { border-radius: 14px; }
+.wicket-btn-main { border-radius: 13px;
+  background: linear-gradient(135deg, #EE5A50, var(--c-danger)); }
+
+/* ── Dark-mode adjustments for new components ────────────── */
+body.dark-mode .sum-chip { background: #0C1A18; color: var(--c-primary-light); }
+body.dark-mode .sum-result,
+body.dark-mode .mc-foot.win { color: var(--c-primary-light); }
+body.dark-mode .stat-line b,
+body.dark-mode .sum-total .rr,
+body.dark-mode .bt-role { color: var(--c-primary-light); }
+@media (prefers-color-scheme: dark) {
+  body:not(.light-mode) .sum-chip { background: #0C1A18; color: var(--c-primary-light); }
+  body:not(.light-mode) .sum-result,
+  body:not(.light-mode) .mc-foot.win { color: var(--c-primary-light); }
+}

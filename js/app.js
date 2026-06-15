@@ -242,7 +242,17 @@ function wireButtons() {
     navigateTo('home');
   });
   on('summary-content', 'click', e => {
-    if (e.target.closest('#btn-super-over')) handleStartSuperOver();
+    if (e.target.closest('#btn-super-over')) { handleStartSuperOver(); return; }
+    const tab = e.target.closest('.sc-tab');
+    if (tab) {
+      const root = document.getElementById('summary-content');
+      const panel = tab.dataset.panel;
+      root.querySelectorAll('.sc-tab').forEach(t => t.classList.toggle('active', t === tab));
+      root.querySelectorAll('.sc-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === panel));
+      return;
+    }
+    const head = e.target.closest('.inn-head');
+    if (head && head.parentElement) head.parentElement.classList.toggle('open');
   });
 
   // Settings

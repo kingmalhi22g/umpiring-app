@@ -1,25 +1,28 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --c-primary:      #1B5E20;
-  --c-primary-mid:  #2E7D32;
-  --c-primary-light:#4CAF50;
-  --c-accent:       #FFCA28;
-  --c-bg:           #F1F8E9;
+  --c-primary:      #0E8C82;
+  --c-primary-mid:  #13A99C;
+  --c-primary-light:#2BC0B0;
+  --c-primary-dark: #0A6F67;
+  --c-accent:       #F2A33C;
+  --c-accent-deep:  #E07B2E;
+  --c-bg:           #F2F5F4;
   --c-surface:      #FFFFFF;
-  --c-text:         #1A1A1A;
-  --c-text-2:       #6B6B6B;
+  --c-text:         #17231F;
+  --c-text-2:       #6B7A74;
   --c-text-inv:     #FFFFFF;
-  --c-border:       #C8E6C9;
-  --c-danger:       #C62828;
-  --c-danger-bg:    #FFEBEE;
-  --c-wide:         #E65100;
-  --c-noball:       #B71C1C;
-  --c-bye:          #4527A0;
-  --c-4:            #1565C0;
-  --c-6:            #6A1B9A;
+  --c-border:       #E5EBE8;
+  --c-danger:       #E2453B;
+  --c-danger-bg:    #FDECEA;
+  --c-ok:           #27A552;
+  --c-wide:         #E07B2E;
+  --c-noball:       #C0392B;
+  --c-bye:          #5A6FB2;
+  --c-4:            #F2A33C;
+  --c-6:            #E07B2E;
   --c-dot:          #9E9E9E;
-  --c-wicket:       #B71C1C;
+  --c-wicket:       #E2453B;
 
   --r-sm:  6px;
   --r-md:  10px;
@@ -95,13 +98,13 @@ input, textarea, select { user-select: auto; font-family: inherit; font-size: 16
 /* System auto-dark (when no manual override) */
 @media (prefers-color-scheme: dark) {
   body:not(.light-mode) {
-    --c-bg:        #0D1B0F;
-    --c-surface:   #162018;
-    --c-text:      #E8F5E9;
-    --c-text-2:    #7A9A7A;
-    --c-border:    #263828;
+    --c-bg:        #0C1A18;
+    --c-surface:   #132321;
+    --c-text:      #E6F5F1;
+    --c-text-2:    #7FA39B;
+    --c-border:    #25382F;
     --c-danger-bg: #3B1515;
-    --c-primary-light: #66BB6A;
+    --c-primary-light: #2BC0B0;
   }
 }
 /* Manual dark mode class on body */

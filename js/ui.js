@@ -142,6 +142,69 @@ function renderBatsmanRow(elId, batsman, isStriker) {
   if (scoreEl) scoreEl.textContent = score;
 }
 
+// ── Redesign helpers ──────────────────────────────────────
+function formatLabel(o) { return o === 10 ? 'T10' : o === 20 ? 'T20' : o === 50 ? 'ODI' : (o + ' ov'); }
+
+function matchResultText(m) {
+  const r = m.result;
+  if (!r) return '';
+  if (r.marginType === 'super over') return r.winner + ' won the Super Over';
+  if (r.marginType === 'tie') return m.innings[2] ? 'Match Tied — Super Over also tied' : 'Match Tied';
+  return r.winner + ' won by ' + r.margin + ' ' + r.marginType;
+}
+
+// First (non super-over) innings a team batted in, or null.
+function getTeamInnings(m, name) {
+  for (let i = 0; i < Math.min(2, m.innings.length); i++) {
+    const inn = m.innings[i];
+    if (inn && inn.battingTeam === name) return inn;
+  }
+  return null;
+}
+
+function chaseLine(m) {
+  const inn = m.innings[m.currentInnings];
+  if (!inn) return 'In progress';
+  if (m.currentInnings === 1 || m.currentInnings === 3) {
+    const t = getTarget(m);
+    if (t) {
+      const need = Math.max(0, t - inn.totalRuns);
+      const bowled = inn.overs.length * 6 + (inn.currentOver ? inn.currentOver.balls.length : 0);
+      const left = Math.max(0, effectiveOvers(m) * 6 - bowled);
+      return inn.battingTeam + ' need ' + need + ' from ' + left;
+    }
+  }
+  return inn.battingTeam + ' batting · ' + inn.totalRuns + '/' + inn.wickets;
+}
+
+function runRate(inn) {
+  const balls = inn.overs.length * 6 + (inn.currentOver ? inn.currentOver.balls.length : 0);
+  return balls ? (inn.totalRuns / (balls / 6)).toFixed(2) : '0.00';
+}
+function oversToBalls(str) { const p = String(str).split('.'); return (parseInt(p[0]) || 0) * 6 + (parseInt(p[1]) || 0); }
+
+const AV_PALETTE = ['#C0392B','#1F6FB2','#6A4FB2','#2E8B57','#B2562E','#2E6FB2','#0E8C82','#E07B2E','#9C5BA6','#427D9D'];
+function avatarColor(name) {
+  let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return AV_PALETTE[h % AV_PALETTE.length];
+}
+function initials(name, n) {
+  const parts = String(name || '?').trim().split(/\s+/);
+  let s = parts.slice(0, n).map(p => p[0]).join('');
+  if (s.length < 2 && parts[0]) s = parts[0].slice(0, 2);
+  return s.toUpperCase();
+}
+function avatarHtml(name, cls, size) {
+  let style = 'background:' + avatarColor(String(name || '?'));
+  if (size) style += ';width:' + size + 'px;height:' + size + 'px;font-size:' + (size < 32 ? 11 : 14) + 'px';
+  return '<div class="' + cls + '" style="' + style + '">' + esc(initials(name, 2)) + '</div>';
+}
+function srSvg(sr) {
+  return sr > 0
+    ? '<svg viewBox="0 0 20 12"><path d="M1 11l5-6 4 3 9-7"/></svg>'
+    : '<svg viewBox="0 0 20 12"><path d="M1 6h18"/></svg>';
+}
+
 // ── Match list (home) ─────────────────────────────────────
 function renderMatchList(containerEl) {
   const matches = getMatches();
@@ -154,20 +217,28 @@ function renderMatchList(containerEl) {
       </div>`;
     return;
   }
+  const scoreStr = inn => inn
+    ? `${inn.totalRuns}/${inn.wickets} <span class="sum-tov">${getOverDisplay(inn)}</span>`
+    : '<span class="sum-tov">—</span>';
   matches.forEach(m => {
     const div = document.createElement('div');
     div.className = 'match-item' + (m.status === 'in_progress' ? ' in-progress' : '');
     div.dataset.id = m.id;
-    const t1 = m.teams[0].name, t2 = m.teams[1].name;
-    let resultText = m.result
-      ? (m.result.marginType === 'tie' ? 'Tie' : (m.result.winner + ' won'))
-      : (m.status === 'in_progress' ? 'In progress' : 'Setup');
+    const t1 = m.teams[0], t2 = m.teams[1];
+    const pill = m.result
+      ? '<span class="sum-pill sum-pill-ok">Completed</span>'
+      : m.status === 'in_progress'
+        ? '<span class="sum-pill sum-pill-live"><span class="live-dot"></span>Live</span>'
+        : '<span class="sum-pill sum-pill-setup">Setup</span>';
+    let foot;
+    if (m.result)                       foot = `<div class="mc-foot win">🏆 ${esc(matchResultText(m))}</div>`;
+    else if (m.status === 'in_progress')foot = `<div class="mc-foot">${esc(chaseLine(m))}</div>`;
+    else                                foot = `<div class="mc-foot">${esc(m.date || '')}${m.ground ? ' · ' + esc(m.ground) : ''}</div>`;
     div.innerHTML = `
-      <div class="match-info">
-        <div class="match-teams">${esc(t1)} vs ${esc(t2)}</div>
-        <div class="match-meta">${esc(m.date)} · ${esc(m.ground||'Unknown ground')}</div>
-      </div>
-      <div class="match-result">${esc(resultText)}</div>
+      <div class="sum-rowb"><span class="sum-chip">${formatLabel(m.overs)}</span>${pill}</div>
+      <div class="mc-team">${avatarHtml(t1.name,'sum-logo',30)}<span class="mc-name">${esc(t1.name)}</span><span class="mc-score">${scoreStr(getTeamInnings(m,t1.name))}</span></div>
+      <div class="mc-team">${avatarHtml(t2.name,'sum-logo',30)}<span class="mc-name">${esc(t2.name)}</span><span class="mc-score">${scoreStr(getTeamInnings(m,t2.name))}</span></div>
+      ${foot}
       <button class="match-delete" data-del="${esc(m.id)}" type="button" aria-label="Delete match">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
       </button>`;
@@ -200,66 +271,142 @@ function renderBowlingTable(inn) {
     </table>`;
 }
 
-// ── Match Summary ─────────────────────────────────────────
+// ── Match Summary (redesigned: status card + tabs) ────────
 function renderMatchSummary(match) {
   if (!match) return;
   const el = document.getElementById('summary-content');
   if (!el) return;
 
-  let html = '';
+  const teams = match.teams;
+  const pill = match.result
+    ? '<span class="sum-pill sum-pill-ok">Completed</span>'
+    : match.status === 'in_progress'
+      ? '<span class="sum-pill sum-pill-live"><span class="live-dot"></span>Live</span>'
+      : '<span class="sum-pill sum-pill-setup">Setup</span>';
+  const scoreStr = inn => inn
+    ? `${inn.totalRuns}/${inn.wickets} <span class="sum-tov">${getOverDisplay(inn)}</span>`
+    : '<span class="sum-tov">yet to bat</span>';
 
-  // Result banner
+  let resultHtml = '';
   if (match.result) {
-    const r = match.result;
-    const hadSuper = !!match.innings[2];
-    let txt;
-    if (r.marginType === 'super over') {
-      txt = r.winner + ' won the Super Over';
-    } else if (r.marginType === 'tie') {
-      txt = hadSuper ? 'Match Tied — Super Over also tied!' : 'Match Tied!';
-    } else {
-      txt = r.winner + ' won by ' + r.margin + ' ' + r.marginType;
-    }
-    const cls = 'result-banner' + (r.marginType === 'super over' ? ' result-super' : '');
-    html += `<div class="${cls}">${esc(txt)}</div>`;
-
-    // Offer a super over when the main match tied (and none played yet)
-    if (r.marginType === 'tie' && !hadSuper) {
-      html += `<button id="btn-super-over" class="btn btn-accent mt-md" type="button">&#9889; Start Super Over</button>`;
-    }
+    const isSuper = match.result.marginType === 'super over';
+    resultHtml = `<div class="sum-result${isSuper ? ' is-super' : ''}">🏆 ${esc(matchResultText(match))}</div>`;
   }
 
-  // Each innings
-  match.innings.forEach((inn, i) => {
-    if (!inn) return;
-    const label = i >= 2
-      ? (esc(inn.battingTeam) + ' — Super Over' + (i === 3 ? ' (Chase)' : ''))
-      : (esc(inn.battingTeam) + ' — Innings ' + (i + 1));
-    html += `<div class="card mt-md">
-      <div class="section-head">${label}</div>
-      <div class="score-main text-primary" style="font-size:22px;color:var(--c-primary-mid);font-weight:900;margin:6px 0">
-        ${inn.totalRuns}/${inn.wickets} <span style="font-size:13px;font-weight:600;color:var(--c-text-2)">(${getOverDisplay(inn)} ov)</span>
-      </div>
-      <table class="scorecard-table">
-        <thead><tr><th>Batsman</th><th>R</th><th>B</th><th>4s</th><th>6s</th></tr></thead>
-        <tbody>
-          ${inn.batsmen.map(b => `
-            <tr>
-              <td><div class="player-name">${esc(b.name)}</div><div class="sc-out">${b.isOut ? esc(b.how) : 'not out'}</div></td>
-              <td class="sc-runs">${b.runs}</td><td>${b.balls}</td><td>${b.fours}</td><td>${b.sixes}</td>
-            </tr>`).join('')}
-        </tbody>
-      </table>
-      <div class="divider mt-sm"></div>
-      <div class="text-sm text-2 mt-sm">
-        Extras: ${totalExtras(inn)}
-        (Wd ${inn.extras.wides}, NB ${inn.extras.noBalls}, B ${inn.extras.byes}, LB ${inn.extras.legByes})
-      </div>
-      ${renderBowlingTable(inn)}
+  const card = `<div class="sum-card">
+    <div class="sum-rowb"><span class="sum-chip">${formatLabel(match.overs)} · Match</span>${pill}</div>
+    <div class="sum-sub">${esc(match.date || '')}${match.ground ? ' · ' + esc(match.ground) : ''}</div>
+    <div class="sum-team">${avatarHtml(teams[0].name,'sum-logo')}<span class="sum-tname">${esc(teams[0].name)}</span><span class="sum-tscore">${scoreStr(getTeamInnings(match,teams[0].name))}</span></div>
+    <div class="sum-team">${avatarHtml(teams[1].name,'sum-logo')}<span class="sum-tname">${esc(teams[1].name)}</span><span class="sum-tscore">${scoreStr(getTeamInnings(match,teams[1].name))}</span></div>
+    ${resultHtml}
+  </div>`;
+
+  let superBtn = '';
+  if (match.result && match.result.marginType === 'tie' && !match.innings[2]) {
+    superBtn = `<button id="btn-super-over" class="btn btn-accent mt-md" type="button">&#9889; Start Super Over</button>`;
+  }
+
+  const tabs = `<div class="sc-tabs">
+    <div class="sc-tab active" data-panel="scorecard">Scorecard</div>
+    <div class="sc-tab" data-panel="summary">Summary</div>
+    <div class="sc-tab" data-panel="stats">Stats</div>
+  </div>`;
+
+  const innList = match.innings.map((inn, i) => inn ? { inn, i } : null).filter(Boolean);
+  const lastIdx = innList.length ? innList[innList.length - 1].i : 0;
+
+  const scorecard = `<div class="sc-panel active" data-panel="scorecard">${
+    innList.map(({ inn, i }) => renderInningsAccordion(match, inn, i, i === lastIdx)).join('')
+  }</div>`;
+  const summaryPanel = `<div class="sc-panel" data-panel="summary">${renderSummaryPanel(match, innList)}</div>`;
+  const statsPanel   = `<div class="sc-panel" data-panel="stats">${renderStatsPanel(match, innList)}</div>`;
+
+  el.innerHTML = card + superBtn + tabs + scorecard + summaryPanel + statsPanel;
+}
+
+function renderInningsAccordion(match, inn, i, open) {
+  const label = i >= 2 ? (inn.battingTeam + ' · Super Over' + (i === 3 ? ' (Chase)' : '')) : inn.battingTeam;
+
+  const bat = inn.batsmen.map(b => {
+    const sr = b.balls > 0 ? (b.runs / b.balls * 100).toFixed(1) : '0.0';
+    const dis = b.isOut ? esc(b.how || 'out') : 'not out';
+    return `<div class="bt-row">
+      <div class="bt-bp">${avatarHtml(b.name,'bt-av')}<div style="min-width:0">
+        <div class="bt-name">${esc(b.name)}</div>
+        <div class="bt-dis${b.isOut ? '' : ' notout'}">${dis}</div></div></div>
+      <div class="bt-n bt-r">${b.runs}</div><div class="bt-n">${b.balls}</div>
+      <div class="bt-n">${b.fours}</div><div class="bt-n">${b.sixes}</div>
+      <div class="bt-sr">${srSvg(parseFloat(sr))}${sr}</div>
+    </div>`;
+  }).join('');
+
+  const seen = new Set();
+  const bowlers = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])]
+    .filter(o => { if (seen.has(o.bowler)) return false; seen.add(o.bowler); return true; })
+    .map(o => o.bowler);
+  const bowl = bowlers.map(name => {
+    const s = getBowlerStats(inn, name);
+    const balls = oversToBalls(s.overStr);
+    const econ = balls ? (s.runs / (balls / 6)).toFixed(1) : '0.0';
+    return `<div class="bt-row bowl">
+      <div class="bt-bp">${avatarHtml(name,'bt-av')}<div class="bt-name">${esc(name)}</div></div>
+      <div class="bt-n">${s.overStr}</div><div class="bt-n bt-r">${s.runs}</div>
+      <div class="bt-n">${s.wkts}</div><div class="bt-n">${econ}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="inn-acc${open ? ' open' : ''}">
+    <div class="inn-head">
+      <span class="inn-nm">${esc(label)}</span>
+      <span><span class="inn-sc">${inn.totalRuns}/${inn.wickets}</span>
+        <span class="sum-tov">${getOverDisplay(inn)} ov</span>
+        <svg class="inn-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+    </div>
+    <div class="inn-body">
+      <div class="bt-head"><span>Batsman</span><span>R</span><span>B</span><span>4s</span><span>6s</span><span>SR</span></div>
+      ${bat}
+      <div class="sum-extras"><span><b>Extras</b> ${totalExtras(inn)}</span>
+        <span class="mut">wd ${inn.extras.wides} · nb ${inn.extras.noBalls} · b ${inn.extras.byes} · lb ${inn.extras.legByes}</span></div>
+      <div class="sum-total"><span>Total&nbsp;&nbsp;${inn.totalRuns}/${inn.wickets}</span><span class="rr">RR ${runRate(inn)}</span></div>
+      ${bowl ? `<div class="bt-sec">Bowling</div>
+        <div class="bt-head bowl"><span>Bowler</span><span>O</span><span>R</span><span>W</span><span>Econ</span></div>${bowl}` : ''}
+    </div>
+  </div>`;
+}
+
+function renderSummaryPanel(match, innList) {
+  let h = '';
+  if (match.result) {
+    const isSuper = match.result.marginType === 'super over';
+    h += `<div class="sum-result${isSuper ? ' is-super' : ''}" style="margin-top:12px">🏆 ${esc(matchResultText(match))}</div>`;
+  }
+  innList.forEach(({ inn, i }) => {
+    const top = [...inn.batsmen].sort((a, b) => b.runs - a.runs)[0];
+    h += `<div class="stat-block"><h4>${esc(inn.battingTeam)}${i >= 2 ? ' · Super Over' : ''}</h4>
+      <div class="stat-line"><span>Score</span><b>${inn.totalRuns}/${inn.wickets} (${getOverDisplay(inn)} ov)</b></div>
+      <div class="stat-line"><span>Run rate</span><b>${runRate(inn)}</b></div>
+      ${top ? `<div class="stat-line"><span>Top scorer</span><b>${esc(top.name)} — ${top.runs} (${top.balls})</b></div>` : ''}
     </div>`;
   });
+  return h || '<div class="stat-block">No innings yet.</div>';
+}
 
-  el.innerHTML = html;
+function renderStatsPanel(match, innList) {
+  let h = '';
+  innList.forEach(({ inn, i }) => {
+    const fow = getFallOfWickets(inn);
+    const pp = getPowerplayOvers(match.overs);
+    const pps = getPowerplayStats(inn, pp);
+    h += `<div class="stat-block"><h4>${esc(inn.battingTeam)}${i >= 2 ? ' · Super Over' : ''}</h4>`;
+    if (pps && pps.played) h += `<div class="stat-line"><span>Powerplay (ov 1-${pp})</span><b>${pps.runs}/${pps.wkts}</b></div>`;
+    if (fow.length) {
+      h += fow.map(f => `<div class="stat-line"><span>Wkt ${f.num} — <b>${f.score}</b></span><span class="text-2">${esc(f.batsman)} · ${f.over} ov</span></div>`).join('');
+    } else {
+      h += `<div class="stat-line"><span>Fall of wickets</span><span class="text-2">none</span></div>`;
+    }
+    h += `</div>`;
+  });
+  return h || '<div class="stat-block">No stats yet.</div>';
 }
 
 // ── Rosters screen ───────────────────────────────────────
