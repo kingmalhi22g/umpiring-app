@@ -73,14 +73,28 @@ function renderLiveHeader(match) {
   const pship = getPartnership(inn);
   setEl('live-stat-pship', pship.runs + ' (' + pship.balls + ')');
 
+  // Runs in the current over.
+  setEl('live-stat-thisover', inn.currentOver ? inn.currentOver.runs : 0);
+
   const chasing = match.currentInnings === 1 || match.currentInnings === 3;
   const target = chasing ? getTarget(match) : null;
-  const needEl   = document.getElementById('stat-need');
-  const rrrEl    = document.getElementById('stat-rrr');
-  const targetEl = document.getElementById('stat-target');
-  const pshipEl  = document.getElementById('stat-pship');
-  // When chasing, surface Need/RRR/Target instead of partnership.
-  if (pshipEl) pshipEl.classList.toggle('hidden', !!target);
+  const show = (id, on) => { const e = document.getElementById(id); if (e) e.classList.toggle('hidden', !on); };
+
+  // Projected final score (1st innings — at the current run rate).
+  if (!chasing) {
+    const totalBalls = effectiveOvers(match) * 6;
+    setEl('live-stat-proj', ballsBowled > 0 ? Math.round(inn.totalRuns / ballsBowled * totalBalls) : inn.totalRuns);
+  }
+
+  // Stat slots — keep it to four, no scrolling:
+  //   1st innings: CRR · This Over · Proj · P'ship
+  //   chasing:     This Over · Need · RRR · Target
+  show('stat-crr',    !chasing);
+  show('stat-proj',   !chasing);
+  show('stat-pship',  !chasing);
+  show('stat-need',   !!target);
+  show('stat-rrr',    !!target);
+  show('stat-target', !!target);
   if (target) {
     const ballsLeft  = Math.max(0, effectiveOvers(match) * 6 - ballsBowled);
     const runsNeeded = Math.max(0, target - inn.totalRuns);
@@ -88,13 +102,6 @@ function renderLiveHeader(match) {
     setEl('live-stat-need',   runsNeeded + ' in ' + ballsLeft);
     setEl('live-stat-rrr',    rrr);
     setEl('live-stat-target', target);
-    if (needEl)   needEl.classList.remove('hidden');
-    if (rrrEl)    rrrEl.classList.remove('hidden');
-    if (targetEl) targetEl.classList.remove('hidden');
-  } else {
-    if (needEl)   needEl.classList.add('hidden');
-    if (rrrEl)    rrrEl.classList.add('hidden');
-    if (targetEl) targetEl.classList.add('hidden');
   }
 
   // Batsmen (CricClubs-style mini scorecard)
