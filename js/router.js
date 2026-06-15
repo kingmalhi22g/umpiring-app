@@ -40,7 +40,15 @@ function _activate(screen) {
   if (titleEl) titleEl.textContent = SCREEN_TITLES[screen] || 'Cricket Umpire';
 
   const backBtn = document.getElementById('btn-back');
-  if (backBtn) backBtn.hidden = !BACK_SCREENS.includes(screen);
+  if (backBtn) {
+    const isSummary = screen === 'summary';
+    backBtn.hidden = !(BACK_SCREENS.includes(screen) || isSummary);
+    // On the finished-match summary, the left button is Home; elsewhere it's Back.
+    backBtn.innerHTML = isSummary
+      ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg>'
+      : '←';
+    backBtn.setAttribute('aria-label', isSummary ? 'Home' : 'Back');
+  }
 
   _onChangeCallbacks.forEach(cb => cb(screen));
 }

@@ -120,7 +120,13 @@ function initApp() {
 // ── Global button wiring ──────────────────────────────────
 function wireButtons() {
   // Header
-  on('btn-back',  'click', () => history.back());
+  on('btn-back',  'click', () => {
+    // On the summary screen the left button goes Home; elsewhere it's Back.
+    if (getCurrentScreen() === 'summary') {
+      setActiveMatchId(null); state.matchId = null; state.viewMatchId = null;
+      navigateTo('home');
+    } else history.back();
+  });
   on('btn-menu',  'click', () => navigateTo('settings'));
   on('btn-rosters', 'click', () => navigateTo('rosters'));
 

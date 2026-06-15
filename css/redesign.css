@@ -274,6 +274,17 @@
 .osp-scroll img { width: 100%; max-width: 560px; height: auto; border-radius: 8px;
   box-shadow: 0 6px 24px rgba(0,0,0,.4); background: #fff; }
 
+/* ── Bigger, centered toasts so errors aren't missed ─────── */
+#toast {
+  top: 42%; bottom: auto; left: 50%;
+  transform: translate(-50%, -50%) scale(.95);
+  font-size: 15px; font-weight: 700; line-height: 1.4;
+  padding: 15px 22px; border-radius: 16px; white-space: normal; text-align: center;
+  max-width: calc(100% - 48px); box-shadow: 0 12px 34px rgba(0,0,0,.4);
+  transition: opacity .2s ease, transform .2s ease;
+}
+#toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
 /* ── Milestone celebration banner ────────────────────────── */
 #milestone-banner {
   position: fixed; top: calc(var(--safe-t) + 64px); left: 50%; z-index: 700;
