@@ -173,6 +173,19 @@
 .score-hero-stats .stat-val { color: #fff; font-size: 14px; }
 .undo-btn { color: #fff; border-color: rgba(255,255,255,.45); background: rgba(255,255,255,.12); }
 
+/* Live batting/bowling mini-scorecards (CricClubs-style) */
+.live-card { padding: 0; overflow: hidden; }
+.live-card .bt-head { border-bottom: 1px solid var(--c-border); }
+.bt-row.on-strike { background: rgba(46,124,196,.07); box-shadow: inset 3px 0 0 var(--c-accent); }
+.strike-dot { display: none; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--c-accent); margin-left: 6px; vertical-align: middle; }
+.on-strike .strike-dot { display: inline-block; }
+.live-switch-row { display: flex; justify-content: flex-end; padding: 7px 12px; border-top: 1px solid var(--c-bg); }
+.live-switch { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700;
+  color: var(--c-primary); background: rgba(46,124,196,.10); border: none; border-radius: 14px;
+  padding: 6px 12px; cursor: pointer; }
+.live-switch svg { width: 14px; height: 14px; stroke: var(--c-primary); fill: none; stroke-width: 2; }
+
 /* Run pad — tighter, less bubbly */
 .run-btn { border-radius: 12px; height: 48px; font-size: 21px; }
 .run-grid { gap: 7px; }

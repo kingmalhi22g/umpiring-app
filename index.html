@@ -160,25 +160,37 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h12l-2.5 4L17 12H5"/></svg>
           <span>Free hit <span class="fh-sub">&mdash; only run-out valid</span></span>
         </div>
-        <!-- Batsmen + bowler -->
-        <div class="card play-card">
-          <div class="bat-rows">
-            <div class="player-row player-on-strike" id="live-striker">
-              <div class="player-name">&mdash;</div><div class="player-score"></div>
-            </div>
-            <div class="player-row" id="live-nonstriker">
-              <div class="player-name">&mdash;</div><div class="player-score"></div>
-            </div>
-            <button class="btn-switch-strike" id="btn-switch-strike" type="button" title="Switch strike">
+        <!-- Batting (current pair) -->
+        <div class="card live-card">
+          <div class="bt-head"><span>Batting</span><span>R</span><span>B</span><span>4s</span><span>6s</span><span>SR</span></div>
+          <div class="bt-row on-strike" id="live-striker">
+            <div class="bt-bp"><span class="bt-av" id="live-striker-av"></span>
+              <div class="bt-name"><span id="live-striker-name">&mdash;</span><span class="strike-dot"></span></div></div>
+            <div class="bt-n bt-r" id="live-striker-r">0</div><div class="bt-n" id="live-striker-b">0</div>
+            <div class="bt-n" id="live-striker-4">0</div><div class="bt-n" id="live-striker-6">0</div>
+            <div class="bt-sr" id="live-striker-sr">&mdash;</div>
+          </div>
+          <div class="bt-row" id="live-nonstriker">
+            <div class="bt-bp"><span class="bt-av" id="live-nonstriker-av"></span>
+              <div class="bt-name"><span id="live-nonstriker-name">&mdash;</span><span class="strike-dot"></span></div></div>
+            <div class="bt-n bt-r" id="live-nonstriker-r">0</div><div class="bt-n" id="live-nonstriker-b">0</div>
+            <div class="bt-n" id="live-nonstriker-4">0</div><div class="bt-n" id="live-nonstriker-6">0</div>
+            <div class="bt-sr" id="live-nonstriker-sr">&mdash;</div>
+          </div>
+          <div class="live-switch-row">
+            <button class="live-switch" id="btn-switch-strike" type="button" title="Switch strike">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l3-3 3 3M10 7v6M17 14l-3 3-3-3M14 17v-6"/></svg>
+              Swap strike
             </button>
           </div>
-          <div class="player-row player-row-bowler" id="live-bowler-row">
-            <div class="player-name">
-              <svg class="ball-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M7.5 4.5c2.5 3 2.5 12 0 15M16.5 4.5c-2.5 3-2.5 12 0 15"/></svg>
-              <span id="live-bowler-name">&mdash;</span>
-            </div>
-            <div class="player-score" id="live-bowler-fig"></div>
+        </div>
+        <!-- Bowling (current bowler) -->
+        <div class="card live-card">
+          <div class="bt-head bowl"><span>Bowling</span><span>O</span><span>R</span><span>W</span><span>Econ</span></div>
+          <div class="bt-row bowl" id="live-bowler">
+            <div class="bt-bp"><span class="bt-av" id="live-bowler-av"></span><div class="bt-name" id="live-bowler-name">&mdash;</div></div>
+            <div class="bt-n" id="live-bowler-o">0</div><div class="bt-n bt-r" id="live-bowler-r">0</div>
+            <div class="bt-n" id="live-bowler-w">0</div><div class="bt-n" id="live-bowler-econ">0.0</div>
           </div>
         </div>
         <!-- Ball dots -->

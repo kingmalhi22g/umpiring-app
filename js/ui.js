@@ -94,17 +94,22 @@ function renderLiveHeader(match) {
     if (targetEl) targetEl.classList.add('hidden');
   }
 
-  // Batsmen
-  const striker    = inn.batsmen[inn.strikerIdx];
-  const nonStriker = inn.batsmen[inn.nonStrikerIdx];
-  renderBatsmanRow('live-striker',     striker,    true);
-  renderBatsmanRow('live-nonstriker',  nonStriker, false);
+  // Batsmen (CricClubs-style mini scorecard)
+  fillBatRow('striker',    inn.batsmen[inn.strikerIdx]);
+  fillBatRow('nonstriker', inn.batsmen[inn.nonStrikerIdx]);
 
   // Bowler
   if (inn.currentOver) {
     const bowler = inn.currentOver.bowler;
+    const bs = getBowlerStats(inn, bowler);
+    const balls = oversToBalls(bs.overStr);
+    const econ = balls ? (bs.runs / (balls / 6)).toFixed(1) : '0.0';
+    setAvatar('live-bowler-av', bowler);
     setEl('live-bowler-name', bowler);
-    setEl('live-bowler-fig',  getBowlerFigures(inn, bowler));
+    setEl('live-bowler-o',   bs.overStr);
+    setEl('live-bowler-r',   bs.runs);
+    setEl('live-bowler-w',   bs.wkts);
+    setEl('live-bowler-econ', econ);
   }
 
   // Ball dots (tappable to edit)
@@ -126,20 +131,33 @@ function renderLiveHeader(match) {
   }
 }
 
-function renderBatsmanRow(elId, batsman, isStriker) {
-  const el = document.getElementById(elId);
-  if (!el) return;
-  if (!batsman) { el.classList.add('hidden'); return; }
-  el.classList.remove('hidden');
-  el.classList.toggle('player-on-strike', isStriker);
-  const nameEl  = el.querySelector('.player-name');
-  const scoreEl = el.querySelector('.player-score');
-  if (nameEl)  nameEl.textContent  = batsman.name;
-  let score = batsman.runs + ' (' + batsman.balls + ')';
-  if (isStriker && batsman.balls > 0) {
-    score += ' · SR ' + Math.round(batsman.runs / batsman.balls * 100);
+function setAvatar(id, name) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.style.background = avatarColor(String(name || '?'));
+  e.textContent = initials(name, 2);
+}
+
+function fillBatRow(prefix, batsman) {
+  const row = document.getElementById('live-' + prefix);
+  if (!row) return;
+  if (!batsman) { row.classList.add('hidden'); return; }
+  row.classList.remove('hidden');
+  setAvatar('live-' + prefix + '-av', batsman.name);
+  setEl('live-' + prefix + '-name', batsman.name);
+  setEl('live-' + prefix + '-r', batsman.runs);
+  setEl('live-' + prefix + '-b', batsman.balls);
+  setEl('live-' + prefix + '-4', batsman.fours);
+  setEl('live-' + prefix + '-6', batsman.sixes);
+  const srEl = document.getElementById('live-' + prefix + '-sr');
+  if (srEl) {
+    if (batsman.balls > 0) {
+      const sr = Math.round(batsman.runs / batsman.balls * 100);
+      srEl.innerHTML = srSvg(sr) + sr;
+    } else {
+      srEl.textContent = '—';
+    }
   }
-  if (scoreEl) scoreEl.textContent = score;
 }
 
 // ── Redesign helpers ──────────────────────────────────────
