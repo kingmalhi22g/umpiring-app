@@ -232,6 +232,30 @@
   background: linear-gradient(135deg, #EE5A50, var(--c-danger)); }
 .opt-note { font-weight: 600; font-size: 11px; color: var(--c-text-2); }
 
+/* ── Over-by-over sheet preview overlay ──────────────────── */
+.osp-overlay {
+  position: fixed; inset: 0; z-index: 650; background: #2a2f36;
+  display: flex; flex-direction: column;
+  padding-top: var(--safe-t); padding-bottom: var(--safe-b);
+}
+.osp-overlay.hidden { display: none !important; }
+.osp-bar {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 10px 12px;
+  background: linear-gradient(135deg, var(--c-primary-mid), var(--c-primary-dark)); color: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,.3);
+}
+.osp-title { font-size: 14px; font-weight: 800; }
+.osp-btn {
+  border: none; background: rgba(255,255,255,.16); color: #fff;
+  font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 18px; cursor: pointer;
+}
+.osp-btn.osp-share { background: var(--c-accent); color: #fff; }
+.osp-btn:active { filter: brightness(.92); }
+.osp-scroll { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: 12px; text-align: center; }
+.osp-scroll img { width: 100%; max-width: 560px; height: auto; border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.4); background: #fff; }
+
 /* ── Milestone celebration banner ────────────────────────── */
 #milestone-banner {
   position: fixed; top: calc(var(--safe-t) + 64px); left: 50%; z-index: 700;

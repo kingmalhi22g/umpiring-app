@@ -222,7 +222,9 @@ function wireButtons() {
     if (cb) cb();
   });
   on('btn-export-card',  'click', handleExportCard);
-  on('btn-export-oversheet', 'click', handleExportOverSheet);
+  on('btn-export-oversheet', 'click', handleOpenOverSheet);
+  on('btn-osp-share', 'click', handleShareOverSheet);
+  on('btn-osp-close', 'click', closeOverSheetPreview);
   // Dark mode 3-way toggle
   [['dm-auto', null], ['dm-on', true], ['dm-off', false]].forEach(([id, val]) => {
     on(id, 'click', () => { saveDarkMode(val); applyDarkMode(val);
@@ -710,27 +712,42 @@ function _downloadScorecard(url) {
   showToast('Scorecard saved!');
 }
 
-function handleExportOverSheet() {
+// Generate the sheet image and show it in an on-screen preview first.
+let _overSheetBlob = null;
+function handleOpenOverSheet() {
   const m = getMatch(state.viewMatchId || state.matchId);
-  if (!m) { showToast('No match data to export'); return; }
-  showToast('Generating sheet…', 3000);
+  if (!m) { showToast('No match data'); return; }
+  showToast('Generating sheet…', 2500);
   renderOverSheet(m);
   setTimeout(() => {
     const card = document.getElementById('oversheet-card');
-    if (!card || typeof html2canvas === 'undefined') { showToast('Export unavailable'); return; }
+    if (!card || typeof html2canvas === 'undefined') { showToast('Preview unavailable'); return; }
     html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
       canvas.toBlob(blob => {
         if (!blob) { showToast('Could not generate image'); return; }
-        const file = new File([blob], 'over-sheet.png', { type: 'image/png' });
-        const url = URL.createObjectURL(blob);
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: 'Over-by-Over Sheet' }).catch(() => _downloadFile(url, 'over-sheet.png'));
-        } else {
-          _downloadFile(url, 'over-sheet.png');
-        }
+        _overSheetBlob = blob;
+        const img = document.getElementById('osp-img');
+        if (img) img.src = URL.createObjectURL(blob);
+        document.getElementById('oversheet-preview').classList.remove('hidden');
       }, 'image/png');
-    }).catch(() => showToast('Export failed'));
-  }, 200);
+    }).catch(() => showToast('Preview failed'));
+  }, 150);
+}
+
+function handleShareOverSheet() {
+  if (!_overSheetBlob) return;
+  const file = new File([_overSheetBlob], 'over-sheet.png', { type: 'image/png' });
+  const url = URL.createObjectURL(_overSheetBlob);
+  if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({ files: [file], title: 'Over-by-Over Sheet' }).catch(() => _downloadFile(url, 'over-sheet.png'));
+  } else {
+    _downloadFile(url, 'over-sheet.png');
+  }
+}
+
+function closeOverSheetPreview() {
+  const ov = document.getElementById('oversheet-preview');
+  if (ov) ov.classList.add('hidden');
 }
 
 function _downloadFile(url, name) {
