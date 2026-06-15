@@ -258,8 +258,21 @@ function wireButtons() {
   // Innings break
   on('btn-start-2nd', 'click', handleStart2ndInnings);
 
-  // Update banner
-  on('btn-update-refresh', 'click', () => window.location.reload());
+  // Update banner — hard reset so a wedged old worker can't keep serving stale
+  // files: unregister all workers, wipe caches, then reload fresh.
+  on('btn-update-refresh', 'click', async () => {
+    try {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
+      if (window.caches) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+    } catch (e) { /* ignore — reload anyway */ }
+    window.location.reload();
+  });
 
   // Summary
   on('btn-summary-home', 'click', () => {
