@@ -8,7 +8,7 @@
 /* ── App bar ─────────────────────────────────────────────── */
 #app-header {
   background: linear-gradient(135deg, var(--c-primary-mid), var(--c-primary-dark));
-  box-shadow: 0 2px 12px rgba(10,90,80,.25);
+  box-shadow: 0 2px 12px rgba(20,70,120,.25);
   padding-left: 8px; padding-right: 8px;
 }
 #screen-title { font-size: 15px; font-weight: 800; letter-spacing: .2px; }
@@ -27,7 +27,7 @@
 /* ── Pills / chips ───────────────────────────────────────── */
 .sum-chip {
   font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 20px;
-  background: var(--c-bg); color: var(--c-primary-dark);
+  background: rgba(232,98,44,.12); color: var(--c-accent-deep);
   letter-spacing: .4px; text-transform: uppercase; white-space: nowrap;
 }
 .sum-pill {
@@ -60,7 +60,7 @@
 .sum-result {
   margin-top: 11px; border-radius: 10px; padding: 8px 12px; text-align: center;
   font-weight: 800; font-size: 12.5px; color: var(--c-primary-dark);
-  background: linear-gradient(135deg, rgba(19,169,156,.14), rgba(14,140,130,.10));
+  background: linear-gradient(135deg, rgba(46,124,196,.14), rgba(31,111,178,.10));
 }
 .sum-result.is-super { color: #fff; background: linear-gradient(135deg, var(--c-primary-mid), var(--c-primary-dark)); }
 
@@ -74,7 +74,7 @@
 }
 .sc-tab.active {
   background: linear-gradient(135deg, var(--c-primary-mid), var(--c-primary));
-  color: #fff; border-color: transparent; box-shadow: 0 3px 10px rgba(14,140,130,.30);
+  color: #fff; border-color: transparent; box-shadow: 0 3px 10px rgba(31,111,178,.30);
 }
 .sc-panel { display: none; }
 .sc-panel.active { display: block; }
@@ -84,7 +84,7 @@
   border-radius: 12px; margin-top: 8px; overflow: hidden; }
 .inn-head { display: flex; align-items: center; justify-content: space-between;
   padding: 9px 12px; cursor: pointer; }
-.inn-acc.open .inn-head { background: var(--c-bg); }
+.inn-acc.open .inn-head { background: rgba(46,124,196,.12); }
 .inn-nm { font-weight: 800; font-size: 13px; }
 .inn-sc { font-weight: 800; font-size: 13px; }
 .inn-chev { width: 13px; height: 13px; stroke: var(--c-text-2); fill: none; stroke-width: 2.5;
@@ -106,7 +106,7 @@
 .bt-bp { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .bt-name { font-weight: 700; font-size: 12.5px; line-height: 1.15; }
 .bt-role { font-size: 8.5px; font-weight: 800; color: var(--c-primary);
-  background: rgba(19,169,156,.14); padding: 1px 4px; border-radius: 4px; margin-left: 4px; }
+  background: rgba(46,124,196,.14); padding: 1px 4px; border-radius: 4px; margin-left: 4px; }
 .bt-dis { font-size: 10px; color: var(--c-text-2); margin-top: 1px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bt-dis.notout { color: var(--c-ok); font-weight: 700; }
@@ -149,7 +149,7 @@
 .mc-score { font-weight: 800; font-size: 14px; }
 .mc-foot { margin-top: 8px; font-size: 11.5px; color: var(--c-text-2); }
 .mc-foot.win { font-weight: 800; color: var(--c-primary-dark);
-  background: linear-gradient(135deg, rgba(19,169,156,.12), rgba(14,140,130,.08));
+  background: linear-gradient(135deg, rgba(46,124,196,.12), rgba(31,111,178,.08));
   border-radius: 9px; padding: 7px 10px; text-align: center; }
 .match-delete {
   position: absolute; top: 7px; right: 7px; width: 32px; height: 32px;
@@ -162,7 +162,7 @@
 /* ── Live scoring: compact teal hero + run pad ───────────── */
 .score-hero {
   background: linear-gradient(150deg, var(--c-primary-mid), var(--c-primary-dark));
-  border-radius: 16px; box-shadow: 0 6px 18px rgba(14,140,130,.26);
+  border-radius: 16px; box-shadow: 0 6px 18px rgba(31,111,178,.26);
   color: #fff; padding: 12px 15px;
 }
 .score-hero-team { color: rgba(255,255,255,.9); font-size: 11.5px; }
@@ -202,14 +202,14 @@
 .update-banner button:active { background: #eee; }
 
 /* ── Dark-mode adjustments for new components ────────────── */
-body.dark-mode .sum-chip { background: #0C1A18; color: var(--c-primary-light); }
+body.dark-mode .sum-chip { background: rgba(232,98,44,.18); color: #F2925C; }
 body.dark-mode .sum-result,
 body.dark-mode .mc-foot.win { color: var(--c-primary-light); }
 body.dark-mode .stat-line b,
 body.dark-mode .sum-total .rr,
 body.dark-mode .bt-role { color: var(--c-primary-light); }
 @media (prefers-color-scheme: dark) {
-  body:not(.light-mode) .sum-chip { background: #0C1A18; color: var(--c-primary-light); }
+  body:not(.light-mode) .sum-chip { background: rgba(232,98,44,.18); color: #F2925C; }
   body:not(.light-mode) .sum-result,
   body:not(.light-mode) .mc-foot.win { color: var(--c-primary-light); }
 }

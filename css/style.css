@@ -1,26 +1,26 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --c-primary:      #0E8C82;
-  --c-primary-mid:  #13A99C;
-  --c-primary-light:#2BC0B0;
-  --c-primary-dark: #0A6F67;
-  --c-accent:       #F2A33C;
-  --c-accent-deep:  #E07B2E;
-  --c-bg:           #F2F5F4;
+  --c-primary:      #1F6FB2;
+  --c-primary-mid:  #2E7CC4;
+  --c-primary-light:#5BA3E0;
+  --c-primary-dark: #1A5E98;
+  --c-accent:       #E8622C;
+  --c-accent-deep:  #C44E1E;
+  --c-bg:           #F4F6F8;
   --c-surface:      #FFFFFF;
-  --c-text:         #17231F;
-  --c-text-2:       #6B7A74;
+  --c-text:         #1C2733;
+  --c-text-2:       #76838F;
   --c-text-inv:     #FFFFFF;
-  --c-border:       #E5EBE8;
+  --c-border:       #E3E8ED;
   --c-danger:       #E2453B;
   --c-danger-bg:    #FDECEA;
-  --c-ok:           #27A552;
-  --c-wide:         #E07B2E;
+  --c-ok:           #2BA84A;
+  --c-wide:         #E8622C;
   --c-noball:       #C0392B;
   --c-bye:          #5A6FB2;
-  --c-4:            #F2A33C;
-  --c-6:            #E07B2E;
+  --c-4:            #1F6FB2;
+  --c-6:            #E8622C;
   --c-dot:          #9E9E9E;
   --c-wicket:       #E2453B;
 
@@ -98,13 +98,13 @@ input, textarea, select { user-select: auto; font-family: inherit; font-size: 16
 /* System auto-dark (when no manual override) */
 @media (prefers-color-scheme: dark) {
   body:not(.light-mode) {
-    --c-bg:        #0C1A18;
-    --c-surface:   #132321;
-    --c-text:      #E6F5F1;
-    --c-text-2:    #7FA39B;
-    --c-border:    #25382F;
+    --c-bg:        #0E1620;
+    --c-surface:   #16202B;
+    --c-text:      #E6EEF5;
+    --c-text-2:    #8AA0B2;
+    --c-border:    #263442;
     --c-danger-bg: #3B1515;
-    --c-primary-light: #2BC0B0;
+    --c-primary-light: #5BA3E0;
   }
 }
 /* Manual dark mode class on body */
