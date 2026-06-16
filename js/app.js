@@ -171,6 +171,12 @@ function initApp() {
 
   wireButtons();
 
+  // Pull down at the top of the home list to refresh.
+  setupPullToRefresh(document.getElementById('screen-home'), () => {
+    const ml = document.getElementById('match-list');
+    if (ml) renderMatchList(ml);
+  });
+
   // Cloud sync: anonymous identity for everyone, live shared match feed.
   if (typeof cloudInit === 'function') {
     cloudInit();
@@ -531,6 +537,58 @@ function syncHomeTabUI() {
   const mineBtn = document.getElementById('tab-mine');
   if (allBtn)  allBtn.classList.toggle('active',  state.homeTab === 'all');
   if (mineBtn) mineBtn.classList.toggle('active', state.homeTab === 'mine');
+}
+
+// Pull-to-refresh: drag down at the top of a scroll container to refresh.
+function setupPullToRefresh(scrollEl, onRefresh) {
+  const ind = document.getElementById('ptr-indicator');
+  if (!scrollEl || !ind) return;
+  const THRESHOLD = 70, MAX = 110;
+  let startY = 0, dist = 0, pulling = false, refreshing = false;
+
+  const reset = () => {
+    ind.style.transition = 'opacity .2s, transform .2s';
+    ind.style.opacity = '0';
+    ind.style.transform = 'translate(-50%, -120%)';
+  };
+
+  scrollEl.addEventListener('touchstart', e => {
+    if (refreshing || e.touches.length !== 1) { pulling = false; return; }
+    if (scrollEl.scrollTop <= 0) {
+      startY = e.touches[0].clientY; dist = 0; pulling = true;
+      ind.style.transition = 'none';
+    } else { pulling = false; }
+  }, { passive: true });
+
+  scrollEl.addEventListener('touchmove', e => {
+    if (!pulling || refreshing) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy <= 0 || scrollEl.scrollTop > 0) { pulling = false; reset(); return; }
+    e.preventDefault();                       // stop native scroll while pulling
+    dist = Math.min(MAX, dy * 0.5);           // drag resistance
+    const progress = Math.min(1, dist / THRESHOLD);
+    ind.style.opacity = String(progress);
+    ind.style.transform = `translate(-50%, ${dist}px)`;
+  }, { passive: false });
+
+  const end = () => {
+    if (!pulling || refreshing) { pulling = false; return; }
+    pulling = false;
+    ind.style.transition = 'opacity .2s, transform .2s';
+    if (dist >= THRESHOLD) {
+      refreshing = true;
+      ind.style.opacity = '1';
+      ind.style.transform = `translate(-50%, ${THRESHOLD}px)`;
+      ind.classList.add('spinning');
+      Promise.resolve(onRefresh()).finally(() => {
+        setTimeout(() => { ind.classList.remove('spinning'); reset(); refreshing = false; }, 600);
+      });
+    } else {
+      reset();
+    }
+  };
+  scrollEl.addEventListener('touchend', end, { passive: true });
+  scrollEl.addEventListener('touchcancel', end, { passive: true });
 }
 
 function setupSettings() {
