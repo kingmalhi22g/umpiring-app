@@ -117,12 +117,41 @@ function cloudPushMatch(match) {
 
 function _doPush(match) {
   delete _pushTimers[match.id];
-  _db.collection('matches').doc(match.id).set({
+  _db.collection('matches').doc(match.id).set(Object.assign({
     ownerId:   match.ownerId || _uid,
     status:    match.status || 'setup',
     matchJson: JSON.stringify(match),
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: true }).catch(e => console.error('[cloud] push failed', e));
+  }, _summaryFields(match)), { merge: true })
+    .catch(e => console.error('[cloud] push failed', e));
+}
+
+// Human-readable fields so the match is legible in the Firestore console
+// (the app itself still reads matchJson). Best-effort — never throws.
+function _summaryFields(match) {
+  try {
+    const t1 = match.teams && match.teams[0] ? match.teams[0].name : '';
+    const t2 = match.teams && match.teams[1] ? match.teams[1].name : '';
+    const innFor = name => (match.innings || []).find(i => i && i.battingTeam === name);
+    const overStr = inn => (inn && typeof getOverDisplay === 'function') ? getOverDisplay(inn) : '';
+    const score = inn => inn ? (inn.totalRuns + '/' + inn.wickets + ' (' + overStr(inn) + ')') : '';
+    const result = match.result
+      ? (typeof matchResultText === 'function' ? matchResultText(match) : '')
+      : '';
+    return {
+      title:     (t1 || '?') + ' vs ' + (t2 || '?'),
+      team1:     t1,
+      team2:     t2,
+      score1:    score(innFor(t1)),
+      score2:    score(innFor(t2)),
+      format:    (match.overs || '') + ' overs',
+      matchDate: match.date || '',
+      ground:    match.ground || '',
+      result:    result
+    };
+  } catch (e) {
+    return {};
+  }
 }
 
 // Returns a promise: resolves when the cloud doc is gone (or there's no cloud
