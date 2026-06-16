@@ -333,11 +333,13 @@ function renderMatchList(containerEl) {
       <div class="sum-rowb"><span class="sum-chip">${formatLabel(m.overs)}</span>${pill}</div>
       <div class="mc-team">${avatarHtml(t1.name,'sum-logo',30)}<span class="mc-name">${esc(t1.name)}</span><span class="mc-score">${scoreStr(getTeamInnings(m,t1.name))}</span></div>
       <div class="mc-team">${avatarHtml(t2.name,'sum-logo',30)}<span class="mc-name">${esc(t2.name)}</span><span class="mc-score">${scoreStr(getTeamInnings(m,t2.name))}</span></div>
-      ${foot}
-      ${(typeof canEditMatch === 'function' ? canEditMatch(m) : true) ? `
-      <button class="match-delete" data-del="${esc(m.id)}" type="button" aria-label="Delete match">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
-      </button>` : ''}`;
+      <div class="mc-footrow">
+        ${foot}
+        ${(typeof canEditMatch === 'function' ? canEditMatch(m) : true) ? `
+        <button class="match-delete" data-del="${esc(m.id)}" type="button" aria-label="Delete match">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+        </button>` : ''}
+      </div>`;
     containerEl.appendChild(div);
   });
 }
