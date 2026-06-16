@@ -284,20 +284,31 @@ function srSvg(sr) {
 
 // ── Match list (home) ─────────────────────────────────────
 function renderMatchList(containerEl) {
-  // Merge the shared cloud feed with local matches. Local wins for matches I
-  // own (freshest while scoring); cloud supplies everyone else's matches.
-  const byId = new Map();
-  const cloud = (typeof state !== 'undefined' && state.cloudMatches) ? state.cloudMatches : [];
-  cloud.forEach(m => byId.set(m.id, m));
-  getMatches().forEach(m => byId.set(m.id, m));
+  const mode = (typeof state !== 'undefined' && state.homeTab) ? state.homeTab : 'all';
   const idTime = id => Number(String(id).split('_')[1]) || 0;
-  const matches = [...byId.values()].sort((a, b) => idTime(b.id) - idTime(a.id));
+  let matches;
+  if (mode === 'mine') {
+    // Only matches scored on this device (local storage).
+    matches = getMatches().slice();
+  } else {
+    // Merge the shared cloud feed with local matches. Local wins for matches I
+    // own (freshest while scoring); cloud supplies everyone else's matches.
+    const byId = new Map();
+    const cloud = (typeof state !== 'undefined' && state.cloudMatches) ? state.cloudMatches : [];
+    cloud.forEach(m => byId.set(m.id, m));
+    getMatches().forEach(m => byId.set(m.id, m));
+    matches = [...byId.values()];
+  }
+  matches.sort((a, b) => idTime(b.id) - idTime(a.id));
   containerEl.innerHTML = '';
   if (matches.length === 0) {
+    const msg = mode === 'mine'
+      ? 'No matches on this device yet.<br>Tap <strong>New Match</strong> to start.'
+      : 'No matches yet.<br>Tap <strong>New Match</strong> to start.';
     containerEl.innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">🏏</div>
-        <p>No matches yet.<br>Tap <strong>New Match</strong> to start.</p>
+        <p>${msg}</p>
       </div>`;
     return;
   }

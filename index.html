@@ -10,10 +10,10 @@
   <title>Cricket Umpire</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=52">
-  <link rel="stylesheet" href="css/layout.css?v=52">
-  <link rel="stylesheet" href="css/components.css?v=52">
-  <link rel="stylesheet" href="css/redesign.css?v=52">
+  <link rel="stylesheet" href="css/style.css?v=53">
+  <link rel="stylesheet" href="css/layout.css?v=53">
+  <link rel="stylesheet" href="css/components.css?v=53">
+  <link rel="stylesheet" href="css/redesign.css?v=53">
   <style>
     /* Live screen fixed-bottom input panel */
     #screen-live { padding: 0; background: var(--c-bg); }
@@ -28,6 +28,9 @@
       box-shadow: 0 -2px 12px rgba(0,0,0,.06);
       display: flex; flex-direction: column; gap: 8px;
     }
+    /* Home: tabs + refresh row */
+    .home-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; margin-bottom: 2px; }
+    .home-bar .btn-icon { flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -46,6 +49,15 @@
   <section id="screen-home" class="screen active">
     <div class="screen-inner">
       <button id="btn-new-match" class="btn btn-primary btn-lg">&#127951; New Match</button>
+      <div class="home-bar">
+        <div class="sc-tabs" style="margin-top:0">
+          <button class="sc-tab active" id="tab-all"  type="button">All matches</button>
+          <button class="sc-tab"        id="tab-mine" type="button">My matches</button>
+        </div>
+        <button id="btn-refresh" class="btn-icon" type="button" aria-label="Refresh matches" title="Refresh matches">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M20 11a8 8 0 1 0-2.34 5.66M20 5v6h-6"/></svg>
+        </button>
+      </div>
       <div id="match-list"></div>
     </div>
   </section>
@@ -70,15 +82,6 @@
         <div class="form-group mt-md">
           <label class="form-label" for="ms-ground">Ground / Stadium <span class="opt-note">(optional)</span></label>
           <input id="ms-ground" class="form-input" type="text" placeholder="e.g. Victoria Park" autocomplete="off">
-        </div>
-        <div class="form-group mt-md">
-          <label class="form-label">Match Format</label>
-          <div class="preset-chips" id="ms-presets">
-            <button class="preset-chip" type="button" data-overs="10"><span class="pc-name">T10</span><span class="pc-sub">10 overs</span></button>
-            <button class="preset-chip" type="button" data-overs="20"><span class="pc-name">T20</span><span class="pc-sub">20 overs</span></button>
-            <button class="preset-chip" type="button" data-overs="50"><span class="pc-name">ODI</span><span class="pc-sub">50 overs</span></button>
-            <button class="preset-chip" type="button" data-overs="custom"><span class="pc-name">Custom</span><span class="pc-sub">set your own</span></button>
-          </div>
         </div>
         <div class="form-group mt-md">
           <label class="form-label" for="ms-overs">Overs Per Innings</label>
@@ -528,12 +531,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=52"></script>
-<script src="js/storage.js?v=52"></script>
-<script src="js/match.js?v=52"></script>
-<script src="js/router.js?v=52"></script>
-<script src="js/ui.js?v=52"></script>
-<script src="js/app.js?v=52"></script>
+<script src="js/cloud.js?v=53"></script>
+<script src="js/storage.js?v=53"></script>
+<script src="js/match.js?v=53"></script>
+<script src="js/router.js?v=53"></script>
+<script src="js/ui.js?v=53"></script>
+<script src="js/app.js?v=53"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">

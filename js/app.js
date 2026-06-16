@@ -30,6 +30,7 @@ const state = {
   matchId:            null,
   viewMatchId:        null,
   cloudMatches:       [],    // live feed of all matches from Firestore
+  homeTab:            'all',  // 'all' = everyone's matches, 'mine' = this device only
   selectedWicketType: null,
   pendingExtrasType:  null,  // 'wide'|'no_ball'|'bye'|'leg_bye'
   runoutRuns:         0,     // runs completed before a run-out
@@ -197,6 +198,13 @@ function wireButtons() {
 
   // Home
   on('btn-new-match', 'click', () => { state.matchId = null; navigateTo('match-setup'); });
+  on('tab-all',  'click', () => switchHomeTab('all'));
+  on('tab-mine', 'click', () => switchHomeTab('mine'));
+  on('btn-refresh', 'click', () => {
+    const ml = document.getElementById('match-list');
+    if (ml) renderMatchList(ml);
+    showToast('Refreshed');
+  });
   on('match-list', 'click', e => {
     // Delete affordance takes priority over opening the match
     const del = e.target.closest('.match-delete');
@@ -232,18 +240,7 @@ function wireButtons() {
 
   // Match setup
   on('btn-match-continue', 'click', handleMatchSetupContinue);
-  on('ms-presets', 'click', e => {
-    const chip = e.target.closest('.preset-chip');
-    if (!chip) return;
-    const overInput = document.getElementById('ms-overs');
-    if (chip.dataset.overs === 'custom') {
-      if (overInput) overInput.focus();
-    } else if (overInput) {
-      overInput.value = chip.dataset.overs;
-    }
-    syncPresetUI();
-  });
-  on('ms-overs', 'input', syncPresetUI);
+  on('ms-overs', 'input', updateOversHint);
 
   // Toss
   on('btn-bat',   'click', () => handleTossElect('bat'));
@@ -445,7 +442,22 @@ function wireButtons() {
 
 // ── Screen setup ──────────────────────────────────────────
 function setupHome() {
+  syncHomeTabUI();
   renderMatchList(document.getElementById('match-list'));
+}
+
+function switchHomeTab(tab) {
+  state.homeTab = tab;
+  syncHomeTabUI();
+  const ml = document.getElementById('match-list');
+  if (ml) renderMatchList(ml);
+}
+
+function syncHomeTabUI() {
+  const allBtn  = document.getElementById('tab-all');
+  const mineBtn = document.getElementById('tab-mine');
+  if (allBtn)  allBtn.classList.toggle('active',  state.homeTab === 'all');
+  if (mineBtn) mineBtn.classList.toggle('active', state.homeTab === 'mine');
 }
 
 function setupSettings() {
@@ -462,18 +474,12 @@ function setupMatchSetup() {
   if (dateInput) dateInput.value = new Date().toISOString().slice(0,10);
   const overInput = document.getElementById('ms-overs');
   if (overInput) overInput.value = getSettings().defaultOvers;
-  syncPresetUI();
+  updateOversHint();
 }
 
-// Highlight the preset chip matching the current overs value and refresh quota.
-function syncPresetUI() {
+// Refresh the bowler-quota hint under the overs input.
+function updateOversHint() {
   const overs = parseInt(val('ms-overs')) || 0;
-  const isStandard = ['10','20','50'].includes(String(overs));
-  document.querySelectorAll('#ms-presets .preset-chip').forEach(chip => {
-    const match = chip.dataset.overs === 'custom' ? (overs > 0 && !isStandard)
-                                                  : chip.dataset.overs === String(overs);
-    chip.classList.toggle('selected', match);
-  });
   const hint = document.getElementById('ms-quota');
   if (hint) {
     hint.innerHTML = overs > 0
