@@ -1023,23 +1023,27 @@ function showMilestone(text) {
   if (typeof haptic === 'function') haptic();
 }
 
+// Returns true if a milestone flag was set (so the caller can persist it).
 function checkMilestones(m) {
   const inn = m.innings[m.currentInnings];
-  if (!inn) return;
+  if (!inn) return false;
   const s = inn.batsmen[inn.strikerIdx];
   if (s) {
-    if (s.runs >= 100 && !s._m100) { s._m100 = true; s._m50 = true; showMilestone('💯 ' + s.name + ' — Century!'); return; }
-    if (s.runs >= 50 && !s._m50)   { s._m50 = true; showMilestone('🎉 ' + s.name + ' — Fifty!'); return; }
+    if (s.runs >= 100 && !s._m100) { s._m100 = true; s._m50 = true; showMilestone('💯 ' + s.name + ' — Century!'); return true; }
+    if (s.runs >= 50 && !s._m50)   { s._m50 = true; showMilestone('🎉 ' + s.name + ' — Fifty!'); return true; }
   }
   const tm = Math.floor(inn.totalRuns / 50) * 50;     // team 50/100/150…
-  if (tm >= 50 && tm > (inn._teamMs || 0)) { inn._teamMs = tm; showMilestone('🏏 ' + inn.battingTeam + ' — ' + tm + ' up!'); }
+  if (tm >= 50 && tm > (inn._teamMs || 0)) { inn._teamMs = tm; showMilestone('🏏 ' + inn.battingTeam + ' — ' + tm + ' up!'); return true; }
+  return false;
 }
 
 function afterBall(m) {
   const inn = m.innings[m.currentInnings];
   if (!inn) return;
 
-  checkMilestones(m);
+  // Check milestones and persist the "already shown" flags immediately, so the
+  // same fifty/century/team milestone can't pop again on a later ball.
+  if (checkMilestones(m)) saveMatch(m);
 
   // Target reached when chasing (2nd innings, or 2nd super-over innings)?
   if (m.currentInnings === 1 || m.currentInnings === 3) {

@@ -305,6 +305,10 @@ function replayInnings(match) {
     if (b) { b.retired = true; b.how = r.how; if (r.isOut && !b.isOut) { b.isOut = true; inn.wickets++; } }
   });
 
+  // Mark already-passed milestones so they don't pop again after an edit.
+  inn.batsmen.forEach(b => { b._m50 = b.runs >= 50; b._m100 = b.runs >= 100; });
+  inn._teamMs = Math.floor(inn.totalRuns / 50) * 50;
+
   return match;
 }
 
