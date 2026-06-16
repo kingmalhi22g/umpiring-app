@@ -200,8 +200,10 @@
 .chip-sugg { margin-left: 4px; }
 .score-hero-team { color: rgba(255,255,255,.92); font-size: 12.5px; font-weight: 600; margin-top: 7px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.score-hero-team b { font-weight: 800; }
-.hero-vs { opacity: .65; }
+.score-hero-team b { font-weight: 800; font-size: 12.5px; }
+.hero-vs { opacity: .55; font-size: 10px; }
+#live-score-oppo { font-size: 10.5px; font-weight: 500; opacity: .75; }
+.score-hero-overs { font-size: 13px; font-weight: 600; opacity: .8; margin-left: 7px; letter-spacing: 0; }
 .score-hero-top { align-items: center; }
 .hero-icon { width: 32px; height: 32px; flex-shrink: 0; border: none; border-radius: 50%;
   background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center; cursor: pointer; }

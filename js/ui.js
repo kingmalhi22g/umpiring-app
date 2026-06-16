@@ -65,7 +65,7 @@ function renderLiveHeader(match) {
   setEl('live-score-oppo', inn.bowlingTeam);
   setEl('live-score-runs', inn.totalRuns);
   setEl('live-score-wkts', inn.wickets);
-  setEl('live-score-overs', getOverDisplay(inn) + ' ov');
+  setEl('live-score-overs', getOverDisplay(inn));
 
   const ballsBowled = inn.overs.length * 6 + (inn.currentOver ? inn.currentOver.balls.length : 0);
   const crr = ballsBowled > 0 ? (inn.totalRuns / (ballsBowled / 6)).toFixed(2) : null;
