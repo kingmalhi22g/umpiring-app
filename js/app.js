@@ -127,6 +127,19 @@ function initApp() {
     }
   }
 
+  // Belt-and-suspenders double-tap-zoom killer for iOS Safari, where
+  // `touch-action: manipulation` doesn't reliably stop it. Cancels the zoom on
+  // a second tap within 300ms (leaves form fields and pinch-zoom alone).
+  let _lastTouchEnd = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    const tag = e.target && e.target.tagName;
+    if (now - _lastTouchEnd <= 300 && tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+      e.preventDefault();
+    }
+    _lastTouchEnd = now;
+  }, { passive: false });
+
   // Capture the install prompt (Android/Chrome) so our button can trigger it.
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
