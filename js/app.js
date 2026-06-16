@@ -379,7 +379,7 @@ function wireButtons() {
   });
   on('btn-export-card',  'click', handleExportCard);
   on('btn-export-oversheet', 'click', handleOpenOverSheet);
-  on('btn-osp-share', 'click', handleShareOverSheet);
+  on('btn-osp-share', 'click', handleSharePreview);
   on('btn-osp-close', 'click', closeOverSheetPreview);
   // Dark mode 3-way toggle
   [['dm-auto', null], ['dm-on', true], ['dm-off', false]].forEach(([id, val]) => {
@@ -953,41 +953,38 @@ function handleOpenStats() {
   openModal('modal-stats');
 }
 
+// Build the scorecard image and show it in the on-screen preview first
+// (Share happens from the preview's Share button — same flow as the sheet).
 function handleExportCard() {
-  const idToUse = state.viewMatchId || state.matchId;
-  const m = getMatchAny(idToUse);   // any viewable match, incl. others' from the cloud
-  if (!m) { showToast('No match data to export'); return; }
-  showToast('Generating scorecard…', 3000);
+  const m = getMatchAny(state.viewMatchId || state.matchId);   // any viewable match, incl. others'
+  if (!m) { showToast('No match data to share'); return; }
+  showToast('Generating scorecard…', 2500);
   renderExportCard(m);
   setTimeout(() => {
     const card = document.getElementById('export-card');
-    if (!card || typeof html2canvas === 'undefined') { showToast('Export unavailable'); return; }
+    if (!card || typeof html2canvas === 'undefined') { showToast('Preview unavailable'); return; }
     html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#1B5E20' }).then(canvas => {
       canvas.toBlob(blob => {
         if (!blob) { showToast('Could not generate image'); return; }
-        const url = URL.createObjectURL(blob);
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'scorecard.png', { type: 'image/png' })] })) {
-          navigator.share({ files: [new File([blob], 'scorecard.png', { type: 'image/png' })], title: 'Match Scorecard' })
-            .catch(() => _downloadScorecard(url));
-        } else {
-          _downloadScorecard(url);
-        }
+        _showImagePreview(blob, 'Scorecard', 'scorecard.png');
       }, 'image/png');
     }).catch(() => showToast('Export failed'));
   }, 200);
 }
 
-function _downloadScorecard(url) {
-  const a = document.createElement('a');
-  a.href = url; a.download = 'scorecard.png';
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 3000);
-  showToast('Scorecard saved!');
+// Shared image-preview overlay used by both Scorecard and Over-by-Over.
+let _previewBlob = null, _previewName = 'image.png';
+function _showImagePreview(blob, title, filename) {
+  _previewBlob = blob; _previewName = filename;
+  const img = document.getElementById('osp-img');
+  if (img) img.src = URL.createObjectURL(blob);
+  const t = document.querySelector('#oversheet-preview .osp-title');
+  if (t) t.textContent = title;
+  const ov = document.getElementById('oversheet-preview');
+  if (ov) ov.classList.remove('hidden');
 }
 
-// Generate the sheet image and show it in an on-screen preview first.
-let _overSheetBlob = null;
+// Build the over-by-over sheet image and show it in the preview first.
 function handleOpenOverSheet() {
   const m = getMatchAny(state.viewMatchId || state.matchId);   // incl. others' cloud matches
   if (!m) { showToast('No match data'); return; }
@@ -999,23 +996,22 @@ function handleOpenOverSheet() {
     html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
       canvas.toBlob(blob => {
         if (!blob) { showToast('Could not generate image'); return; }
-        _overSheetBlob = blob;
-        const img = document.getElementById('osp-img');
-        if (img) img.src = URL.createObjectURL(blob);
-        document.getElementById('oversheet-preview').classList.remove('hidden');
+        _showImagePreview(blob, 'Over-by-Over Sheet', 'over-sheet.png');
       }, 'image/png');
     }).catch(() => showToast('Preview failed'));
   }, 150);
 }
 
-function handleShareOverSheet() {
-  if (!_overSheetBlob) return;
-  const file = new File([_overSheetBlob], 'over-sheet.png', { type: 'image/png' });
-  const url = URL.createObjectURL(_overSheetBlob);
+// Share whatever image is currently in the preview (scorecard or sheet).
+function handleSharePreview() {
+  if (!_previewBlob) return;
+  const file = new File([_previewBlob], _previewName, { type: 'image/png' });
+  const url = URL.createObjectURL(_previewBlob);
+  const title = _previewName.replace(/\.png$/, '');
   if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-    navigator.share({ files: [file], title: 'Over-by-Over Sheet' }).catch(() => _downloadFile(url, 'over-sheet.png'));
+    navigator.share({ files: [file], title }).catch(() => _downloadFile(url, _previewName));
   } else {
-    _downloadFile(url, 'over-sheet.png');
+    _downloadFile(url, _previewName);
   }
 }
 
@@ -1030,7 +1026,7 @@ function _downloadFile(url, name) {
   document.body.appendChild(a); a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 3000);
-  showToast('Sheet saved!');
+  showToast('Saved!');
 }
 
 // ── Backup & restore ──────────────────────────────────────
