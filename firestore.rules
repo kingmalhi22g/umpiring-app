@@ -1,0 +1,26 @@
+rules_version = '2';
+
+// Cricket Umpire — match sharing rules.
+// • Anyone signed in (everyone is, at least anonymously) can READ all matches.
+// • You can only create a match owned by yourself.
+// • Only the match's creator — or the admin — can update or delete it.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'kingmalhi22g@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    match /matches/{matchId} {
+      allow read: if request.auth != null;
+
+      allow create: if request.auth != null
+        && request.resource.data.ownerId == request.auth.uid;
+
+      allow update, delete: if request.auth != null
+        && (resource.data.ownerId == request.auth.uid || isAdmin());
+    }
+  }
+}

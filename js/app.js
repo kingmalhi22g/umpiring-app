@@ -29,6 +29,7 @@ function debounced(fn) {
 const state = {
   matchId:            null,
   viewMatchId:        null,
+  cloudMatches:       [],    // live feed of all matches from Firestore
   selectedWicketType: null,
   pendingExtrasType:  null,  // 'wide'|'no_ball'|'bye'|'leg_bye'
   runoutRuns:         0,     // runs completed before a run-out
@@ -106,7 +107,6 @@ function initApp() {
       'end-of-over':   setupEndOfOver,
       'innings-break': setupInningsBreak,
       'summary':       setupSummary,
-      'rosters':       renderRosters,
       'settings':      setupSettings
     };
     if (handlers[screen]) handlers[screen]();
@@ -115,6 +115,72 @@ function initApp() {
   init(); // router — activates the current screen and fires its handler
 
   wireButtons();
+
+  // Cloud sync: anonymous identity for everyone, live shared match feed.
+  if (typeof cloudInit === 'function') {
+    cloudInit();
+    cloudSubscribeMatches(feed => {
+      state.cloudMatches = feed;
+      if (getCurrentScreen() === 'home') {
+        const ml = document.getElementById('match-list');
+        if (ml) renderMatchList(ml);
+      }
+    });
+  }
+}
+
+// Called by cloud.js whenever sign-in state settles (anon or admin).
+function onCloudAuth() {
+  updateAccountUI();
+  if (getCurrentScreen() === 'home') {
+    const ml = document.getElementById('match-list');
+    if (ml) renderMatchList(ml);
+  }
+}
+
+// A match found in local storage was created on this device, so it's mine.
+// Cloud-only matches belong to other people (view-only unless I'm admin).
+function getMatchAny(id) {
+  return getMatch(id) || state.cloudMatches.find(m => m.id === id) || null;
+}
+function canEditMatch(m) {
+  if (!m) return false;
+  if (typeof cloudIsAdmin === 'function' && cloudIsAdmin()) return true;
+  // Signed-in (Google) owners can manage their own matches on any device;
+  // anonymous owners fall back to "is it on this device?" (per-device identity).
+  if (typeof cloudUid === 'function' && cloudUid() && m.ownerId &&
+      m.ownerId === cloudUid() && typeof cloudIsAnon === 'function' && !cloudIsAnon()) {
+    return true;
+  }
+  return !!getMatch(m.id);
+}
+
+function updateAccountUI() {
+  const el     = document.getElementById('account-status');
+  const inBtn  = document.getElementById('btn-google-signin');
+  const outBtn = document.getElementById('btn-google-signout');
+  if (!el) return;
+  // Toggle via inline display — the .btn class sets `display`, which would
+  // otherwise override the plain [hidden] attribute and show both buttons.
+  const show = (btn, on) => { if (btn) btn.style.display = on ? '' : 'none'; };
+  if (typeof cloudReady !== 'function' || !cloudReady()) {
+    el.textContent = 'Connecting…';
+    show(inBtn, false); show(outBtn, false);
+    return;
+  }
+  if (cloudIsAdmin()) {
+    // Only the owner email is admin (enforced server-side in firestore.rules).
+    el.textContent = 'Signed in as admin. You can edit or delete any match.';
+    show(inBtn, false); show(outBtn, true);
+  } else if (!cloudIsAnon()) {
+    // A normal Google user — signed in, no admin powers.
+    const who = cloudEmail() ? ' (' + cloudEmail() + ')' : '';
+    el.textContent = 'Signed in' + who + '. Your matches sync to your account on any device.';
+    show(inBtn, false); show(outBtn, true);
+  } else {
+    el.textContent = 'Your matches are shared and visible on every device. Signing in with Google is optional — it lets you manage your own matches from any device.';
+    show(inBtn, true); show(outBtn, false);
+  }
 }
 
 // ── Global button wiring ──────────────────────────────────
@@ -128,7 +194,6 @@ function wireButtons() {
     } else history.back();
   });
   on('btn-menu',  'click', () => navigateTo('settings'));
-  on('btn-rosters', 'click', () => navigateTo('rosters'));
 
   // Home
   on('btn-new-match', 'click', () => { state.matchId = null; navigateTo('match-setup'); });
@@ -137,7 +202,7 @@ function wireButtons() {
     const del = e.target.closest('.match-delete');
     if (del) {
       e.stopPropagation();
-      const m = getMatch(del.dataset.del);
+      const m = getMatchAny(del.dataset.del);
       if (!m) return;
       const label = m.teams[0].name + ' vs ' + m.teams[1].name;
       const delId = del.dataset.del;
@@ -157,9 +222,11 @@ function wireButtons() {
     }
     const item = e.target.closest('.match-item');
     if (!item) return;
-    const m = getMatch(item.dataset.id);
+    const m = getMatchAny(item.dataset.id);
     if (!m) return;
-    if (m.status === 'in_progress') { state.matchId = m.id; setActiveMatchId(m.id); navigateTo('live'); }
+    // Only resume live scoring for a match I own; everyone else views it.
+    const mine = !!getMatch(m.id);
+    if (m.status === 'in_progress' && mine) { state.matchId = m.id; setActiveMatchId(m.id); navigateTo('live'); }
     else { state.viewMatchId = m.id; navigateTo('summary'); }
   });
 
@@ -344,7 +411,6 @@ function wireButtons() {
     saveSettings({ defaultOvers: overs });
     showToast('Settings saved');
   });
-  on('btn-go-rosters', 'click', () => navigateTo('rosters'));
   on('btn-export-data', 'click', handleExportData);
   on('btn-import-data', 'click', () => document.getElementById('import-file').click());
   on('import-file', 'change', e => {
@@ -352,10 +418,25 @@ function wireButtons() {
     handleImportData(f);
     e.target.value = '';
   });
+  on('btn-google-signin', 'click', () => {
+    if (typeof cloudSignInGoogle !== 'function') return;
+    cloudSignInGoogle()
+      .then(() => {
+        showToast(cloudIsAdmin() ? 'Signed in as admin' : 'Signed in');
+        updateAccountUI();
+        const ml = document.getElementById('match-list');
+        if (ml && getCurrentScreen() === 'home') renderMatchList(ml);
+      })
+      .catch(() => showToast('Sign-in failed'));
+  });
+  on('btn-google-signout', 'click', () => {
+    if (typeof cloudSignOut !== 'function') return;
+    cloudSignOut().then(() => { showToast('Signed out'); updateAccountUI(); });
+  });
   on('btn-clear-data', 'click', () => {
     showConfirm({
       title: 'Clear all data?',
-      message: 'Delete all matches and rosters? This cannot be undone.',
+      message: 'Delete all matches? This cannot be undone.',
       confirmText: 'Clear all',
       onConfirm: () => { clearAll(); navigateTo('home'); showToast('All data cleared'); }
     });
@@ -371,6 +452,7 @@ function setupSettings() {
   const oInput = document.getElementById('settings-overs');
   if (oInput) oInput.value = getSettings().defaultOvers;
   applyDarkMode(getDarkMode()); // syncs the toggle label
+  updateAccountUI();
 }
 
 function setupMatchSetup() {
@@ -430,7 +512,7 @@ function setupInningsBreak() {
 }
 
 function setupSummary() {
-  renderMatchSummary(getMatch(state.viewMatchId || state.matchId));
+  renderMatchSummary(getMatchAny(state.viewMatchId || state.matchId));
 }
 
 // Subtle red outline on an empty/invalid required field (cleared on input).
@@ -458,8 +540,6 @@ function handleEditNameSave() {
   if (!newName || newName === oldName) { closeModal(); return; }
   const inn = m.innings[m.currentInnings];
   renamePlayerInInnings(inn, oldName, newName);
-  addPlayerToRoster(inn.battingTeam, newName);
-  addPlayerToRoster(inn.bowlingTeam, newName);
   saveMatch(m);
   state.editNameOld = null;
   closeModal();
@@ -523,9 +603,7 @@ function handleTossElect(elected) {
 
 // ── Openers modal ─────────────────────────────────────────
 function showOpenersModal(m, innIdx) {
-  const inn      = m.innings[innIdx];
-  const batTeam  = m.teams.find(t => t.name === inn.battingTeam);
-  const bowlTeam = m.teams.find(t => t.name === inn.bowlingTeam);
+  const inn = m.innings[innIdx];
 
   setEl('openers-team', inn.battingTeam + ' — Opening Pair');
   document.getElementById('opener1').value       = '';
@@ -543,14 +621,6 @@ function showOpenersModal(m, innIdx) {
   const backBtn = document.getElementById('btn-openers-back');
   if (backBtn) backBtn.style.display = innIdx === 0 ? '' : 'none';
 
-  populateDatalist('openers-dl', [
-    ...(batTeam ? batTeam.batsmen : []),
-    ...getRoster(inn.battingTeam)
-  ]);
-  populateDatalist('bowler-datalist', [
-    ...(bowlTeam ? bowlTeam.bowlers : []),
-    ...getRoster(inn.bowlingTeam)
-  ]);
   openModal('modal-openers');
 }
 
@@ -568,9 +638,6 @@ function handleStartInnings() {
 
   setOpeners(inn, op1, op2);
   inn.currentOver = createOver(1, bwl);
-  addPlayerToRoster(inn.battingTeam, op1);
-  addPlayerToRoster(inn.battingTeam, op2);
-  addPlayerToRoster(inn.bowlingTeam, bwl);
   saveMatch(m);
   closeModal();
   navigateTo('live');
@@ -700,13 +767,6 @@ function handleWicketConfirm() {
   saveMatch(m);
 
   // Show new batsman
-  const batTeam = m.teams.find(t => t.name === updatedInn.battingTeam);
-  const taken   = new Set(updatedInn.batsmen.map(b => b.name));
-  populateDatalist('new-batsman-dl', [
-    ...(batTeam ? batTeam.batsmen : []),
-    ...getRoster(updatedInn.battingTeam)
-  ].filter(n => !taken.has(n)));
-
   document.getElementById('new-batsman-name').value = '';
   const howLabel = wType ? wType.replace(/_/g,' ') : 'out';
   const runsNote = runoutRuns > 0 ? ' · ' + runoutRuns + ' run' + (runoutRuns > 1 ? 's' : '') + ' completed' : '';
@@ -732,12 +792,6 @@ function handleRetire(m, inn, type) {
   }
   saveMatch(m);
 
-  const batTeam = m.teams.find(t => t.name === inn.battingTeam);
-  const taken   = new Set(inn.batsmen.map(b => b.name));
-  populateDatalist('new-batsman-dl', [
-    ...(batTeam ? batTeam.batsmen : []),
-    ...getRoster(inn.battingTeam)
-  ].filter(n => !taken.has(n)));
   document.getElementById('new-batsman-name').value = '';
   setEl('new-batsman-info', striker.name + ' ' + striker.how + ' · select replacement');
   openModal('modal-new-batsman');
@@ -748,7 +802,6 @@ function handleNewBatsmanConfirm() {
   const inn = m.innings[m.currentInnings];
   const name = val('new-batsman-name') || ('Batsman ' + (inn.batsmen.length + 1));
   addBatsman(inn, name);
-  addPlayerToRoster(inn.battingTeam, name);
   saveMatch(m);
   closeModal();
   renderLiveHeader(m);
@@ -1142,7 +1195,6 @@ function endInnings(m) {
   setActiveMatchId(null);
   state.viewMatchId = m.id;
   state.matchId     = null;
-  savePlayersFromMatch(m);
   saveMatch(m);
   navigateTo('summary');
 }
@@ -1180,7 +1232,6 @@ function handleEndOfOverContinue() {
   }
   let m = getMatch(state.matchId);
   m = startNewOver(m, bowler);
-  addPlayerToRoster(m.innings[m.currentInnings].bowlingTeam, bowler);
   saveMatch(m);
   navigateTo('live');
 }
@@ -1222,12 +1273,6 @@ function showConfirm(opts) {
   setEl('btn-confirm-cancel', o.cancelText || 'Cancel');
   _confirmCallback = typeof o.onConfirm === 'function' ? o.onConfirm : null;
   openModal('modal-confirm');
-}
-
-// Exposed for inline onclick in rosters
-function handleRemovePlayer(team, player) {
-  removePlayerFromRoster(team, player);
-  renderRosters();
 }
 
 // ── Helpers ───────────────────────────────────────────────

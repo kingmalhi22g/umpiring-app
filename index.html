@@ -10,10 +10,10 @@
   <title>Cricket Umpire</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=48">
-  <link rel="stylesheet" href="css/layout.css?v=48">
-  <link rel="stylesheet" href="css/components.css?v=48">
-  <link rel="stylesheet" href="css/redesign.css?v=48">
+  <link rel="stylesheet" href="css/style.css?v=52">
+  <link rel="stylesheet" href="css/layout.css?v=52">
+  <link rel="stylesheet" href="css/components.css?v=52">
+  <link rel="stylesheet" href="css/redesign.css?v=52">
   <style>
     /* Live screen fixed-bottom input panel */
     #screen-live { padding: 0; background: var(--c-bg); }
@@ -45,10 +45,7 @@
   <!-- HOME -->
   <section id="screen-home" class="screen active">
     <div class="screen-inner">
-      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:stretch">
-        <button id="btn-new-match" class="btn btn-primary btn-lg">&#127951; New Match</button>
-        <button id="btn-rosters" class="btn btn-ghost btn-lg" style="width:auto;padding:14px 14px" title="Manage Rosters">&#128100;</button>
-      </div>
+      <button id="btn-new-match" class="btn btn-primary btn-lg">&#127951; New Match</button>
       <div id="match-list"></div>
     </div>
   </section>
@@ -272,7 +269,7 @@
         <div class="form-group mt-sm">
           <label class="form-label" for="eos-next-bowler">Next Bowler</label>
           <input id="eos-next-bowler" class="form-input" type="text"
-                 placeholder="Bowler name" list="bowler-datalist" autocomplete="off">
+                 placeholder="Bowler name" autocomplete="off">
         </div>
       </div>
       <button id="btn-eos-continue" class="btn btn-primary btn-lg">Continue &rarr;</button>
@@ -305,21 +302,16 @@
     </div>
   </section>
 
-  <!-- MANAGE ROSTERS -->
-  <section id="screen-rosters" class="screen">
-    <div class="screen-inner">
-      <p class="text-sm text-2">
-        Player names are saved automatically when you complete a match.
-        Add players manually here or delete unwanted entries.
-      </p>
-      <div id="rosters-content"></div>
-    </div>
-  </section>
-
   <!-- SETTINGS -->
   <section id="screen-settings" class="screen">
     <div class="screen-inner">
       <div class="card">
+        <div class="section-head">Sharing &amp; Account</div>
+        <p class="text-sm text-2 mt-sm" id="account-status">Connecting…</p>
+        <button id="btn-google-signin" class="btn btn-primary btn-sm mt-md" type="button" style="display:none">Sign in with Google (optional)</button>
+        <button id="btn-google-signout" class="btn btn-ghost btn-sm mt-sm" type="button" style="display:none">Sign out</button>
+      </div>
+      <div class="card mt-sm">
         <div class="section-head">Preferences</div>
         <div class="form-group mt-md">
           <label class="form-label" for="settings-overs">Default Overs Per Innings</label>
@@ -336,20 +328,15 @@
         <button class="btn btn-primary mt-md btn-sm" id="btn-save-settings" type="button">Save</button>
       </div>
       <div class="card mt-sm">
-        <div class="section-head">Rosters</div>
-        <p class="text-sm text-2 mt-sm">View and manage saved player names.</p>
-        <button id="btn-go-rosters" class="btn btn-ghost btn-sm mt-md" type="button">&#128100; Manage Rosters</button>
-      </div>
-      <div class="card mt-sm">
         <div class="section-head">Backup &amp; Restore</div>
-        <p class="text-sm text-2 mt-sm">Your matches live only on this device. Save a backup file you can restore later or move to another phone.</p>
+        <p class="text-sm text-2 mt-sm">Matches sync to the cloud and show on every device. You can also save a local backup file here.</p>
         <button id="btn-export-data" class="btn btn-ghost btn-sm mt-md" type="button">&#11015; Export Backup</button>
         <button id="btn-import-data" class="btn btn-ghost btn-sm mt-sm" type="button">&#11014; Import Backup</button>
         <input id="import-file" type="file" accept="application/json,.json" style="display:none">
       </div>
       <div class="card" style="border-left:4px solid var(--c-danger)">
         <div class="section-head" style="color:var(--c-danger)">Danger Zone</div>
-        <p class="text-sm text-2 mt-sm">Permanently delete all matches and saved rosters.</p>
+        <p class="text-sm text-2 mt-sm">Permanently delete all matches on this device.</p>
         <button id="btn-clear-data" class="btn btn-danger btn-sm mt-md" type="button">Clear All Data</button>
       </div>
     </div>
@@ -366,20 +353,19 @@
     <div class="modal-title" id="openers-team">Opening Pair</div>
     <div class="form-group">
       <label class="form-label">Striker (Opener 1)</label>
-      <input id="opener1" class="form-input" type="text" placeholder="Batsman name (optional)" list="openers-dl" autocomplete="off">
+      <input id="opener1" class="form-input" type="text" placeholder="Batsman name (optional)" autocomplete="off">
     </div>
     <div class="form-group mt-md">
       <label class="form-label">Non-Striker (Opener 2)</label>
-      <input id="opener2" class="form-input" type="text" placeholder="Batsman name (optional)" list="openers-dl" autocomplete="off">
+      <input id="opener2" class="form-input" type="text" placeholder="Batsman name (optional)" autocomplete="off">
     </div>
     <div class="divider mt-md"></div>
     <div class="form-group mt-md">
       <label class="form-label">First Bowler</label>
-      <input id="first-bowler" class="form-input" type="text" placeholder="Bowler name" list="bowler-datalist" autocomplete="off">
+      <input id="first-bowler" class="form-input" type="text" placeholder="Bowler name" autocomplete="off">
     </div>
     <button id="btn-start-innings" class="btn btn-primary btn-lg mt-md" type="button">Start Innings</button>
     <button id="btn-openers-back" class="btn btn-ghost btn-sm mt-sm" type="button">&#8592; Back to toss</button>
-    <datalist id="openers-dl"></datalist>
   </div>
 
   <!-- Edit player name (mid-innings) -->
@@ -465,10 +451,9 @@
     <div class="form-group">
       <label class="form-label">Batsman Name <span class="opt-note">(optional)</span></label>
       <input id="new-batsman-name" class="form-input" type="text"
-             placeholder="Next batsman (optional)" list="new-batsman-dl" autocomplete="off">
+             placeholder="Next batsman (optional)" autocomplete="off">
     </div>
     <button id="btn-new-batsman-ok" class="btn btn-primary btn-lg mt-md" type="button">&#9654; Continue</button>
-    <datalist id="new-batsman-dl"></datalist>
   </div>
 
   <!-- Edit Ball (feature A) -->
@@ -536,15 +521,19 @@
   <button id="btn-update-refresh" type="button">Refresh</button>
 </div>
 
-<!-- ── Shared datalists ── -->
-<datalist id="bowler-datalist"></datalist>
+
+<!-- ── Firebase (compat SDK — gives global `firebase`) ── -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/storage.js?v=48"></script>
-<script src="js/match.js?v=48"></script>
-<script src="js/router.js?v=48"></script>
-<script src="js/ui.js?v=48"></script>
-<script src="js/app.js?v=48"></script>
+<script src="js/cloud.js?v=52"></script>
+<script src="js/storage.js?v=52"></script>
+<script src="js/match.js?v=52"></script>
+<script src="js/router.js?v=52"></script>
+<script src="js/ui.js?v=52"></script>
+<script src="js/app.js?v=52"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">

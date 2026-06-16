@@ -8,12 +8,11 @@ const SCREEN_TITLES = {
   'end-of-over':   'End of Over',
   'innings-break': 'Innings Break',
   'summary':       'Match Summary',
-  'rosters':       'Manage Rosters',
   'settings':      'Settings'
 };
 
 // Screens where the back button should show
-const BACK_SCREENS = ['match-setup','toss','rosters','settings'];
+const BACK_SCREENS = ['match-setup','toss','settings'];
 
 // Screens where the live match header info should show
 const LIVE_SCREENS = ['live','end-of-over'];

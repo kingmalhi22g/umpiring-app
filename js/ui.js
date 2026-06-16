@@ -284,7 +284,14 @@ function srSvg(sr) {
 
 // ── Match list (home) ─────────────────────────────────────
 function renderMatchList(containerEl) {
-  const matches = getMatches();
+  // Merge the shared cloud feed with local matches. Local wins for matches I
+  // own (freshest while scoring); cloud supplies everyone else's matches.
+  const byId = new Map();
+  const cloud = (typeof state !== 'undefined' && state.cloudMatches) ? state.cloudMatches : [];
+  cloud.forEach(m => byId.set(m.id, m));
+  getMatches().forEach(m => byId.set(m.id, m));
+  const idTime = id => Number(String(id).split('_')[1]) || 0;
+  const matches = [...byId.values()].sort((a, b) => idTime(b.id) - idTime(a.id));
   containerEl.innerHTML = '';
   if (matches.length === 0) {
     containerEl.innerHTML = `
@@ -316,9 +323,10 @@ function renderMatchList(containerEl) {
       <div class="mc-team">${avatarHtml(t1.name,'sum-logo',30)}<span class="mc-name">${esc(t1.name)}</span><span class="mc-score">${scoreStr(getTeamInnings(m,t1.name))}</span></div>
       <div class="mc-team">${avatarHtml(t2.name,'sum-logo',30)}<span class="mc-name">${esc(t2.name)}</span><span class="mc-score">${scoreStr(getTeamInnings(m,t2.name))}</span></div>
       ${foot}
+      ${(typeof canEditMatch === 'function' ? canEditMatch(m) : true) ? `
       <button class="match-delete" data-del="${esc(m.id)}" type="button" aria-label="Delete match">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
-      </button>`;
+      </button>` : ''}`;
     containerEl.appendChild(div);
   });
 }
@@ -521,34 +529,6 @@ function renderStatsPanel(match, innList) {
   return h || '<div class="stat-block">No stats yet.</div>';
 }
 
-// ── Rosters screen ───────────────────────────────────────
-function renderRosters() {
-  const el = document.getElementById('rosters-content');
-  if (!el) return;
-  const rosters = getAllRosters();
-  const teams   = Object.keys(rosters);
-  if (teams.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">👤</div><p>No saved rosters yet.<br>Player names are saved automatically after a match.</p></div>';
-    return;
-  }
-  let html = '';
-  teams.forEach(team => {
-    const players = rosters[team];
-    if (!players.length) return;
-    html += `<div class="card mb-md">
-      <div class="section-head">${esc(team)}</div>
-      <div class="roster-chips" id="chips-${safeid(team)}">
-        ${players.map(p => `
-          <div class="roster-chip">
-            ${esc(p)}
-            <button onclick="handleRemovePlayer('${esc(team)}','${esc(p)}')" aria-label="Remove">×</button>
-          </div>`).join('')}
-      </div>
-    </div>`;
-  });
-  el.innerHTML = html || '<div class="empty-state"><div class="empty-icon">👤</div><p>No saved players.</p></div>';
-}
-
 // ── Over summary (end-of-over screen) ────────────────────
 function renderOverSummary(match) {
   const inn = match.innings[match.currentInnings];
@@ -563,15 +543,6 @@ function renderOverSummary(match) {
   setEl('eos-total',       inn.totalRuns + '/' + inn.wickets + ' (' + getOverDisplay(inn) + ' ov)');
 
   renderBallDots(document.getElementById('eos-dots'), lastOver);
-
-  // Populate bowling team for next bowler datalist
-  const bowlingTeam = match.teams.find(t => t.name === inn.bowlingTeam);
-  if (bowlingTeam) {
-    populateDatalist('bowler-datalist', [
-      ...bowlingTeam.bowlers,
-      ...getRoster(bowlingTeam.name)
-    ]);
-  }
 
   // Recent bowlers chips (current innings only) — grey out last bowler and quota-reached bowlers
   const chipsEl = document.getElementById('eos-recent-bowlers');
@@ -643,15 +614,6 @@ function esc(s) {
   return String(s)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function safeid(s) { return s.replace(/[^a-zA-Z0-9]/g,'_'); }
-
-function populateDatalist(id, names) {
-  const dl = document.getElementById(id);
-  if (!dl) return;
-  const unique = [...new Set(names.filter(Boolean))].sort();
-  dl.innerHTML = unique.map(n => `<option value="${esc(n)}">`).join('');
 }
 
 // ── Live Stats modal ─────────────────────────────────────

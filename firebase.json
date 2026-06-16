@@ -1,4 +1,7 @@
 {
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "hosting": {
     "public": ".",
     "ignore": [
@@ -7,7 +10,9 @@
       "**/.*",
       "**/node_modules/**",
       "icons/_preview/**",
-      "*.md"
+      "*.md",
+      "server.js",
+      "firestore.rules"
     ]
   }
 }
