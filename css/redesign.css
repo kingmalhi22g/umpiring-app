@@ -241,12 +241,13 @@
   padding: 6px 12px; cursor: pointer; }
 .live-switch svg { width: 14px; height: 14px; stroke: var(--c-primary); fill: none; stroke-width: 2; }
 
-/* Run pad — calm neutral runs, bold boundaries (recommended look) */
-#ball-input-area { background: var(--c-bg); border-top: 1px solid var(--c-border); }
-.run-btn { border-radius: 12px; height: 42px; font-size: 17px;
+/* Run pad — calm neutral runs, bold boundaries; compact to save vertical space */
+#ball-input-area { background: var(--c-bg); border-top: 1px solid var(--c-border);
+  padding: 6px 10px calc(6px + var(--safe-b)); gap: 5px; }
+.run-btn { border-radius: 11px; height: 38px; font-size: 16px;
   box-shadow: 0 1px 2px rgba(0,0,0,.08); }
 .run-btn:active { transform: scale(.96); }
-.run-grid { gap: 8px; }
+.run-grid { gap: 6px; }
 .run-grid .run-0,
 .run-grid .run-1,
 .run-grid .run-2,
@@ -256,11 +257,23 @@
   box-shadow: 0 4px 12px rgba(31,111,178,.32); }
 .run-grid .run-6 { background: linear-gradient(135deg, #F2A33C, var(--c-accent-deep)); color: #fff; border: none;
   box-shadow: 0 4px 12px rgba(224,123,46,.32); }
-.extra-btn { font-size: 12.5px; background: var(--c-surface);
+.extras-row { gap: 6px; }
+.extra-btn { height: 38px; font-size: 12.5px; background: var(--c-surface);
   border: 1px solid var(--c-border); color: var(--c-primary); }
-.wicket-btn-main { border-radius: 12px; font-size: 14px;
+.wicket-btn-main { height: 38px; border-radius: 11px; font-size: 14px;
   background: linear-gradient(135deg, #EE5A50, var(--c-danger)); }
+.end-innings-link { margin-top: 1px; padding: 3px 8px; }
 .opt-note { font-weight: 600; font-size: 11px; color: var(--c-text-2); }
+
+/* Tighten the live screen vertical rhythm so it fits without scrolling
+   (even with the 2nd-bowler row and a wrapped over). */
+#live-scroll { padding: 10px 13px 8px; }
+#live-scroll .screen-inner { gap: 8px; }
+.score-hero { padding: 10px 14px; }
+.live-card .bt-row { padding: 4px 11px; }
+.live-switch-row { padding: 3px 11px; }
+.over-strip { margin-top: 0; }
+.over-strip-head { margin-bottom: 3px; }
 
 /* Subtle required-field highlight (not loud) */
 .field-error { border-color: var(--c-danger) !important; box-shadow: 0 0 0 1px var(--c-danger); }
