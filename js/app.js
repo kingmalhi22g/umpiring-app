@@ -71,6 +71,48 @@ function showUpdateBanner() {
   if (b) b.classList.remove('hidden');
 }
 
+// ── Add to Home Screen (PWA install) ──────────────────────
+let _deferredPrompt = null;
+
+function isAppInstalled() {
+  return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+}
+
+function handleInstall() {
+  // Native prompt available (Android/Chrome) — use it.
+  if (_deferredPrompt) {
+    _deferredPrompt.prompt();
+    _deferredPrompt.userChoice.finally(() => { _deferredPrompt = null; updateInstallUI(); });
+    return;
+  }
+  // Otherwise show platform-specific manual instructions.
+  const ua = navigator.userAgent || '';
+  const isIOS = /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document);
+  showConfirm({
+    title: 'Add to Home Screen',
+    danger: false,
+    confirmText: 'Got it',
+    cancelText: 'Close',
+    message: isIOS
+      ? "In Safari, tap the Share button (the square with an up-arrow), then choose “Add to Home Screen.”"
+      : "Open your browser menu (⋮), then tap “Install app” or “Add to Home screen.”",
+    onConfirm: () => {}
+  });
+}
+
+function updateInstallUI() {
+  const note = document.getElementById('install-note');
+  const btn  = document.getElementById('btn-install');
+  if (!btn) return;
+  if (isAppInstalled()) {
+    btn.style.display = 'none';
+    if (note) note.textContent = '✓ The app is installed on this device.';
+  } else {
+    btn.style.display = '';
+    if (note) note.textContent = 'Add the app to your home screen for quick, full-screen access.';
+  }
+}
+
 // ── Init ─────────────────────────────────────────────────
 function initApp() {
   // The app no longer uses a service worker — offline caching caused stale
@@ -84,6 +126,18 @@ function initApp() {
       caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(() => {});
     }
   }
+
+  // Capture the install prompt (Android/Chrome) so our button can trigger it.
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _deferredPrompt = e;
+    updateInstallUI();
+  });
+  window.addEventListener('appinstalled', () => {
+    _deferredPrompt = null;
+    showToast('App added to your home screen');
+    updateInstallUI();
+  });
 
   // Apply saved dark mode preference on startup
   applyDarkMode(getDarkMode());
@@ -448,6 +502,7 @@ function wireButtons() {
       .catch(() => showToast('Backfill failed'))
       .finally(() => { if (btn) { btn.disabled = false; btn.textContent = orig; } });
   });
+  on('btn-install', 'click', handleInstall);
   on('btn-clear-data', 'click', () => {
     showConfirm({
       title: 'Clear all data?',
@@ -483,6 +538,7 @@ function setupSettings() {
   if (oInput) oInput.value = getSettings().defaultOvers;
   applyDarkMode(getDarkMode()); // syncs the toggle label
   updateAccountUI();
+  updateInstallUI();
 }
 
 function setupMatchSetup() {
@@ -841,7 +897,7 @@ function handleOpenStats() {
 
 function handleExportCard() {
   const idToUse = state.viewMatchId || state.matchId;
-  const m = getMatch(idToUse);
+  const m = getMatchAny(idToUse);   // any viewable match, incl. others' from the cloud
   if (!m) { showToast('No match data to export'); return; }
   showToast('Generating scorecard…', 3000);
   renderExportCard(m);
@@ -875,7 +931,7 @@ function _downloadScorecard(url) {
 // Generate the sheet image and show it in an on-screen preview first.
 let _overSheetBlob = null;
 function handleOpenOverSheet() {
-  const m = getMatch(state.viewMatchId || state.matchId);
+  const m = getMatchAny(state.viewMatchId || state.matchId);   // incl. others' cloud matches
   if (!m) { showToast('No match data'); return; }
   showToast('Generating sheet…', 2500);
   renderOverSheet(m);

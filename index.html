@@ -10,11 +10,13 @@
   <title>Cricket Umpire</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=58">
-  <link rel="stylesheet" href="css/layout.css?v=58">
-  <link rel="stylesheet" href="css/components.css?v=58">
-  <link rel="stylesheet" href="css/redesign.css?v=58">
+  <link rel="stylesheet" href="css/style.css?v=59">
+  <link rel="stylesheet" href="css/layout.css?v=59">
+  <link rel="stylesheet" href="css/components.css?v=59">
+  <link rel="stylesheet" href="css/redesign.css?v=59">
   <style>
+    /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
+    * { touch-action: manipulation; }
     /* Live screen fixed-bottom input panel */
     #screen-live { padding: 0; background: var(--c-bg); }
     #screen-live.active { display: flex; flex-direction: column; }
@@ -343,6 +345,11 @@
         <p class="text-sm text-2 mt-sm">Permanently delete all matches on this device.</p>
         <button id="btn-clear-data" class="btn btn-danger btn-sm mt-md" type="button">Clear All Data</button>
       </div>
+      <div class="card mt-sm">
+        <div class="section-head">Install App</div>
+        <p class="text-sm text-2 mt-sm" id="install-note">Add the app to your home screen for quick, full-screen access.</p>
+        <button id="btn-install" class="btn btn-primary btn-sm mt-md" type="button">&#128241; Add to Home Screen</button>
+      </div>
     </div>
   </section>
 
@@ -532,12 +539,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=58"></script>
-<script src="js/storage.js?v=58"></script>
-<script src="js/match.js?v=58"></script>
-<script src="js/router.js?v=58"></script>
-<script src="js/ui.js?v=58"></script>
-<script src="js/app.js?v=58"></script>
+<script src="js/cloud.js?v=59"></script>
+<script src="js/storage.js?v=59"></script>
+<script src="js/match.js?v=59"></script>
+<script src="js/router.js?v=59"></script>
+<script src="js/ui.js?v=59"></script>
+<script src="js/app.js?v=59"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
