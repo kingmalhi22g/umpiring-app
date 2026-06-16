@@ -8,38 +8,34 @@
       "firebase.json",
       ".firebaserc",
       "**/.*",
+      ".git/**",
+      ".github/**",
+      ".firebase/**",
+      ".claude/**",
       "**/node_modules/**",
       "icons/_preview/**",
       "*.md",
       "server.js",
-      "firestore.rules"
+      "firestore.rules",
+      "deploy.bat"
     ],
     "headers": [
       {
         "source": "/index.html",
         "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache, no-store, must-revalidate"
-          }
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
         ]
       },
       {
         "source": "/",
         "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache, no-store, must-revalidate"
-          }
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
         ]
       },
       {
         "source": "/service-worker.js",
         "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache, no-store, must-revalidate"
-          }
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
         ]
       }
     ]
