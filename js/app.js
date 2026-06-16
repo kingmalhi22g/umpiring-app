@@ -164,11 +164,13 @@ function updateAccountUI() {
   // Toggle via inline display — the .btn class sets `display`, which would
   // otherwise override the plain [hidden] attribute and show both buttons.
   const show = (btn, on) => { if (btn) btn.style.display = on ? '' : 'none'; };
+  const backfillBtn = document.getElementById('btn-backfill');
   if (typeof cloudReady !== 'function' || !cloudReady()) {
     el.textContent = 'Connecting…';
-    show(inBtn, false); show(outBtn, false);
+    show(inBtn, false); show(outBtn, false); show(backfillBtn, false);
     return;
   }
+  show(backfillBtn, !!cloudIsAdmin());   // admin-only maintenance tool
   if (cloudIsAdmin()) {
     // Only the owner email is admin (enforced server-side in firestore.rules).
     el.textContent = 'Signed in as admin. You can edit or delete any match.';
@@ -435,6 +437,16 @@ function wireButtons() {
   on('btn-google-signout', 'click', () => {
     if (typeof cloudSignOut !== 'function') return;
     cloudSignOut().then(() => { showToast('Signed out'); updateAccountUI(); });
+  });
+  on('btn-backfill', 'click', () => {
+    if (typeof cloudBackfillSummaries !== 'function') return;
+    const btn = document.getElementById('btn-backfill');
+    const orig = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Updating…'; }
+    cloudBackfillSummaries()
+      .then(r => showToast('Updated ' + r.updated + ' of ' + r.total + ' matches'))
+      .catch(() => showToast('Backfill failed'))
+      .finally(() => { if (btn) { btn.disabled = false; btn.textContent = orig; } });
   });
   on('btn-clear-data', 'click', () => {
     showConfirm({

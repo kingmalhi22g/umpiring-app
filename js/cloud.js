@@ -157,6 +157,24 @@ function _summaryFields(match) {
 // Returns a promise: resolves when the cloud doc is gone (or there's no cloud
 // to talk to), rejects if the server refuses (e.g. not the owner). Deleting a
 // non-existent doc resolves successfully.
+// Admin-only: rewrite the readable summary fields on every existing match doc
+// (for matches saved before summary fields existed). Returns {updated,skipped,total}.
+async function cloudBackfillSummaries() {
+  if (!cloudAvailable()) throw new Error('Cloud not ready');
+  if (!_isAdmin) throw new Error('Admin only');
+  const snap = await _db.collection('matches').get();
+  let updated = 0, skipped = 0;
+  for (const doc of snap.docs) {
+    const d = doc.data();
+    if (!d || !d.matchJson) { skipped++; continue; }
+    let m;
+    try { m = JSON.parse(d.matchJson); } catch (_) { skipped++; continue; }
+    try { await doc.ref.set(_summaryFields(m), { merge: true }); updated++; }
+    catch (e) { skipped++; }
+  }
+  return { updated, skipped, total: snap.size };
+}
+
 function cloudDeleteMatch(id) {
   clearTimeout(_pushTimers[id]);
   if (!cloudAvailable()) return Promise.resolve();   // local-only mode
