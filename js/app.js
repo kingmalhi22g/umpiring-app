@@ -402,6 +402,7 @@ function wireButtons() {
     const stats = document.getElementById('modal-stats');
     if (e.target === _overlay && stats && !stats.classList.contains('hidden')) closeModal();
   });
+  enableSheetDrag('modal-stats', 'stats-content');
   // Home from the live screen — keep the match active so it can be resumed.
   on('btn-live-home',    'click', () => navigateTo('home'));
 
@@ -1429,6 +1430,41 @@ function openModal(id) {
 function closeModal() {
   document.getElementById('modal-overlay').classList.add('hidden');
   document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+}
+
+// Bottom-sheet drag-to-dismiss. Starts only from the handle/title, or when the
+// inner content is scrolled to the top — so it never fights normal scrolling.
+function enableSheetDrag(modalId, scrollId) {
+  const sheet = document.getElementById(modalId);
+  if (!sheet) return;
+  let startY = 0, dy = 0, dragging = false;
+  sheet.addEventListener('touchstart', e => {
+    const scroller = scrollId ? document.getElementById(scrollId) : null;
+    const onGrip = e.target.closest('.modal-handle') || e.target.closest('.modal-title');
+    const atTop  = !scroller || scroller.scrollTop <= 0;
+    dragging = !!(onGrip || atTop);
+    if (!dragging) return;
+    startY = e.touches[0].clientY; dy = 0;
+    sheet.style.transition = 'none';
+  }, { passive: true });
+  sheet.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    dy = Math.max(0, e.touches[0].clientY - startY);
+    if (dy > 0) { sheet.style.transform = 'translateY(' + dy + 'px)'; e.preventDefault(); }
+  }, { passive: false });
+  const end = () => {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = 'transform .22s ease';
+    if (dy > 90) {
+      sheet.style.transform = 'translateY(100%)';
+      setTimeout(() => { closeModal(); sheet.style.transform = ''; sheet.style.transition = ''; }, 200);
+    } else {
+      sheet.style.transform = '';
+    }
+  };
+  sheet.addEventListener('touchend', end, { passive: true });
+  sheet.addEventListener('touchcancel', end, { passive: true });
 }
 
 // In-app replacement for window.confirm — runs onConfirm when the user accepts.
