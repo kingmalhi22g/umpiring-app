@@ -62,6 +62,7 @@ function renderLiveHeader(match) {
 
   const isSuper = match.currentInnings >= 2;
   setEl('live-score-team', (isSuper ? 'Super Over · ' : '') + inn.battingTeam);
+  setEl('live-score-oppo', inn.bowlingTeam);
   setEl('live-score-runs', inn.totalRuns);
   setEl('live-score-wkts', inn.wickets);
   setEl('live-score-overs', getOverDisplay(inn) + ' ov');
