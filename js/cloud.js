@@ -81,7 +81,7 @@ function _startFeed() {
   if (!_db || !_feedCb || _unsubFeed) return;
   _unsubFeed = _db.collection('matches')
     .orderBy('updatedAt', 'desc')
-    .limit(100)
+    .limit(200)
     .onSnapshot(snap => {
       const arr = [];
       snap.forEach(doc => {
