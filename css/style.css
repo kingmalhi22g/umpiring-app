@@ -1,33 +1,46 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --c-primary:      #1F6FB2;
-  --c-primary-mid:  #2E7CC4;
-  --c-primary-light:#5BA3E0;
-  --c-primary-dark: #1A5E98;
-  --c-accent:       #E8622C;
-  --c-accent-deep:  #C44E1E;
-  --c-bg:           #F4F6F8;
+  /* ── Sky theme · LIGHT ── */
+  --c-primary:      #0E7C8C;
+  --c-primary-mid:  #1497A3;
+  --c-primary-light:#2BD4D4;
+  --c-primary-dark: #0A5E6B;
+  --c-accent:       #E5851A;
+  --c-accent-deep:  #C46A0E;
+  --c-bg:           #EAF0F6;
   --c-surface:      #FFFFFF;
-  --c-text:         #1C2733;
-  --c-text-2:       #76838F;
+  --c-text:         #0B2238;
+  --c-text-2:       #5E7C99;
   --c-text-inv:     #FFFFFF;
-  --c-border:       #E3E8ED;
-  --c-danger:       #E2453B;
+  --c-border:       #D7E1EC;
+  --c-danger:       #E5343B;
   --c-danger-bg:    #FDECEA;
-  --c-ok:           #2BA84A;
-  --c-wide:         #E8622C;
+  --c-ok:           #138A95;
+  --c-wide:         #E5851A;
   --c-noball:       #C0392B;
-  --c-bye:          #5A6FB2;
-  --c-4:            #1F6FB2;
-  --c-6:            #E8622C;
-  --c-dot:          #9E9E9E;
-  --c-wicket:       #E2453B;
+  --c-bye:          #4F8BD6;
+  --c-4:            #0E7C8C;
+  --c-6:            #E5851A;
+  --c-dot:          #9FB3C6;
+  --c-wicket:       #E5343B;
+
+  /* Sky cyan / amber gradients + stadium glow (reused across screens) */
+  --grad-cyan:   linear-gradient(145deg,#2BD4D4,#138A95);
+  --grad-amber:  linear-gradient(145deg,#FFC24B,#E5851A);
+  --grad-wicket: linear-gradient(145deg,#E5343B,#B91D24);
+  --grad-header: radial-gradient(130% 190% at 50% -60%, #1C4A78, #071321 72%);
+  --on-cyan:  #04222A;
+  --on-amber: #3A2406;
+
+  --font-body:    'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Archivo', 'Hanken Grotesk', sans-serif;
+  --font-num:     'Saira Condensed', 'Hanken Grotesk', sans-serif;
 
   --r-sm:  6px;
   --r-md:  10px;
-  --r-lg:  13px;
-  --r-xl:  19px;
+  --r-lg:  14px;
+  --r-xl:  20px;
   --r-full:50%;
 
   --sh-sm: 0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.08);
@@ -48,7 +61,7 @@
 html, body { height: 100%; overflow: hidden; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 14px;
   line-height: 1.5;
   color: var(--c-text);
@@ -96,24 +109,49 @@ input, textarea, select { user-select: auto; font-family: inherit; font-size: 16
 
 /* ── Dark mode ──────────────────────────────────────────── */
 /* System auto-dark (when no manual override) */
+/* ── Sky theme · DARK (navy / cyan broadcast) ── */
 @media (prefers-color-scheme: dark) {
   body:not(.light-mode) {
-    --c-bg:        #0E1620;
-    --c-surface:   #16202B;
-    --c-text:      #E6EEF5;
-    --c-text-2:    #8AA0B2;
-    --c-border:    #263442;
-    --c-danger-bg: #3B1515;
-    --c-primary-light: #5BA3E0;
+    --c-primary:      #15A3AD;
+    --c-primary-mid:  #2BD4D4;
+    --c-primary-light:#7CF0E4;
+    --c-primary-dark: #0E6E78;
+    --c-accent:       #FFC24B;
+    --c-accent-deep:  #E5851A;
+    --c-bg:           #071321;
+    --c-surface:      #0E2235;
+    --c-text:         #EAF1F8;
+    --c-text-2:       #8FA8C0;
+    --c-border:       #16314A;
+    --c-danger:       #E5343B;
+    --c-danger-bg:    #3A1518;
+    --c-ok:           #2BD4D4;
+    --c-bye:          #4F8BD6;
+    --c-4:            #2BD4D4;
+    --c-6:            #FFC24B;
+    --c-dot:          #5E7C99;
+    --c-wicket:       #E5343B;
   }
 }
 /* Manual dark mode class on body */
 body.dark-mode {
-  --c-bg:        #0D1B0F;
-  --c-surface:   #162018;
-  --c-text:      #E8F5E9;
-  --c-text-2:    #7A9A7A;
-  --c-border:    #263828;
-  --c-danger-bg: #3B1515;
-  --c-primary-light: #66BB6A;
+  --c-primary:      #15A3AD;
+  --c-primary-mid:  #2BD4D4;
+  --c-primary-light:#7CF0E4;
+  --c-primary-dark: #0E6E78;
+  --c-accent:       #FFC24B;
+  --c-accent-deep:  #E5851A;
+  --c-bg:           #071321;
+  --c-surface:      #0E2235;
+  --c-text:         #EAF1F8;
+  --c-text-2:       #8FA8C0;
+  --c-border:       #16314A;
+  --c-danger:       #E5343B;
+  --c-danger-bg:    #3A1518;
+  --c-ok:           #2BD4D4;
+  --c-bye:          #4F8BD6;
+  --c-4:            #2BD4D4;
+  --c-6:            #FFC24B;
+  --c-dot:          #5E7C99;
+  --c-wicket:       #E5343B;
 }
