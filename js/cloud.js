@@ -96,11 +96,17 @@ function cloudSubscribeMatches(cb) {
   if (_ready) _startFeed();
 }
 
+// Detach the live feed listener. Called when the user leaves the home screen
+// so 100 idle devices aren't each billed a read for every ball scored anywhere.
+function cloudUnsubscribeMatches() {
+  if (_unsubFeed) { _unsubFeed(); _unsubFeed = null; }
+}
+
 function _startFeed() {
   if (!_db || !_feedCb || _unsubFeed) return;
   _unsubFeed = _db.collection('matches')
     .orderBy('updatedAt', 'desc')
-    .limit(200)
+    .limit(75)
     .onSnapshot(snap => {
       const arr = [];
       snap.forEach(doc => {
@@ -131,7 +137,7 @@ function cloudPushMatch(match) {
   if (match.status === 'completed') {
     _doPush(match);                                   // finished → save now
   } else {
-    _pushTimers[match.id] = setTimeout(() => _doPush(match), 1500);
+    _pushTimers[match.id] = setTimeout(() => _doPush(match), 4000);
   }
 }
 

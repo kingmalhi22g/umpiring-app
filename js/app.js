@@ -178,6 +178,14 @@ function initApp() {
       'settings':      setupSettings
     };
     if (handlers[screen]) handlers[screen]();
+
+    // Cloud feed costs a Firestore read per device per match update, so only
+    // listen while the user is actually looking at the home list. Off home
+    // (scoring, summary, settings…) we detach — huge saving at scale.
+    if (typeof cloudSubscribeMatches === 'function') {
+      if (screen === 'home') cloudSubscribeMatches(_cloudFeed);
+      else if (typeof cloudUnsubscribeMatches === 'function') cloudUnsubscribeMatches();
+    }
   });
 
   init(); // router — activates the current screen and fires its handler
@@ -191,15 +199,23 @@ function initApp() {
   });
 
   // Cloud sync: anonymous identity for everyone, live shared match feed.
+  // The feed is attached/detached by the onScreenChange handler above (only
+  // active on the home screen). If we cold-loaded straight onto home, attach now.
   if (typeof cloudInit === 'function') {
     cloudInit();
-    cloudSubscribeMatches(feed => {
-      state.cloudMatches = feed;
-      if (getCurrentScreen() === 'home') {
-        const ml = document.getElementById('match-list');
-        if (ml) renderMatchList(ml);
-      }
-    });
+    if (getCurrentScreen() === 'home' && typeof cloudSubscribeMatches === 'function') {
+      cloudSubscribeMatches(_cloudFeed);
+    }
+  }
+}
+
+// Home-feed snapshot handler: cache the shared matches and refresh the list
+// if the home screen is showing.
+function _cloudFeed(feed) {
+  state.cloudMatches = feed;
+  if (getCurrentScreen() === 'home') {
+    const ml = document.getElementById('match-list');
+    if (ml) renderMatchList(ml);
   }
 }
 

@@ -1,3 +1,66 @@
+# >> DEPLOY FIRST  (handoff to Claude Code - 2026-06-16)
+
+Claude Code runs locally and CAN deploy (Cowork's sandbox can't reach git/Firebase creds).
+There are finished changes on disk. To ship:
+
+    cd "C:\Users\SAM\Documents\Umpiring app project"
+    git add -A && git commit -m "Broadcast redesign + scaling" && git push origin main
+
+Pushing to `main` AUTO-DEPLOYS via GitHub Actions (set up this session). Or deploy directly:
+`firebase deploy --only hosting`. Live: https://tally-stats.web.app. Asset cache is at **?v=71**.
+(If `git push` reports "Everything up-to-date", the latest batch is already committed/pushed - just confirm the Actions run is green.)
+
+## What changed this session
+- **Broadcast "Sky" theme applied to the WHOLE app** (previously live-screen only): home, match-setup,
+  toss, live, end-of-over, innings-break, summary, settings each get a navy gradient `.scr-hero` header
+  (italic Archivo titles), team crests, skewed Saira numerals, gradient buttons, status pills.
+  Token-driven, so LIGHT + DARK both work. New CSS = appended blocks in `css/redesign.css`
+  ("APP-WIDE BROADCAST THEME", live "BROADCAST DIRECTION", plus small fix blocks at the end).
+- **Live screen** rebuilt to a broadcast scoreboard: LIVE pill + format/innings label, crest + big skewed
+  score + overs, 2nd-team row, CRR/Proj/P'ship strip, compact batting table, single-line bowler.
+  A Last-5-overs momentum chart was added then REMOVED (user called it useless) - `renderMomentum` in
+  ui.js is now dead code (unused), markup gone.
+- **Bowler line** now shows **O-M-R-W . extras . economy** (`setBowlerFig` in `js/ui.js`).
+- **Undo** moved out of the hero into the "This over" strip, right after the runs total (`.over-undo`).
+- **Fixes**: match-setup compacted so Continue shows without scrolling; home refresh button
+  (`#btn-refresh`) restyled to be visible in LIGHT mode (was white-on-light).
+- **End-of-over / innings-break** markup restructured + `renderOverSummary` / `renderInningsBreak`
+  (ui.js) updated. New IDs: ib-team-crest, ib-team-name, ib-bignum, ib-need-line, ib-target-num,
+  ib-row-target, ib-row-overs, ib-row-rpo. Removed old IDs ib-score / ib-target.
+- **Scaling (free, no Blaze) in `js/cloud.js` + `js/app.js`**:
+  - Home feed now DETACHES when off the home screen (`cloudUnsubscribeMatches`, wired in app.js
+    `onScreenChange`; `_cloudFeed` is the snapshot handler). Scorers/spectators off-home cost 0 feed reads.
+  - Feed `.limit(200) -> .limit(75)`.
+  - Live-scoring write debounce `1500ms -> 4000ms`.
+
+## Auto-deploy (configured this session)
+- Ran `firebase init hosting:github`. Workflows: `.github/workflows/firebase-hosting-merge.yml`
+  (push to main -> deploy) and `firebase-hosting-pull-request.yml` (PR previews). GitHub repo secret
+  `FIREBASE_SERVICE_ACCOUNT_TALLY_STATS` is set. Every push to `main` auto-deploys.
+- `firebase.json` `ignore` now excludes `.git/**`, `.github/**`, `.firebase/**`, `.claude/**`, `*.bat`.
+  (Spark plan rejects executable files - first Action run failed with "Executable files are forbidden
+  on the Spark billing plan" because `.git` + `.bat` were being uploaded.) Added `Cache-Control: no-cache`
+  headers for `/index.html`, `/`, `/service-worker.js`.
+- Repo-root helper scripts (ignored from hosting): `deploy.bat` (one-click `firebase deploy`),
+  `ship.bat` (one-click git add+commit+push).
+
+## Scaling reality (answer to "will 100 users crash it?")
+No crash (serverless). The risk is the **free Spark plan's daily Firestore quotas** (~50K reads/day).
+The expensive bit is feed read fan-out: a change to one match pushes to every listener (1 read each).
+With live scoring + 100 people that could exhaust reads in minutes -> app stops syncing (not crash) until
+midnight PT. The free optimizations above cut this a lot. For real scale, **upgrade to Blaze** (pay-as-you-go;
+~$0.06 per 100K reads, removes daily caps). Further free win: per-match listeners for spectators instead of
+the shared feed (not yet built).
+
+## Verify after deploy
+The Cowork editor intermittently truncated files mid-save this session; index.html, ui.js, cloud.js, app.js
+were each rebuilt from `git HEAD` + re-applied edits and re-verified (all pass `node -c`, no NUL bytes,
+sections balanced). Still worth a smoke test: home -> new match -> toss -> live (score balls, undo, wicket)
+-> end of over -> innings break -> summary, in BOTH light and dark; and open on two devices to confirm a
+scored ball appears on the other's home list.
+
+---
+
 # Cricket Umpire — Session Handoff
 
 _Last updated: 2026-06-15. Live at **https://tally-stats.web.app** (currently v65)._

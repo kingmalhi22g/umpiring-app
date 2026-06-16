@@ -17,7 +17,7 @@
       "*.md",
       "server.js",
       "firestore.rules",
-      "deploy.bat"
+      "*.bat"
     ],
     "headers": [
       {
