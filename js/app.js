@@ -395,6 +395,13 @@ function wireButtons() {
   on('btn-switch-strike', 'click', handleSwitchStrike);
   on('btn-live-stats',   'click', handleOpenStats);
   on('btn-stats-close',  'click', closeModal);
+  // Tap the dimmed area outside the sheet to dismiss the Scoreboard only — mid-flow
+  // modals (wicket, openers, new batsman) still require an explicit button.
+  const _overlay = document.getElementById('modal-overlay');
+  if (_overlay) _overlay.addEventListener('click', e => {
+    const stats = document.getElementById('modal-stats');
+    if (e.target === _overlay && stats && !stats.classList.contains('hidden')) closeModal();
+  });
   // Home from the live screen — keep the match active so it can be resumed.
   on('btn-live-home',    'click', () => navigateTo('home'));
 

@@ -91,8 +91,10 @@ function renderLiveHeader(match) {
   const pship = getPartnership(inn);
   setEl('live-stat-pship', pship.runs + ' (' + pship.balls + ')');
 
-  // Runs in the current over (shown with the live ball-by-ball dots).
+  // Runs (and wickets, if any) in the current over — shown above the ball-by-ball dots.
   setEl('live-over-runs', inn.currentOver ? inn.currentOver.runs : 0);
+  const overWkts = inn.currentOver ? inn.currentOver.wickets : 0;
+  setEl('live-over-wkts', '/' + overWkts);
 
   const chasing = match.currentInnings === 1 || match.currentInnings === 3;
   const target = chasing ? getTarget(match) : null;
@@ -188,7 +190,7 @@ function setBowlerFig(id, inn, bowler) {
   const econ = balls ? (s.runs / (balls / 6)).toFixed(2) : '0.00';
   e.innerHTML = esc(s.overStr) + '–' + s.maidens + '–' + s.runs +
                 '–<span class="bowl-line-w">' + s.wkts + '</span>' +
-                '<span class="bowl-line-x"> · ' + s.extras + ' ext · ' + econ + ' eco</span>';
+                '<span class="bowl-line-x"> · ' + s.wides + 'wd ' + s.noBalls + 'nb · ' + econ + ' eco</span>';
 }
 
 // Last-5-(completed)-overs momentum bars, scaled to the busiest over.
@@ -453,7 +455,6 @@ function renderMatchSummary(match) {
   const tabs = `<div class="sc-tabs">
     <div class="sc-tab active" data-panel="scorecard">Scorecard</div>
     <div class="sc-tab" data-panel="summary">Summary</div>
-    <div class="sc-tab" data-panel="stats">Stats</div>
   </div>`;
 
   const innList = match.innings.map((inn, i) => inn ? { inn, i } : null).filter(Boolean);
@@ -463,9 +464,8 @@ function renderMatchSummary(match) {
     innList.map(({ inn, i }) => renderInningsAccordion(match, inn, i, i === lastIdx)).join('')
   }</div>`;
   const summaryPanel = `<div class="sc-panel" data-panel="summary">${renderSummaryPanel(match, innList)}</div>`;
-  const statsPanel   = `<div class="sc-panel" data-panel="stats">${renderStatsPanel(match, innList)}</div>`;
 
-  el.innerHTML = card + superBtn + tabs + scorecard + summaryPanel + statsPanel;
+  el.innerHTML = card + superBtn + tabs + scorecard + summaryPanel;
 }
 
 function renderInningsAccordion(match, inn, i, open) {
@@ -494,8 +494,8 @@ function renderInningsAccordion(match, inn, i, open) {
     const econ = balls ? (s.runs / (balls / 6)).toFixed(1) : '0.0';
     return `<div class="bt-row bowl">
       <div class="bt-bp">${avatarHtml(name,'bt-av')}<div class="bt-name">${esc(name)}</div></div>
-      <div class="bt-n">${s.overStr}</div><div class="bt-n bt-r">${s.runs}</div>
-      <div class="bt-n">${s.wkts}</div><div class="bt-n">${econ}</div>
+      <div class="bt-n">${s.overStr}</div><div class="bt-n">${s.maidens}</div><div class="bt-n bt-r">${s.runs}</div>
+      <div class="bt-n">${s.wkts}</div><div class="bt-n">${econ}</div><div class="bt-n">${s.wides}</div><div class="bt-n">${s.noBalls}</div>
     </div>`;
   }).join('');
 
@@ -513,7 +513,7 @@ function renderInningsAccordion(match, inn, i, open) {
         <span class="mut">wd ${inn.extras.wides} · nb ${inn.extras.noBalls} · b ${inn.extras.byes} · lb ${inn.extras.legByes}</span></div>
       <div class="sum-total"><span>Total&nbsp;&nbsp;${inn.totalRuns}/${inn.wickets}</span><span class="rr">RR ${runRate(inn)}</span></div>
       ${bowl ? `<div class="bt-sec">Bowling</div>
-        <div class="bt-head bowl"><span>Bowler</span><span>O</span><span>R</span><span>W</span><span>Econ</span></div>${bowl}` : ''}
+        <div class="bt-head bowl"><span>Bowler</span><span>O</span><span>M</span><span>R</span><span>W</span><span>Econ</span><span>Wd</span><span>NB</span></div>${bowl}` : ''}
     </div>
   </div>`;
 }
@@ -717,7 +717,7 @@ function renderStatsModal(match) {
     const isCurrent = inn.currentOver && inn.currentOver.bowler === name;
     return `<tr${isCurrent ? ' class="sc-active"' : ''}>
       <td><div class="player-name">${esc(name)}${isCurrent ? ' <span class="sc-strike">bowling</span>' : ''}</div></td>
-      <td>${s.overStr}</td><td>${s.runs}</td><td>${s.wkts}</td><td>${econ}</td>
+      <td>${s.overStr}</td><td>${s.maidens}</td><td>${s.runs}</td><td>${s.wkts}</td><td>${econ}</td><td>${s.wides}</td><td>${s.noBalls}</td>
     </tr>`;
   }).join('');
 
@@ -736,19 +736,6 @@ function renderStatsModal(match) {
         <span class="fow-over">${f.over} ov</span>
       </div>`).join('')}
     </div>` : '';
-
-  // Powerplay strip
-  const pp  = getPowerplayOvers(match.overs);
-  const pps = getPowerplayStats(inn, pp);
-  const ppHtml = `
-    <div class="divider mt-sm"></div>
-    <div class="section-head mt-sm">POWERPLAY</div>
-    <div class="pp-strip">
-      ${Array.from({ length: match.overs }, (_, i) => i + 1).map(n =>
-        `<span class="pp-over${n <= pp ? ' pp' : ''}${n === pps.played && inn.currentOver ? ' pp-current' : ''}">${n}</span>`
-      ).join('')}
-    </div>
-    <div class="pp-legend">Overs 1&ndash;${pp} &middot; scored <strong>${pps.runs}/${pps.wkts}</strong></div>`;
 
   el.innerHTML = `
     <div class="stats-hero">
@@ -769,11 +756,10 @@ function renderStatsModal(match) {
     <div class="divider mt-sm"></div>
     <div class="section-head mt-sm">BOWLING — ${esc(inn.bowlingTeam)}</div>
     <table class="scorecard-table mt-sm">
-      <thead><tr><th>Bowler</th><th>O</th><th>R</th><th>W</th><th>Econ</th></tr></thead>
+      <thead><tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Econ</th><th>Wd</th><th>NB</th></tr></thead>
       <tbody>${bowlRows}</tbody>
     </table>` : ''}
     ${fowHtml}
-    ${ppHtml}
   `;
 }
 

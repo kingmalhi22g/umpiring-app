@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=71">
-  <link rel="stylesheet" href="css/layout.css?v=71">
-  <link rel="stylesheet" href="css/components.css?v=71">
-  <link rel="stylesheet" href="css/redesign.css?v=71">
+  <link rel="stylesheet" href="css/style.css?v=72">
+  <link rel="stylesheet" href="css/layout.css?v=72">
+  <link rel="stylesheet" href="css/components.css?v=72">
+  <link rel="stylesheet" href="css/redesign.css?v=72">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -158,14 +158,15 @@
           <div class="score-hero-top">
             <div class="live-pill"><span class="live-pulse"></span>LIVE</div>
             <div class="live-format" id="live-format-label">1ST INNINGS</div>
-            <div class="hero-actions">
-              <button class="hero-icon" id="btn-live-home" type="button" title="Home" aria-label="Home">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg>
-              </button>
-              <button class="hero-icon" id="btn-live-stats" type="button" title="Full scoreboard" aria-label="Scoreboard">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-7M12 21V5M19 21v-10"/></svg>
-              </button>
-            </div>
+            <button class="hero-icon" id="btn-live-home" type="button" title="Home" aria-label="Home">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg>
+            </button>
+          </div>
+          <div class="hero-actions">
+            <button class="hero-btn hero-btn-accent" id="btn-live-stats" type="button" title="Full scoreboard" aria-label="Scoreboard">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-7M12 21V5M19 21v-10"/></svg>
+              Scoreboard
+            </button>
           </div>
           <div class="hero-team-row" aria-hidden="true">
             <div class="hero-crest" id="live-bat-crest">T</div>
@@ -236,13 +237,18 @@
         </div>
         <!-- This over (live ball-by-ball) -->
         <div class="over-strip">
-          <span class="over-strip-label">This over</span>
+          <div class="over-strip-head">
+            <span class="over-strip-spacer"></span>
+            <div class="over-strip-center">
+              <span class="over-strip-label">This over -</span>
+              <span class="over-strip-runs"><b id="live-over-runs">0</b><span class="over-strip-wkts" id="live-over-wkts"></span></span>
+            </div>
+            <button class="over-undo" id="btn-undo" type="button" title="Undo last ball" aria-label="Undo last ball">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
+              Undo
+            </button>
+          </div>
           <div class="ball-dots" id="live-dots"></div>
-          <span class="over-strip-runs"><b id="live-over-runs">0</b></span>
-          <button class="over-undo" id="btn-undo" type="button" title="Undo last ball" aria-label="Undo last ball">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
-            Undo
-          </button>
         </div>
       </div>
     </div>
@@ -578,12 +584,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=71"></script>
-<script src="js/storage.js?v=71"></script>
-<script src="js/match.js?v=71"></script>
-<script src="js/router.js?v=71"></script>
-<script src="js/ui.js?v=71"></script>
-<script src="js/app.js?v=71"></script>
+<script src="js/cloud.js?v=72"></script>
+<script src="js/storage.js?v=72"></script>
+<script src="js/match.js?v=72"></script>
+<script src="js/router.js?v=72"></script>
+<script src="js/ui.js?v=72"></script>
+<script src="js/app.js?v=72"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">

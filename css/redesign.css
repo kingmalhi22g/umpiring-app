@@ -95,7 +95,9 @@
 
 /* ── Scorecard tables (avatar rows) ──────────────────────── */
 .bt-head, .bt-row { display: grid; grid-template-columns: 1fr 28px 24px 22px 22px 44px; gap: 2px; }
-.bt-head.bowl, .bt-row.bowl { grid-template-columns: 1fr 34px 28px 24px 36px; }
+.bt-head.bowl, .bt-row.bowl { grid-template-columns: 1fr 26px 20px 24px 20px 34px 22px 22px; gap: 1px; }
+.bt-row.bowl .bt-n { font-size: 12px; }
+.bt-head.bowl span:not(:first-child) { font-size: 8.5px; letter-spacing: 0; }
 .bt-head {
   padding: 6px 12px; font-size: 9.5px; font-weight: 800; color: var(--c-text-2);
   text-transform: uppercase; letter-spacing: .3px; border-bottom: 1px solid var(--c-border);
@@ -206,6 +208,7 @@
 #live-score-oppo { font-size: 10.5px; font-weight: 500; opacity: .75; }
 .score-hero-overs { font-size: 13px; font-weight: 600; opacity: .8; margin-left: 7px; letter-spacing: 0; }
 .score-hero-top { align-items: center; }
+.hero-actions { justify-content: flex-end; margin-top: 7px; }
 .hero-icon { width: 32px; height: 32px; flex-shrink: 0; border: none; border-radius: 50%;
   background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .hero-icon svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; }
@@ -217,6 +220,10 @@
   border-radius: 14px; padding: 6px 11px; cursor: pointer; white-space: nowrap; }
 .hero-btn svg { width: 14px; height: 14px; stroke: #fff; fill: none; stroke-width: 2; }
 .hero-btn:active { background: rgba(255,255,255,.3); }
+.hero-btn-accent { background: var(--grad-cyan); border-color: transparent; color: var(--on-cyan);
+  font-weight: 800; box-shadow: 0 2px 8px rgba(43,212,212,.35); }
+.hero-btn-accent svg { stroke: var(--on-cyan); }
+.hero-btn-accent:active { background: var(--grad-cyan); filter: brightness(.92); }
 .score-hero-main { font-family: var(--font-num); font-weight: 800; font-size: 50px; line-height: .9;
   transform: skewX(-7deg); letter-spacing: -1px; color: #fff; margin: 2px 0 10px;
   text-shadow: 0 3px 14px rgba(0,0,0,.5); }
@@ -489,15 +496,19 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
 .mom-val.hot { color: var(--c-accent); }
 
 /* ── This over: inline label + rounded-square pills ── */
-.over-strip { display: flex; align-items: center; gap: 8px; padding: 2px 4px; flex-wrap: wrap; }
-.over-strip-label { font: 800 9px var(--font-body); letter-spacing: 1px; text-transform: uppercase;
-  color: var(--c-text-2); flex-shrink: 0; }
-#live-dots { min-height: 0; max-height: none; overflow: visible; display: flex; gap: 6px; flex: 1; }
+.over-strip { display: flex; flex-direction: column; gap: 7px; padding: 4px; }
+.over-strip-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+.over-strip-center { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+.over-strip-label { font: 800 12px var(--font-body); letter-spacing: 1px; text-transform: uppercase;
+  color: var(--c-text-2); }
+#live-dots { min-height: 0; max-height: none; overflow: visible; display: flex; gap: 6px;
+  justify-content: center; flex-wrap: wrap; }
 #live-dots .ball-dot { width: 26px; height: 26px; border-radius: 6px; font-size: 13px;
   font-family: var(--font-num); font-weight: 700; }
-.over-strip-runs { font-family: var(--font-num); font-weight: 700; font-size: 12px;
-  color: var(--c-text-2); margin-left: auto; flex-shrink: 0; }
-.over-strip-runs b { color: var(--c-primary); }
+.over-strip-runs { font-family: var(--font-num); font-weight: 800; font-size: 20px; line-height: 1;
+  color: var(--c-text-2); }
+.over-strip-runs b { color: inherit; font-weight: inherit; font-size: inherit; }
+.over-strip-wkts { color: inherit; font-size: inherit; }
 
 /* Run pad: single broadcast row of six (0·1·2·3·4·6) like the mockup */
 .run-grid { grid-template-columns: repeat(6, 1fr); gap: 6px; }
@@ -634,7 +645,7 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
 .over-undo svg { width: 14px; height: 14px; stroke: var(--c-primary); fill: none;
   stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .over-undo:active { background: rgba(43,212,212,.24); transform: scale(.97); }
-.over-strip-runs { margin-left: auto; }
+.over-undo { justify-self: end; }
 
 /* Home refresh button — visible in BOTH themes (was white-on-light) */
 #btn-refresh { background: var(--c-surface); border: 1px solid var(--c-border);

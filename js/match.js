@@ -403,7 +403,7 @@ function getBowlerStats(inn, bowlerName) {
     if (d.extras && d.extras.type === 'wide')    wides++;
     if (d.extras && d.extras.type === 'no_ball') noBalls++;
   }));
-  return { overStr, completedOvers, inOver, runs, wkts, maidens, extras: wides + noBalls };
+  return { overStr, completedOvers, inOver, runs, wkts, maidens, wides, noBalls, extras: wides + noBalls };
 }
 
 function getBowlerFigures(inn, bowlerName) {
