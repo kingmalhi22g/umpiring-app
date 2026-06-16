@@ -1032,6 +1032,21 @@ function checkMilestones(m) {
     if (s.runs >= 100 && !s._m100) { s._m100 = true; s._m50 = true; showMilestone('💯 ' + s.name + ' — Century!'); return true; }
     if (s.runs >= 50 && !s._m50)   { s._m50 = true; showMilestone('🎉 ' + s.name + ' — Fifty!'); return true; }
   }
+
+  // Bowler milestones — hat-trick, five-for, three-for.
+  const bowler = inn.currentOver ? inn.currentOver.bowler : null;
+  if (bowler) {
+    inn._bowlerMs = inn._bowlerMs || {};
+    const rec = inn._bowlerMs[bowler] || (inn._bowlerMs[bowler] = {});
+    const bw = bowlerWicketCount(inn, bowler);
+    if (bowlerHatTrick(inn, bowler) && !rec['ht' + bw]) {
+      rec['ht' + bw] = true; if (bw >= 3) rec.w3 = true; if (bw >= 5) rec.w5 = true;
+      showMilestone('🎩 ' + bowler + ' — HAT-TRICK!'); return true;
+    }
+    if (bw >= 5 && !rec.w5) { rec.w5 = true; rec.w3 = true; showMilestone('🔥 ' + bowler + ' — Five-for!'); return true; }
+    if (bw >= 3 && !rec.w3) { rec.w3 = true; showMilestone('👏 ' + bowler + ' — 3 wickets!'); return true; }
+  }
+
   const tm = Math.floor(inn.totalRuns / 50) * 50;     // team 50/100/150…
   if (tm >= 50 && tm > (inn._teamMs || 0)) { inn._teamMs = tm; showMilestone('🏏 ' + inn.battingTeam + ' — ' + tm + ' up!'); return true; }
   return false;
@@ -1060,7 +1075,7 @@ function afterBall(m) {
     m = completeOver(m);
     const updatedInn = m.innings[m.currentInnings];
     if (finishingOver && finishingOver.runs === 0 && finishingOver.balls.length >= 6) {
-      showMilestone('🎯 Maiden over — ' + finishingOver.bowler + '!');
+      showMilestone((finishingOver.wickets > 0 ? '💥 Wicket maiden — ' : '🎯 Maiden over — ') + finishingOver.bowler + '!');
     }
     saveMatch(m);
     if (isInningsComplete(updatedInn, effectiveOvers(m), effectiveMaxWickets(m))) {

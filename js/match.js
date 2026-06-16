@@ -308,6 +308,13 @@ function replayInnings(match) {
   // Mark already-passed milestones so they don't pop again after an edit.
   inn.batsmen.forEach(b => { b._m50 = b.runs >= 50; b._m100 = b.runs >= 100; });
   inn._teamMs = Math.floor(inn.totalRuns / 50) * 50;
+  inn._bowlerMs = {};
+  const seenB = new Set();
+  [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])].forEach(o => {
+    if (seenB.has(o.bowler)) return; seenB.add(o.bowler);
+    const w = bowlerWicketCount(inn, o.bowler);
+    inn._bowlerMs[o.bowler] = { w3: w >= 3, w5: w >= 5 };
+  });
 
   return match;
 }
@@ -402,6 +409,33 @@ function getBowlerStats(inn, bowlerName) {
 function getBowlerFigures(inn, bowlerName) {
   const s = getBowlerStats(inn, bowlerName);
   return `${s.overStr}-${s.maidens}-${s.runs}-${s.wkts}`;
+}
+
+// A delivery that counts as a wicket CREDITED to the bowler (excludes run-outs
+// and free-hit-voided dismissals).
+function isBowlerWicket(d) {
+  return !!(d.isWicket && d.wicket && d.wicket.bowlerCredit && !d.freeHit);
+}
+// Wickets credited to a bowler in this innings.
+function bowlerWicketCount(inn, bowler) {
+  let w = 0;
+  [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])].forEach(o => {
+    if (o.bowler === bowler) o.allDeliveries.forEach(d => { if (isBowlerWicket(d)) w++; });
+  });
+  return w;
+}
+// True when the bowler's last 3 legal deliveries (across their overs) are all
+// wickets — a hat-trick (wides/no-balls between don't break it).
+function bowlerHatTrick(inn, bowler) {
+  const legal = [];
+  [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])].forEach(o => {
+    if (o.bowler !== bowler) return;
+    o.allDeliveries.forEach(d => {
+      const t = d.extras ? d.extras.type : null;
+      if (t !== 'wide' && t !== 'no_ball') legal.push(d);
+    });
+  });
+  return legal.length >= 3 && legal.slice(-3).every(isBowlerWicket);
 }
 
 // Current (unbroken) partnership: runs and legal balls since the last wicket fell
