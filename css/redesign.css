@@ -218,8 +218,9 @@
 .hero-btn:active { background: rgba(255,255,255,.3); }
 .score-hero-main { font-size: 26px; letter-spacing: -.5px; color: #fff; margin: 3px 0 9px; }
 .score-hero-wkts { color: rgba(255,255,255,.78); }
-.score-hero-stats { border-top-color: rgba(255,255,255,.22); padding-top: 8px; gap: 4px; }
-.score-hero-stats .stat { min-width: 0; }
+.score-hero-stats { border-top-color: rgba(255,255,255,.22); padding-top: 8px;
+  gap: 10px; justify-content: space-between; }
+.score-hero-stats .stat { min-width: 0; flex: 0 1 auto; }
 .score-hero-stats .stat-label { color: rgba(255,255,255,.8); font-size: 8.5px; letter-spacing: .2px; white-space: nowrap; }
 .score-hero-stats .stat-val { color: #fff; font-size: 11.5px; white-space: nowrap; }
 .undo-btn { color: #fff; border-color: rgba(255,255,255,.45); background: rgba(255,255,255,.12); }
