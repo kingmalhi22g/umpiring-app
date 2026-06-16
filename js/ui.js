@@ -86,10 +86,10 @@ function renderLiveHeader(match) {
     setEl('live-stat-proj', ballsBowled > 0 ? Math.round(inn.totalRuns / ballsBowled * totalBalls) : inn.totalRuns);
   }
 
-  // Stat slots — partnership shows in both innings now:
+  // Stat slots (CRR + partnership show in both innings):
   //   1st innings: CRR · Proj · P'ship
-  //   chasing:     Need · RRR · Target · P'ship
-  show('stat-crr',    !chasing);
+  //   chasing:     CRR · P'ship · Need · RRR · Target
+  show('stat-crr',    true);
   show('stat-proj',   !chasing);
   show('stat-pship',  true);
   show('stat-need',   !!target);
