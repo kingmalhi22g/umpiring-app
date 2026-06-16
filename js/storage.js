@@ -27,10 +27,13 @@ function saveMatch(match) {
 
 function getMatch(id)    { return getMatches().find(m => m.id === id) || null; }
 
-function deleteMatch(id) {
+// Cloud-first: only remove the local copy once the cloud delete confirms, so a
+// rejected delete (e.g. you're not the owner) can't leave a half-deleted match.
+// Rejects if the cloud refuses — the caller keeps the match and warns the user.
+async function deleteMatch(id) {
+  if (typeof cloudDeleteMatch === 'function') await cloudDeleteMatch(id);
   _set(KEYS.MATCHES, getMatches().filter(m => m.id !== id));
   if (getActiveMatchId() === id) setActiveMatchId(null);
-  if (typeof cloudDeleteMatch === 'function') cloudDeleteMatch(id);
 }
 
 // ── Active match ─────────────────────────────────────────

@@ -19,8 +19,15 @@ service cloud.firestore {
       allow create: if request.auth != null
         && request.resource.data.ownerId == request.auth.uid;
 
-      allow update, delete: if request.auth != null
+      allow update: if request.auth != null
         && (resource.data.ownerId == request.auth.uid || isAdmin());
+
+      // Deleting a never-synced (non-existent) doc is a harmless no-op, so allow
+      // it — otherwise local-only matches could never be deleted.
+      allow delete: if request.auth != null
+        && (resource == null
+            || resource.data.ownerId == request.auth.uid
+            || isAdmin());
     }
   }
 }

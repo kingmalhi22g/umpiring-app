@@ -218,8 +218,14 @@ function wireButtons() {
         title: 'Delete match?',
         message: '"' + label + '"\n\nThis permanently removes the match and cannot be undone.',
         confirmText: 'Delete',
-        onConfirm: () => {
-          deleteMatch(delId);
+        onConfirm: async () => {
+          try {
+            await deleteMatch(delId);
+          } catch (e) {
+            showToast("Couldn't delete — you may not have permission");
+            renderMatchList(document.getElementById('match-list'));
+            return;
+          }
           if (state.matchId === delId)     state.matchId = null;
           if (state.viewMatchId === delId) state.viewMatchId = null;
           renderMatchList(document.getElementById('match-list'));

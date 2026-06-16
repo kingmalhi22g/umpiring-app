@@ -125,11 +125,13 @@ function _doPush(match) {
   }, { merge: true }).catch(e => console.error('[cloud] push failed', e));
 }
 
+// Returns a promise: resolves when the cloud doc is gone (or there's no cloud
+// to talk to), rejects if the server refuses (e.g. not the owner). Deleting a
+// non-existent doc resolves successfully.
 function cloudDeleteMatch(id) {
-  if (!cloudAvailable()) return;
   clearTimeout(_pushTimers[id]);
-  _db.collection('matches').doc(id).delete()
-    .catch(e => console.error('[cloud] delete failed', e));
+  if (!cloudAvailable()) return Promise.resolve();   // local-only mode
+  return _db.collection('matches').doc(id).delete();
 }
 
 // ── Admin sign-in / out ───────────────────────────────────
