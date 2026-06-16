@@ -33,11 +33,25 @@ let _unsubFeed = null;
 const _pushTimers = {}; // debounce timers, keyed by match id
 
 function cloudAvailable() { return typeof firebase !== 'undefined' && !!_db; }
-function cloudUid()       { return _uid; }
-function cloudEmail()     { return _email; }
-function cloudIsAnon()    { return _isAnon; }
-function cloudIsAdmin()   { return _isAdmin; }
-function cloudReady()     { return _ready; }
+
+// Read auth state LIVE from currentUser so the UI is correct the instant a
+// sign-in / link resolves, even if onAuthStateChanged doesn't re-fire (which
+// happens when linking an anonymous account to Google).
+function _curUser() { return (_auth && _auth.currentUser) || null; }
+function _userEmail(u) {
+  if (!u) return null;
+  if (u.email) return u.email;
+  if (u.providerData) { for (const p of u.providerData) { if (p && p.email) return p.email; } }
+  return null;
+}
+function cloudUid()   { const u = _curUser(); return u ? u.uid : _uid; }
+function cloudEmail() { return _userEmail(_curUser()); }
+function cloudIsAnon(){ const u = _curUser(); return u ? !!u.isAnonymous : true; }
+function cloudIsAdmin() {
+  const u = _curUser(); const e = _userEmail(u);
+  return !!(u && !u.isAnonymous && e && e.toLowerCase() === ADMIN_EMAIL);
+}
+function cloudReady()  { return _ready || !!_curUser(); }
 
 // ── Init + auth ───────────────────────────────────────────
 function cloudInit() {
@@ -53,6 +67,11 @@ function cloudInit() {
     console.error('[cloud] init failed', e);
     return;
   }
+
+  // Complete a redirect-based sign-in if we just came back from one (mobile).
+  _auth.getRedirectResult()
+    .then(res => { if (res && res.user) { _startFeed(); if (typeof onCloudAuth === 'function') onCloudAuth(); } })
+    .catch(e => console.error('[cloud] redirect sign-in failed', e));
 
   _auth.onAuthStateChanged(user => {
     if (user) {
@@ -102,10 +121,11 @@ function _startFeed() {
 // deeply-nested scoring structure. Live scoring is debounced; a finished match
 // is pushed immediately.
 function cloudPushMatch(match) {
-  if (!cloudAvailable() || !_uid) return;
-  if (!match.ownerId) match.ownerId = _uid;
+  const uid = cloudUid();
+  if (!cloudAvailable() || !uid) return;
+  if (!match.ownerId) match.ownerId = uid;
   // Only sync matches you own (or anything, if you're the admin).
-  if (match.ownerId !== _uid && !_isAdmin) return;
+  if (match.ownerId !== uid && !cloudIsAdmin()) return;
 
   clearTimeout(_pushTimers[match.id]);
   if (match.status === 'completed') {
@@ -118,7 +138,7 @@ function cloudPushMatch(match) {
 function _doPush(match) {
   delete _pushTimers[match.id];
   _db.collection('matches').doc(match.id).set(Object.assign({
-    ownerId:   match.ownerId || _uid,
+    ownerId:   match.ownerId || cloudUid(),
     status:    match.status || 'setup',
     matchJson: JSON.stringify(match),
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -161,7 +181,7 @@ function _summaryFields(match) {
 // (for matches saved before summary fields existed). Returns {updated,skipped,total}.
 async function cloudBackfillSummaries() {
   if (!cloudAvailable()) throw new Error('Cloud not ready');
-  if (!_isAdmin) throw new Error('Admin only');
+  if (!cloudIsAdmin()) throw new Error('Admin only');
   const snap = await _db.collection('matches').get();
   let updated = 0, skipped = 0;
   for (const doc of snap.docs) {
@@ -186,17 +206,32 @@ function cloudSignInGoogle() {
   if (!_auth) return Promise.reject(new Error('Firebase not ready'));
   const provider = new firebase.auth.GoogleAuthProvider();
   const cur = _auth.currentUser;
+
+  // Refresh UI/feed once a sign-in resolves (onAuthStateChanged may not fire
+  // when linking an anonymous account).
+  const finish = res => { _startFeed(); if (typeof onCloudAuth === 'function') onCloudAuth(); return res; };
+
+  // Popups are unreliable on mobile; fall back to a full-page redirect.
+  const isPopupProblem = e => e && [
+    'auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/cancelled-popup-request',
+    'auth/operation-not-supported-in-this-environment', 'auth/web-storage-unsupported'
+  ].includes(e.code);
+
   // If currently anonymous, link so matches made anonymously keep their owner.
-  if (cur && cur.isAnonymous) {
-    return cur.linkWithPopup(provider).catch(err => {
-      if (err.code === 'auth/credential-already-in-use' ||
-          err.code === 'auth/email-already-in-use') {
-        return _auth.signInWithPopup(provider);       // account already exists
-      }
-      throw err;
-    });
-  }
-  return _auth.signInWithPopup(provider);
+  const popup = (cur && cur.isAnonymous)
+    ? cur.linkWithPopup(provider).catch(err => {
+        if (err.code === 'auth/credential-already-in-use' ||
+            err.code === 'auth/email-already-in-use') {
+          return _auth.signInWithPopup(provider);     // account already exists
+        }
+        throw err;
+      })
+    : _auth.signInWithPopup(provider);
+
+  return popup.then(finish).catch(err => {
+    if (isPopupProblem(err)) return _auth.signInWithRedirect(provider); // page reloads
+    throw err;
+  });
 }
 
 function cloudSignOut() {
