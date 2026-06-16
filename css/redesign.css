@@ -380,3 +380,273 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
   body:not(.light-mode) .sum-result,
   body:not(.light-mode) .mc-foot.win { color: var(--c-primary-light); }
 }
+
+/* ════════════════════════════════════════════════════════════
+   LIVE SCREEN — BROADCAST DIRECTION (Sky redesign mockup)
+   The hero is always the dark navy stadium gradient, so text
+   inside it is light in BOTH themes. Cards below the hero use
+   tokens so they follow light/dark.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Hero top strip: LIVE pill · format/innings · actions ── */
+.score-hero-top { display: flex; align-items: center; gap: 9px; }
+.live-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--grad-wicket); color: #fff;
+  font: 800 10px var(--font-body); letter-spacing: 1.4px;
+  padding: 5px 10px; border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(229,52,59,.5); flex-shrink: 0;
+}
+.live-pulse { width: 6px; height: 6px; border-radius: 50%; background: #fff;
+  animation: umpPulse 1.3s infinite; }
+@keyframes umpPulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+.live-format { flex: 1; text-align: center; font: 700 11px var(--font-body);
+  letter-spacing: 1.3px; color: #7FA8CC; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; }
+.score-hero-top .hero-actions { gap: 6px; }
+.score-hero-top .hero-icon { width: 30px; height: 30px; }
+
+/* ── Batting team: crest + name + big skewed score ── */
+.hero-team-row { display: flex; align-items: center; gap: 12px; margin-top: 11px; }
+.hero-crest {
+  width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+  background: var(--grad-amber); color: var(--on-amber);
+  display: flex; align-items: center; justify-content: center;
+  font: 800 20px var(--font-display);
+  box-shadow: 0 5px 12px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.55);
+  border: 2px solid rgba(255,255,255,.18);
+}
+.hero-team-block { flex: 1; min-width: 0; }
+.hero-team-name {
+  font: 800 13px var(--font-display); letter-spacing: .5px;
+  text-transform: uppercase; color: #EAF1F8;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.score-hero-main {
+  font-family: var(--font-num); font-weight: 800; font-size: 48px; line-height: .82;
+  transform: skewX(-7deg); letter-spacing: -1px; color: #fff;
+  margin: 1px 0 0; text-shadow: 0 3px 14px rgba(0,0,0,.5); white-space: nowrap;
+}
+.score-hero-wkts { color: var(--c-accent); }
+.score-hero-overs {
+  font-family: var(--font-num); font-size: 14px; font-weight: 700; letter-spacing: .5px;
+  color: #9FBEDB; margin-left: 9px; transform: skewX(7deg); display: inline-block;
+}
+
+/* ── Bowling team mini row ── */
+.hero-oppo-row { display: flex; align-items: center; gap: 9px; margin-top: 9px; }
+.hero-crest-sm {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(145deg,#4F8BD6,#1E4E8C); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font: 800 11px var(--font-display); box-shadow: inset 0 1px 0 rgba(255,255,255,.3);
+}
+.hero-oppo-name { font: 700 12px var(--font-body); letter-spacing: .3px; color: #9FBEDB;
+  text-transform: uppercase; }
+.hero-oppo-status { font: 600 12px var(--font-body); color: #5E7C99; }
+
+/* ── Decorative momentum gradient bar ── */
+.hero-grad-bar {
+  height: 4px; margin: 12px -14px 0;
+  background: linear-gradient(90deg,#2BD4D4,#7CF0C8,#FFC24B);
+  clip-path: polygon(0 0,100% 0,calc(100% - 14px) 100%,14px 100%);
+}
+
+.score-hero .score-hero-stats { margin-top: 10px; }
+
+/* ── Compact bowler line ── */
+.bowl-line-card { padding: 0; overflow: hidden; }
+.bowl-line { display: flex; align-items: center; gap: 9px; padding: 10px 13px; }
+.bowl-line + .bowl-line { border-top: 1px solid var(--c-border); }
+.bowl-av {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; color: #fff;
+}
+.bowl-line-name { flex: 1; min-width: 0; font: 600 13px var(--font-body); color: var(--c-text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bowl-line-sub { color: var(--c-text-2); font-weight: 500; }
+.bowl-line-fig { font-family: var(--font-num); font-weight: 700; font-size: 15px;
+  color: var(--c-text); white-space: nowrap; letter-spacing: .3px; }
+.bowl-line-fig .bowl-line-w { color: var(--c-danger); }
+.prev-bowler { opacity: .55; }
+
+/* ── Last-5-overs momentum chart ── */
+.momentum-card { padding: 12px 13px; }
+.momentum-head { display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 11px; }
+.momentum-head > span:first-child { font: 800 9px var(--font-body); letter-spacing: 1px;
+  text-transform: uppercase; color: var(--c-text-2); }
+.momentum-sum { font-family: var(--font-num); font-weight: 700; font-size: 12px; color: var(--c-text-2); }
+.momentum-bars { display: flex; align-items: flex-end; gap: 7px; height: 50px; }
+.mom-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  height: 100%; justify-content: flex-end; }
+.mom-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 4px;
+  background: linear-gradient(180deg,#2BD4D4,#1C7E8C); }
+.mom-bar.hot { background: var(--grad-amber); }
+.mom-bar.cold { background: linear-gradient(180deg,#5E7C99,#3A4E63); }
+.mom-val { font-family: var(--font-num); font-weight: 700; font-size: 10px; color: var(--c-text-2); }
+.mom-val.hot { color: var(--c-accent); }
+
+/* ── This over: inline label + rounded-square pills ── */
+.over-strip { display: flex; align-items: center; gap: 8px; padding: 2px 4px; flex-wrap: wrap; }
+.over-strip-label { font: 800 9px var(--font-body); letter-spacing: 1px; text-transform: uppercase;
+  color: var(--c-text-2); flex-shrink: 0; }
+#live-dots { min-height: 0; max-height: none; overflow: visible; display: flex; gap: 6px; flex: 1; }
+#live-dots .ball-dot { width: 26px; height: 26px; border-radius: 6px; font-size: 13px;
+  font-family: var(--font-num); font-weight: 700; }
+.over-strip-runs { font-family: var(--font-num); font-weight: 700; font-size: 12px;
+  color: var(--c-text-2); margin-left: auto; flex-shrink: 0; }
+.over-strip-runs b { color: var(--c-primary); }
+
+/* Run pad: single broadcast row of six (0·1·2·3·4·6) like the mockup */
+.run-grid { grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.run-btn { height: 44px; border-radius: 9px; font-size: 19px; }
+.run-grid .run-4, .run-grid .run-6 { font-size: 19px; }
+
+/* ════════════════════════════════════════════════════════════
+   APP-WIDE BROADCAST THEME (Sky) — extends the live look to
+   every screen. Token-driven; the gradient heroes stay navy in
+   both light + dark, exactly like the live score hero.
+   ════════════════════════════════════════════════════════════ */
+
+/* Per-screen gradient stadium hero (mirrors .score-hero) */
+.scr-hero {
+  background: var(--grad-header);
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(0,0,0,.45);
+  color: #EAF1F8;
+  padding: 20px 18px;
+  position: relative;
+  overflow: hidden;
+}
+.scr-hero.center { text-align: center; }
+.scr-hero .scr-eyebrow {
+  font: 800 10px var(--font-body); letter-spacing: 2.2px;
+  text-transform: uppercase; color: #5FA0D6;
+}
+.scr-hero .scr-title {
+  font: 900 26px var(--font-display); font-style: italic; letter-spacing: -.3px;
+  text-transform: uppercase; color: #fff; margin-top: 7px; line-height: 1.08;
+}
+.scr-hero .scr-sub { font: 600 12.5px var(--font-body); color: #9FBEDB; margin-top: 8px; }
+/* thin cyan→amber accent strip at the foot of a hero */
+.scr-hero .scr-accent {
+  height: 4px; margin: 14px -18px -20px;
+  background: linear-gradient(90deg,#2BD4D4,#7CF0C8,#FFC24B);
+  clip-path: polygon(0 0,100% 0,calc(100% - 14px) 100%,14px 100%);
+}
+/* hero menu/back/round icon button (for nav inside a hero) */
+.scr-hero-row { display: flex; align-items: center; gap: 13px; }
+.scr-hero-ico {
+  width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; border: none; cursor: pointer;
+  background: rgba(255,255,255,.10); display: flex; align-items: center; justify-content: center;
+}
+.scr-hero-ico svg { width: 19px; height: 19px; stroke: #9FBEDB; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.scr-hero-ico:active { background: rgba(255,255,255,.22); }
+.scr-hero-grow { flex: 1; min-width: 0; }
+
+/* Skewed broadcast numeral (the big-score look) */
+.bignum {
+  font-family: var(--font-num); font-weight: 800; line-height: .85;
+  transform: skewX(-7deg); letter-spacing: -1px; display: inline-block;
+}
+
+/* ── Home: title hero + Saira scores on cards ── */
+.mc-score, .sum-tscore, .mc-team .mc-score { font-family: var(--font-num); font-weight: 800; letter-spacing: .3px; }
+.match-item.in-progress { border-left: 3px solid var(--c-accent); }
+
+/* ── Toss: broadcast Bat/Bowl tiles + gold coin ── */
+.toss-coin {
+  width: 96px; height: 96px;
+  background: radial-gradient(circle at 36% 30%,#FFE49A,#E6A521);
+  border-radius: 50%; border: 4px solid #FFD66B;
+  box-shadow: 0 16px 34px rgba(0,0,0,.5), inset 0 -6px 14px rgba(150,100,0,.4);
+  display: block; margin: 0 auto var(--sp-md);
+}
+.toss-coin circle, .toss-coin path { stroke: #8A5A06; }
+.choice-btns { display: flex; gap: 12px; }
+.choice-btn {
+  flex: 1; border-radius: 18px; padding: 22px 12px; text-align: center;
+  background: var(--c-surface); border: 2px solid var(--c-border); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.choice-svg { width: 32px; height: 32px; stroke: var(--c-text-2); fill: none; stroke-width: 2; }
+.choice-label { font: 800 16px var(--font-body); color: var(--c-text); }
+.choice-btn.selected, .choice-btn:active {
+  background: var(--grad-cyan); border-color: transparent;
+  box-shadow: 0 12px 24px rgba(43,212,212,.28);
+}
+.choice-btn.selected .choice-svg, .choice-btn:active .choice-svg { stroke: var(--on-cyan); }
+.choice-btn.selected .choice-label, .choice-btn:active .choice-label { color: var(--on-cyan); }
+
+/* ── End of over: recap squares + skewed stat numbers ── */
+#eos-dots { justify-content: center; gap: 7px; }
+#eos-dots .ball-dot { width: 34px; height: 34px; border-radius: 8px; font-size: 15px;
+  font-family: var(--font-num); font-weight: 700; }
+.eos-recap { display: flex; justify-content: space-around; border-top: 1px solid var(--c-border);
+  padding-top: 14px; margin-top: 14px; text-align: center; }
+.eos-recap .rk-lbl { font: 800 9px var(--font-body); letter-spacing: 1px; color: var(--c-text-2); text-transform: uppercase; }
+.eos-recap .rk-num { font-family: var(--font-num); font-weight: 700; font-size: 26px; margin-top: 2px; }
+.eos-recap .rk-num.wkt { color: var(--c-danger); }
+.eos-recap .rk-fig { font: 700 11px var(--font-num); color: var(--c-primary); margin-top: 2px; }
+
+/* ── Innings break: total card + cyan target reveal ── */
+.ib-total-card { text-align: center; border-top: 3px solid var(--c-accent); }
+.ib-team { display: flex; align-items: center; justify-content: center; gap: 11px; }
+.ib-team .sum-logo { width: 40px; height: 40px; font-size: 16px; }
+.ib-team-name { font: 800 15px var(--font-display); letter-spacing: .5px; text-transform: uppercase; }
+.ib-bignum { font-size: 58px; margin-top: 12px; color: var(--c-text); }
+.ib-bignum .wk { color: var(--c-accent); }
+.ib-overs { font: 600 13px var(--font-body); color: var(--c-text-2); margin-top: 6px; }
+.ib-target-card {
+  text-align: center; border-radius: 16px; padding: 22px;
+  background: linear-gradient(150deg, rgba(43,212,212,.14), var(--c-surface));
+  box-shadow: 0 0 0 1px rgba(43,212,212,.25), inset 0 0 30px rgba(43,212,212,.06);
+}
+.ib-target-eyebrow { font: 800 10px var(--font-body); letter-spacing: 2px; color: var(--c-primary-mid); text-transform: uppercase; }
+.ib-target-num { font-size: 50px; color: var(--c-primary-mid); margin-top: 8px; }
+.ib-target-sub { font: 700 14px var(--font-body); margin-top: 4px; color: var(--c-text); }
+.ib-target-row { display: flex; justify-content: center; gap: 18px; margin-top: 16px;
+  border-top: 1px solid var(--c-border); padding-top: 14px; }
+.ib-target-row .k { font: 700 11px var(--font-body); color: var(--c-text-2); }
+.ib-target-row .v { font: 700 14px var(--font-num); }
+
+/* ── Summary: broadcast winner lockup ── */
+.sum-card { border-top: 3px solid var(--c-accent); }
+.sum-result { background: linear-gradient(150deg, rgba(43,212,212,.13), var(--c-surface));
+  box-shadow: 0 0 0 1px rgba(43,212,212,.22); color: var(--c-primary-mid); font-weight: 800; }
+
+/* Expanded bowler line (O-M-R-W-Ext-Econ) — allow the figure to wrap */
+.bowl-line { flex-wrap: wrap; }
+.bowl-line-name { flex: 1 1 auto; }
+.bowl-line-fig { white-space: normal; }
+.bowl-line-fig .bowl-line-x { color: var(--c-text-2); font-weight: 600; font-size: 12px;
+  font-family: var(--font-body); letter-spacing: 0; }
+
+/* Undo button relocated into the "this over" strip, after the runs total */
+.over-undo {
+  display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0;
+  border: none; cursor: pointer; font: 700 11px var(--font-body);
+  color: var(--c-primary); background: rgba(43,212,212,.12);
+  border-radius: 14px; padding: 5px 11px;
+}
+.over-undo svg { width: 14px; height: 14px; stroke: var(--c-primary); fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.over-undo:active { background: rgba(43,212,212,.24); transform: scale(.97); }
+.over-strip-runs { margin-left: auto; }
+
+/* Home refresh button — visible in BOTH themes (was white-on-light) */
+#btn-refresh { background: var(--c-surface); border: 1px solid var(--c-border);
+  color: var(--c-text-2); }
+#btn-refresh:active { background: var(--c-bg); }
+
+/* Match setup — compact so Continue is visible without scrolling */
+#screen-match-setup .scr-hero { padding: 12px 16px; }
+#screen-match-setup .scr-hero .scr-title { font-size: 19px; margin-top: 3px; }
+#screen-match-setup .scr-accent { display: none; }
+#screen-match-setup .screen-inner { gap: 9px; }
+#screen-match-setup .card { padding: 12px 14px; }
+#screen-match-setup .form-group.mt-md { margin-top: 9px; }
+#screen-match-setup .btn-lg { padding: 12px var(--sp-md); }
+#screen-match-setup .btn.mt-md { margin-top: 9px; }

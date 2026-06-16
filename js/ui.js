@@ -61,11 +61,28 @@ function renderLiveHeader(match) {
   if (!inn) return;
 
   const isSuper = match.currentInnings >= 2;
-  setEl('live-score-team', (isSuper ? 'Super Over · ' : '') + inn.battingTeam);
+  setEl('live-score-team', inn.battingTeam);
   setEl('live-score-oppo', inn.bowlingTeam);
   setEl('live-score-runs', inn.totalRuns);
   setEl('live-score-wkts', inn.wickets);
   setEl('live-score-overs', getOverDisplay(inn));
+
+  // Format · innings label (e.g. "T20 · 1ST INNINGS")
+  const inningsName = isSuper ? 'SUPER OVER'
+    : (match.currentInnings === 1 ? '2ND INNINGS' : '1ST INNINGS');
+  setEl('live-format-label', formatLabel(effectiveOvers(match)).toUpperCase() + ' · ' + inningsName);
+
+  // Team crests (single letter; circle colours come from CSS)
+  setCrestLetter('live-bat-crest', inn.battingTeam);
+  setCrestLetter('live-bowl-crest', inn.bowlingTeam);
+
+  // Bowling team's status: their score if they've batted, else "yet to bat"
+  const oppoInn = getTeamInnings(match, inn.bowlingTeam);
+  const oppoEl = document.getElementById('live-oppo-status');
+  if (oppoEl) {
+    oppoEl.textContent = (oppoInn && (oppoInn.overs.length || oppoInn.totalRuns))
+      ? (oppoInn.totalRuns + '-' + oppoInn.wickets) : 'yet to bat';
+  }
 
   const ballsBowled = inn.overs.length * 6 + (inn.currentOver ? inn.currentOver.balls.length : 0);
   const crr = ballsBowled > 0 ? (inn.totalRuns / (ballsBowled / 6)).toFixed(2) : null;
@@ -109,18 +126,12 @@ function renderLiveHeader(match) {
   fillBatRow('striker',    inn.batsmen[inn.strikerIdx]);
   fillBatRow('nonstriker', inn.batsmen[inn.nonStrikerIdx]);
 
-  // Bowler (current)
+  // Bowler (current) — compact O–M–R–W line
   if (inn.currentOver) {
     const bowler = inn.currentOver.bowler;
-    const bs = getBowlerStats(inn, bowler);
-    const balls = oversToBalls(bs.overStr);
-    const econ = balls ? (bs.runs / (balls / 6)).toFixed(1) : '0.0';
     setAvatar('live-bowler-av', bowler);
     setEl('live-bowler-name', bowler);
-    setEl('live-bowler-o',   bs.overStr);
-    setEl('live-bowler-r',   bs.runs);
-    setEl('live-bowler-w',   bs.wkts);
-    setEl('live-bowler-econ', econ);
+    setBowlerFig('live-bowler-fig', inn, bowler);
   }
 
   // Previous bowler (whoever just bowled the last completed over)
@@ -128,15 +139,9 @@ function renderLiveHeader(match) {
   const prevOver = inn.overs.length ? inn.overs[inn.overs.length - 1] : null;
   const curBowler = inn.currentOver ? inn.currentOver.bowler : null;
   if (row2 && prevOver && prevOver.bowler && prevOver.bowler !== curBowler) {
-    const bs2 = getBowlerStats(inn, prevOver.bowler);
-    const balls2 = oversToBalls(bs2.overStr);
-    const econ2 = balls2 ? (bs2.runs / (balls2 / 6)).toFixed(1) : '0.0';
     setAvatar('live-bowler2-av', prevOver.bowler);
     setEl('live-bowler2-name', prevOver.bowler);
-    setEl('live-bowler2-o',   bs2.overStr);
-    setEl('live-bowler2-r',   bs2.runs);
-    setEl('live-bowler2-w',   bs2.wkts);
-    setEl('live-bowler2-econ', econ2);
+    setBowlerFig('live-bowler2-fig', inn, prevOver.bowler);
     row2.classList.remove('hidden');
   } else if (row2) {
     row2.classList.add('hidden');
@@ -166,6 +171,47 @@ function setAvatar(id, name) {
   if (!e) return;
   e.style.background = avatarColor(String(name || '?'));
   e.textContent = initials(name, 2);
+}
+
+// Single-letter team crest (background gradient comes from CSS).
+function setCrestLetter(id, name) {
+  const e = document.getElementById(id);
+  if (e) e.textContent = initials(name, 1);
+}
+
+// Bowler figure "O–M–R–W" + extras + economy, wickets highlighted.
+function setBowlerFig(id, inn, bowler) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  const s = getBowlerStats(inn, bowler);
+  const balls = oversToBalls(s.overStr);
+  const econ = balls ? (s.runs / (balls / 6)).toFixed(2) : '0.00';
+  e.innerHTML = esc(s.overStr) + '–' + s.maidens + '–' + s.runs +
+                '–<span class="bowl-line-w">' + s.wkts + '</span>' +
+                '<span class="bowl-line-x"> · ' + s.extras + ' ext · ' + econ + ' eco</span>';
+}
+
+// Last-5-(completed)-overs momentum bars, scaled to the busiest over.
+function renderMomentum(inn) {
+  const card = document.getElementById('live-momentum-card');
+  const wrap = document.getElementById('live-momentum');
+  if (!card || !wrap) return;
+  const overs = inn.overs.slice(-5);
+  if (overs.length === 0) { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+  const runsArr = overs.map(o => o.runs || 0);
+  const max = Math.max(1, ...runsArr);
+  let totRuns = 0, totWkts = 0;
+  wrap.innerHTML = overs.map(o => {
+    const r = o.runs || 0;
+    totRuns += r; totWkts += (o.wickets || 0);
+    const pct = Math.max(8, Math.round(r / max * 100));
+    const cls = r === max ? ' hot' : (r <= 2 ? ' cold' : '');
+    return '<div class="mom-col"><div class="mom-bar' + cls + '" style="height:' + pct +
+           '%"></div><span class="mom-val' + (r === max ? ' hot' : '') + '">' + r + '</span></div>';
+  }).join('');
+  const sum = document.getElementById('live-momentum-sum');
+  if (sum) sum.textContent = totRuns + ' runs · ' + totWkts + ' wkt' + (totWkts === 1 ? '' : 's');
 }
 
 function fillBatRow(prefix, batsman) {
@@ -548,12 +594,12 @@ function renderOverSummary(match) {
   const lastOver = inn.overs[inn.overs.length - 1];
   if (!lastOver) return;
 
-  setEl('eos-over-num',    'Over ' + lastOver.overNumber + ' complete');
+  setEl('eos-over-num',    'End of Over ' + lastOver.overNumber);
   setEl('eos-bowler-name', lastOver.bowler);
-  setEl('eos-over-runs',   lastOver.runs + ' run' + (lastOver.runs !== 1 ? 's' : ''));
-  setEl('eos-over-wkts',   lastOver.wickets + ' wicket' + (lastOver.wickets !== 1 ? 's' : ''));
+  setEl('eos-over-runs',   lastOver.runs);
+  setEl('eos-over-wkts',   lastOver.wickets);
   setEl('eos-bowler-fig',  getBowlerFigures(inn, lastOver.bowler));
-  setEl('eos-total',       inn.totalRuns + '/' + inn.wickets + ' (' + getOverDisplay(inn) + ' ov)');
+  setEl('eos-total',       inn.battingTeam + ' · ' + inn.totalRuns + '-' + inn.wickets);
 
   renderBallDots(document.getElementById('eos-dots'), lastOver);
 
@@ -612,9 +658,19 @@ function suggestNextBowler(inn, maxOv) {
 function renderInningsBreak(match) {
   const inn1 = match.innings[0];
   const t2   = match.teams.find(t => t.name !== inn1.battingTeam);
-  setEl('ib-score',  inn1.battingTeam + ' scored ' + inn1.totalRuns + '/' + inn1.wickets);
-  setEl('ib-overs',  '(' + getOverDisplay(inn1) + ' overs)');
-  setEl('ib-target', (t2 ? t2.name : 'Team 2') + ' need ' + getTarget(match) + ' to win');
+  const target = getTarget(match);
+  const oversN = effectiveOvers(match);
+  const rpo = oversN ? (target / oversN).toFixed(2) : '—';
+  setAvatar('ib-team-crest', inn1.battingTeam);
+  setEl('ib-team-name', inn1.battingTeam);
+  const big = document.getElementById('ib-bignum');
+  if (big) big.innerHTML = inn1.totalRuns + '<span class="wk">-' + inn1.wickets + '</span>';
+  setEl('ib-overs', getOverDisplay(inn1) + ' overs · RR ' + runRate(inn1));
+  setEl('ib-need-line', (t2 ? t2.name : 'Team 2') + ' need');
+  setEl('ib-target-num', target);
+  setEl('ib-row-target', target);
+  setEl('ib-row-overs', oversN);
+  setEl('ib-row-rpo', rpo);
 }
 
 // ── Helpers ──────────────────────────────────────────────
@@ -889,7 +945,6 @@ function renderOverSheet(match) {
     </div>`;
   });
 
-  html += `<div style="text-align:center;padding:12px 0 16px;font-size:10px;color:#999">Made with Cricket Umpire App</div>`;
   el.innerHTML = html;
 }
 

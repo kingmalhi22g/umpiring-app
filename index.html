@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=65">
-  <link rel="stylesheet" href="css/layout.css?v=65">
-  <link rel="stylesheet" href="css/components.css?v=65">
-  <link rel="stylesheet" href="css/redesign.css?v=65">
+  <link rel="stylesheet" href="css/style.css?v=70">
+  <link rel="stylesheet" href="css/layout.css?v=70">
+  <link rel="stylesheet" href="css/components.css?v=70">
+  <link rel="stylesheet" href="css/redesign.css?v=70">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -56,6 +56,11 @@
   <!-- HOME -->
   <section id="screen-home" class="screen active">
     <div class="screen-inner">
+      <div class="scr-hero">
+        <div class="scr-eyebrow">Cricket Umpire</div>
+        <div class="scr-title">Matches</div>
+        <div class="scr-accent"></div>
+      </div>
       <button id="btn-new-match" class="btn btn-primary btn-lg">&#127951; New Match</button>
       <div class="home-bar">
         <div class="sc-tabs" style="margin-top:0">
@@ -73,6 +78,11 @@
   <!-- MATCH SETUP -->
   <section id="screen-match-setup" class="screen">
     <div class="screen-inner">
+      <div class="scr-hero">
+        <div class="scr-eyebrow">New match</div>
+        <div class="scr-title">Set up</div>
+        <div class="scr-accent"></div>
+      </div>
       <div class="card">
         <div class="section-head">Match Details</div>
         <div class="form-group mt-md">
@@ -104,13 +114,16 @@
   <!-- TOSS -->
   <section id="screen-toss" class="screen">
     <div class="screen-inner">
+      <div class="scr-hero center">
+        <div class="scr-eyebrow">First decision</div>
+        <div class="scr-title">The Toss</div>
+      </div>
       <div class="card text-center">
         <svg class="toss-coin" viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="12" r="9"/>
           <circle cx="12" cy="12" r="6"/>
           <path d="M12 9v6M9.5 11h3.5a1.25 1.25 0 0 1 0 2.5H10"/>
         </svg>
-        <div class="section-head" style="border:none;text-align:center;font-size:16px">Toss</div>
         <div class="form-group mt-md">
           <label class="form-label" for="toss-winner">Who won the toss?</label>
           <select id="toss-winner" class="form-input"></select>
@@ -140,28 +153,35 @@
   <section id="screen-live" class="screen">
     <div id="live-scroll">
       <div class="screen-inner">
-        <!-- Score hero -->
+        <!-- Score hero (broadcast) -->
         <div class="score-hero">
           <div class="score-hero-top">
-            <button class="hero-icon" id="btn-live-home" type="button" title="Home" aria-label="Home">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg>
-            </button>
+            <div class="live-pill"><span class="live-pulse"></span>LIVE</div>
+            <div class="live-format" id="live-format-label">1ST INNINGS</div>
             <div class="hero-actions">
-              <button class="hero-btn" id="btn-live-stats" type="button" title="Full scoreboard">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-7M12 21V5M19 21v-10"/></svg>
-                Scoreboard
+              <button class="hero-icon" id="btn-live-home" type="button" title="Home" aria-label="Home">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg>
               </button>
-              <button class="hero-icon" id="btn-undo" type="button" title="Undo last ball" aria-label="Undo">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
+              <button class="hero-icon" id="btn-live-stats" type="button" title="Full scoreboard" aria-label="Scoreboard">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-7M12 21V5M19 21v-10"/></svg>
               </button>
             </div>
           </div>
-          <div class="score-hero-team" aria-hidden="true">
-            <b id="live-score-team">Team A</b><span class="hero-vs"> v </span><span id="live-score-oppo">Team B</span>
+          <div class="hero-team-row" aria-hidden="true">
+            <div class="hero-crest" id="live-bat-crest">T</div>
+            <div class="hero-team-block">
+              <div class="hero-team-name" id="live-score-team">Team A</div>
+              <div class="score-hero-main">
+                <span id="live-score-runs">0</span><span class="score-hero-wkts">-<span id="live-score-wkts">0</span></span><span class="score-hero-overs"><span id="live-score-overs">0.0</span> OV</span>
+              </div>
+            </div>
           </div>
-          <div class="score-hero-main" aria-hidden="true">
-            <span id="live-score-runs">0</span><span class="score-hero-wkts">/<span id="live-score-wkts">0</span></span><span class="score-hero-overs">(<span id="live-score-overs">0.0</span> ov)</span>
+          <div class="hero-oppo-row" aria-hidden="true">
+            <div class="hero-crest-sm" id="live-bowl-crest">L</div>
+            <span class="hero-oppo-name" id="live-score-oppo">Team B</span>
+            <span class="hero-oppo-status" id="live-oppo-status">yet to bat</span>
           </div>
+          <div class="hero-grad-bar" aria-hidden="true"></div>
           <div class="sr-only" id="live-score-announce" aria-live="polite" aria-atomic="true"></div>
           <div class="score-hero-stats">
             <div class="stat" id="stat-crr"><span class="stat-label">CRR</span><span class="stat-val" id="live-stat-crr">&mdash;</span></div>
@@ -201,27 +221,28 @@
             </button>
           </div>
         </div>
-        <!-- Bowling (current bowler) -->
-        <div class="card live-card">
-          <div class="bt-head bowl"><span>Bowling</span><span>O</span><span>R</span><span>W</span><span>Econ</span></div>
-          <div class="bt-row bowl" id="live-bowler">
-            <div class="bt-bp"><span class="bt-av" id="live-bowler-av"></span><div class="bt-name" id="live-bowler-name">&mdash;</div></div>
-            <div class="bt-n" id="live-bowler-o">0</div><div class="bt-n bt-r" id="live-bowler-r">0</div>
-            <div class="bt-n" id="live-bowler-w">0</div><div class="bt-n" id="live-bowler-econ">0.0</div>
+        <!-- Bowling (current bowler — compact broadcast line) -->
+        <div class="card bowl-line-card">
+          <div class="bowl-line" id="live-bowler">
+            <span class="bowl-av" id="live-bowler-av"></span>
+            <span class="bowl-line-name"><span id="live-bowler-name">&mdash;</span><span class="bowl-line-sub"> bowling</span></span>
+            <span class="bowl-line-fig" id="live-bowler-fig">0&ndash;0&ndash;0&ndash;<span class="bowl-line-w">0</span></span>
           </div>
-          <div class="bt-row bowl prev-bowler hidden" id="live-bowler2">
-            <div class="bt-bp"><span class="bt-av" id="live-bowler2-av"></span><div class="bt-name" id="live-bowler2-name">&mdash;</div></div>
-            <div class="bt-n" id="live-bowler2-o">0</div><div class="bt-n bt-r" id="live-bowler2-r">0</div>
-            <div class="bt-n" id="live-bowler2-w">0</div><div class="bt-n" id="live-bowler2-econ">0.0</div>
+          <div class="bowl-line prev-bowler hidden" id="live-bowler2">
+            <span class="bowl-av" id="live-bowler2-av"></span>
+            <span class="bowl-line-name"><span id="live-bowler2-name">&mdash;</span><span class="bowl-line-sub"> last over</span></span>
+            <span class="bowl-line-fig" id="live-bowler2-fig">0&ndash;0&ndash;0&ndash;<span class="bowl-line-w">0</span></span>
           </div>
         </div>
         <!-- This over (live ball-by-ball) -->
         <div class="over-strip">
-          <div class="over-strip-head">
-            <span class="over-strip-label">This over</span>
-            <span class="over-strip-runs"><b id="live-over-runs">0</b> runs</span>
-          </div>
+          <span class="over-strip-label">This over</span>
           <div class="ball-dots" id="live-dots"></div>
+          <span class="over-strip-runs"><b id="live-over-runs">0</b></span>
+          <button class="over-undo" id="btn-undo" type="button" title="Undo last ball" aria-label="Undo last ball">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
+            Undo
+          </button>
         </div>
       </div>
     </div>
@@ -249,38 +270,28 @@
   <!-- END OF OVER -->
   <section id="screen-end-of-over" class="screen">
     <div class="screen-inner">
-      <div class="card text-center">
-        <svg viewBox="0 0 45 38" width="54" height="46" style="display:block;margin:0 auto 4px" aria-hidden="true">
-          <!-- stumps -->
-          <rect x="5"  y="11" width="6" height="26" rx="3" fill="#2E7D32"/>
-          <rect x="20" y="11" width="6" height="26" rx="3" fill="#2E7D32"/>
-          <rect x="35" y="11" width="6" height="26" rx="3" fill="#2E7D32"/>
-          <!-- bails -->
-          <rect x="7"  y="7" width="16" height="5" rx="2.5" fill="#FFCA28"/>
-          <rect x="23" y="7" width="16" height="5" rx="2.5" fill="#FFCA28"/>
-        </svg>
-        <h2 class="text-lg text-bold mt-sm" id="eos-over-num">Over complete</h2>
-        <div class="text-2 mt-sm" id="eos-total"></div>
+      <div class="scr-hero center">
+        <div class="scr-eyebrow" id="eos-total">&nbsp;</div>
+        <div class="scr-title" id="eos-over-num">End of over</div>
       </div>
       <div class="card">
-        <div class="section-head">Over Summary</div>
-        <div class="ball-dots mt-sm" id="eos-dots"></div>
-        <div class="flex justify-between mt-md">
-          <div><div class="text-xs text-2">RUNS</div><div class="text-xl text-bold" id="eos-over-runs">0</div></div>
-          <div><div class="text-xs text-2">WICKETS</div><div class="text-xl text-bold" id="eos-over-wkts">0</div></div>
-          <div class="text-right">
-            <div class="text-xs text-2">BOWLER</div>
-            <div class="text-bold" id="eos-bowler-name"></div>
-            <div class="text-xs text-2" id="eos-bowler-fig"></div>
+        <div class="ball-dots" id="eos-dots"></div>
+        <div class="eos-recap">
+          <div><div class="rk-lbl">Runs</div><div class="rk-num" id="eos-over-runs">0</div></div>
+          <div><div class="rk-lbl">Wickets</div><div class="rk-num wkt" id="eos-over-wkts">0</div></div>
+          <div>
+            <div class="rk-lbl">Bowler</div>
+            <div style="font:700 14px var(--font-body);margin-top:4px" id="eos-bowler-name"></div>
+            <div class="rk-fig" id="eos-bowler-fig"></div>
           </div>
         </div>
       </div>
       <div class="card">
+        <div class="form-label" style="margin-bottom:9px">Next bowler</div>
         <div id="eos-recent-bowlers" class="eos-bowler-chips"></div>
         <div class="form-group mt-sm">
-          <label class="form-label" for="eos-next-bowler">Next Bowler</label>
           <input id="eos-next-bowler" class="form-input" type="text"
-                 placeholder="Bowler name" autocomplete="off">
+                 placeholder="Or type a new bowler…" autocomplete="off">
         </div>
       </div>
       <button id="btn-eos-continue" class="btn btn-primary btn-lg">Continue &rarr;</button>
@@ -290,13 +301,25 @@
   <!-- INNINGS BREAK -->
   <section id="screen-innings-break" class="screen">
     <div class="screen-inner">
-      <div class="card text-center" style="padding:var(--sp-xl) var(--sp-lg)">
-        <div style="font-size:48px">&#9749;</div>
-        <h2 class="text-xl text-bold mt-md" id="ib-score">Innings complete</h2>
-        <div class="text-2 mt-sm" id="ib-overs"></div>
-        <div class="divider mt-md"></div>
-        <div class="mt-md" style="font-size:22px;font-weight:900;color:var(--c-primary-mid)" id="ib-target">
-          Target: —
+      <div class="scr-hero center">
+        <div class="scr-title">Innings Break</div>
+      </div>
+      <div class="card ib-total-card">
+        <div class="ib-team">
+          <span class="sum-logo" id="ib-team-crest"></span>
+          <span class="ib-team-name" id="ib-team-name">Team</span>
+        </div>
+        <div class="bignum ib-bignum" id="ib-bignum">0<span class="wk">-0</span></div>
+        <div class="ib-overs" id="ib-overs">0.0 overs</div>
+      </div>
+      <div class="ib-target-card">
+        <div class="ib-target-eyebrow" id="ib-need-line">Target</div>
+        <div class="bignum ib-target-num" id="ib-target-num">0</div>
+        <div class="ib-target-sub">to win</div>
+        <div class="ib-target-row">
+          <div><span class="k">TARGET </span><span class="v" id="ib-row-target">0</span></div>
+          <div><span class="k">OVERS </span><span class="v" id="ib-row-overs">0</span></div>
+          <div><span class="k">RPO </span><span class="v" id="ib-row-rpo">0</span></div>
         </div>
       </div>
       <button id="btn-start-2nd" class="btn btn-primary btn-lg">Start 2nd Innings &rarr;</button>
@@ -316,6 +339,11 @@
   <!-- SETTINGS -->
   <section id="screen-settings" class="screen">
     <div class="screen-inner">
+      <div class="scr-hero">
+        <div class="scr-eyebrow">Cricket Umpire</div>
+        <div class="scr-title">Settings</div>
+        <div class="scr-accent"></div>
+      </div>
       <div class="card">
         <div class="section-head">Sharing &amp; Account</div>
         <p class="text-sm text-2 mt-sm" id="account-status">Connecting…</p>
@@ -550,12 +578,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=65"></script>
-<script src="js/storage.js?v=65"></script>
-<script src="js/match.js?v=65"></script>
-<script src="js/router.js?v=65"></script>
-<script src="js/ui.js?v=65"></script>
-<script src="js/app.js?v=65"></script>
+<script src="js/cloud.js?v=70"></script>
+<script src="js/storage.js?v=70"></script>
+<script src="js/match.js?v=70"></script>
+<script src="js/router.js?v=70"></script>
+<script src="js/ui.js?v=70"></script>
+<script src="js/app.js?v=70"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
