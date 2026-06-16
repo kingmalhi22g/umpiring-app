@@ -1043,7 +1043,7 @@ function checkMilestones(m) {
       rec['ht' + bw] = true; if (bw >= 3) rec.w3 = true; if (bw >= 5) rec.w5 = true;
       showMilestone('🎩 ' + bowler + ' — HAT-TRICK!'); return true;
     }
-    if (bw >= 5 && !rec.w5) { rec.w5 = true; rec.w3 = true; showMilestone('🔥 ' + bowler + ' — Five-for!'); return true; }
+    if (bw >= 5 && !rec.w5) { rec.w5 = true; rec.w3 = true; showMilestone('🔥 ' + bowler + ' — Fifer!'); return true; }
     if (bw >= 3 && !rec.w3) { rec.w3 = true; showMilestone('👏 ' + bowler + ' — 3 wickets!'); return true; }
   }
 
