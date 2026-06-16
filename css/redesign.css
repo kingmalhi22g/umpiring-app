@@ -189,7 +189,11 @@
   text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
 .over-strip-runs { color: var(--c-text-2); }
 .over-strip-runs b { color: var(--c-primary); font-size: 14px; }
-.over-strip .ball-dots { min-height: 34px; }
+/* Compact, bounded live dots: ~10 fit on one row, and the area is capped to
+   two rows (scrolls internally in rare huge overs) so it never pushes the
+   rest of the live screen out of view / forces a page scroll. */
+#live-dots { min-height: 32px; max-height: 70px; overflow-y: auto; gap: 5px; align-content: flex-start; }
+#live-dots .ball-dot { width: 28px; height: 28px; font-size: 11px; }
 
 /* Suggested next bowler chip */
 .eos-chip-sugg { border-color: var(--c-accent) !important; box-shadow: 0 0 0 1px var(--c-accent); }
