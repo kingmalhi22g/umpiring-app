@@ -541,6 +541,9 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
   font: 800 10px var(--font-body); letter-spacing: 2.2px;
   text-transform: uppercase; color: #5FA0D6;
 }
+.scr-brand { display: flex; align-items: center; gap: 9px; }
+.scr-brand .sb-mark { height: 30px; width: auto; flex-shrink: 0; }
+.scr-brand .scr-eyebrow { font-size: 12px; }
 .scr-hero .scr-title {
   font: 900 26px var(--font-display); font-style: italic; letter-spacing: -.3px;
   text-transform: uppercase; color: #fff; margin-top: 7px; line-height: 1.08;
