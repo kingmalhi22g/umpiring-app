@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "tally-stats"
-  }
+  },
+  "targets": {
+    "tally-stats": {
+      "hosting": {
+        "app": [
+          "scoringbook"
+        ],
+        "old": [
+          "tally-stats"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

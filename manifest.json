@@ -1,12 +1,12 @@
 {
-  "name": "Cricket Umpire",
-  "short_name": "Umpire",
-  "description": "Ball-by-ball cricket umpiring and scoring app",
+  "name": "ScoringBook",
+  "short_name": "ScoringBook",
+  "description": "Ball-by-ball cricket scoring app",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#1B5E20",
-  "theme_color": "#1B5E20",
+  "background_color": "#0d1b2a",
+  "theme_color": "#1F6FB2",
   "orientation": "portrait",
   "icons": [
     {

@@ -19,7 +19,7 @@ const _isIOS = /iphone|ipad|ipod/i.test(_ua) ||
 
 const FIREBASE_CONFIG = {
   apiKey:            'AIzaSyAbqn_7pFzXLX0Q6lVhSTr2T2oV0aO-YIE',
-  authDomain:        _isIOS ? 'tally-stats.web.app' : 'tally-stats.firebaseapp.com',
+  authDomain:        _isIOS ? 'scoringbook.web.app' : 'tally-stats.firebaseapp.com',
   projectId:         'tally-stats',
   storageBucket:     'tally-stats.firebasestorage.app',
   messagingSenderId: '927750615819',

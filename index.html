@@ -4,19 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Umpire">
+  <meta name="apple-mobile-web-app-title" content="ScoringBook">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#1F6FB2">
-  <title>Cricket Umpire</title>
+  <title>ScoringBook</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=80">
-  <link rel="stylesheet" href="css/layout.css?v=80">
-  <link rel="stylesheet" href="css/components.css?v=80">
-  <link rel="stylesheet" href="css/redesign.css?v=80">
+  <link rel="stylesheet" href="css/style.css?v=81">
+  <link rel="stylesheet" href="css/layout.css?v=81">
+  <link rel="stylesheet" href="css/components.css?v=81">
+  <link rel="stylesheet" href="css/redesign.css?v=81">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -46,7 +46,7 @@
 <!-- ── Header ── -->
 <header id="app-header">
   <button id="btn-back" class="btn-icon" hidden>&#8592;</button>
-  <h1 id="screen-title">Cricket Umpire</h1>
+  <h1 id="screen-title">ScoringBook</h1>
   <button id="btn-menu" class="btn-icon" aria-label="Menu">&#9881;</button>
 </header>
 
@@ -57,7 +57,7 @@
   <section id="screen-home" class="screen active">
     <div class="screen-inner">
       <div class="scr-hero">
-        <div class="scr-eyebrow">Cricket Umpire</div>
+        <div class="scr-eyebrow">ScoringBook</div>
         <div class="scr-title">Matches</div>
         <div class="scr-accent"></div>
       </div>
@@ -346,7 +346,7 @@
   <section id="screen-settings" class="screen">
     <div class="screen-inner">
       <div class="scr-hero">
-        <div class="scr-eyebrow">Cricket Umpire</div>
+        <div class="scr-eyebrow">ScoringBook</div>
         <div class="scr-title">Settings</div>
         <div class="scr-accent"></div>
       </div>
@@ -584,17 +584,17 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=80"></script>
-<script src="js/storage.js?v=80"></script>
-<script src="js/match.js?v=80"></script>
-<script src="js/router.js?v=80"></script>
-<script src="js/ui.js?v=80"></script>
-<script src="js/app.js?v=80"></script>
+<script src="js/cloud.js?v=81"></script>
+<script src="js/storage.js?v=81"></script>
+<script src="js/match.js?v=81"></script>
+<script src="js/router.js?v=81"></script>
+<script src="js/ui.js?v=81"></script>
+<script src="js/app.js?v=81"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
   <div style="padding:28px 24px 16px;text-align:center;color:white">
-    <div style="font-size:13px;letter-spacing:2px;opacity:.8;text-transform:uppercase">Cricket Umpire</div>
+    <div style="font-size:13px;letter-spacing:2px;opacity:.8;text-transform:uppercase">ScoringBook</div>
     <div id="ec-title" style="font-size:22px;font-weight:900;margin:6px 0 2px">Lions CC vs Tigers CC</div>
     <div id="ec-meta" style="font-size:12px;opacity:.75"></div>
   </div>

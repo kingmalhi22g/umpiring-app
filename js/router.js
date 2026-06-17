@@ -1,7 +1,7 @@
 // router.js — hash-based screen navigation
 
 const SCREEN_TITLES = {
-  'home':          'Cricket Umpire',
+  'home':          'ScoringBook',
   'match-setup':   'New Match',
   'toss':          'Toss',
   'live':          'Live Match',
@@ -36,7 +36,7 @@ function _activate(screen) {
 
   // Update header
   const titleEl = document.getElementById('screen-title');
-  if (titleEl) titleEl.textContent = SCREEN_TITLES[screen] || 'Cricket Umpire';
+  if (titleEl) titleEl.textContent = SCREEN_TITLES[screen] || 'ScoringBook';
 
   const backBtn = document.getElementById('btn-back');
   if (backBtn) {

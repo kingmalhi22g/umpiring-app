@@ -857,7 +857,7 @@ function renderExportCard(match) {
     body += `<div style="background:#FFCA28;color:#1B5E20;padding:12px;border-radius:6px;text-align:center;font-weight:900;font-size:16px">${txt}</div>`;
   }
 
-  body += `<div style="text-align:center;padding:12px 0 4px;font-size:10px;color:#999">Made with Cricket Umpire App</div>`;
+  body += `<div style="text-align:center;padding:12px 0 4px;font-size:10px;color:#999">Made with ScoringBook</div>`;
 
   const ecBody = document.getElementById('ec-body');
   if (ecBody) ecBody.innerHTML = body;
