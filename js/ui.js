@@ -786,7 +786,7 @@ function renderExportCard(match) {
     const batRows = inn.batsmen.map(b => `
       <tr>
         <td style="padding:5px 4px"><strong>${esc(b.name)}</strong><br>
-          <span style="font-size:10px;color:#666">${b.isOut ? esc(b.how) : 'not out'}</span></td>
+          <span style="font-size:10px;color:#5C6B7A">${b.isOut ? esc(b.how) : 'not out'}</span></td>
         <td style="padding:5px 4px;font-weight:700;text-align:center">${b.runs}</td>
         <td style="padding:5px 4px;text-align:center">${b.balls}</td>
         <td style="padding:5px 4px;text-align:center">${b.fours}</td>
@@ -809,49 +809,49 @@ function renderExportCard(match) {
 
     body += `
       <div style="margin-bottom:16px">
-        <div style="background:#1B5E20;color:white;padding:8px 12px;border-radius:6px 6px 0 0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">
+        <div style="background:#0A1B2E;color:#fff;border-left:4px solid #2BD4D4;padding:8px 12px;border-radius:6px 6px 0 0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">
           ${esc(inn.battingTeam)} — ${i >= 2 ? 'Super Over' + (i === 3 ? ' (Chase)' : '') : 'Innings ' + (i + 1)}
         </div>
-        <div style="background:white;border-radius:0 0 6px 6px;overflow:hidden">
+        <div style="background:#fff;border-radius:0 0 6px 6px;overflow:hidden">
           <div style="padding:10px 12px">
-            <span style="font-size:28px;font-weight:900;color:#1B5E20">${inn.totalRuns}/${inn.wickets}</span>
-            <span style="font-size:13px;color:#666;margin-left:6px">(${getOverDisplay(inn)} ov)</span>
+            <span style="font-size:28px;font-weight:900;color:#16314A">${inn.totalRuns}/${inn.wickets}</span>
+            <span style="font-size:13px;color:#5C6B7A;margin-left:6px">(${getOverDisplay(inn)} ov)</span>
           </div>
           <table style="width:100%;border-collapse:collapse;font-size:12px">
-            <thead><tr style="background:#F1F8E9">
-              <th style="padding:5px 4px;text-align:left;font-size:10px;color:#666;text-transform:uppercase">Batsman</th>
-              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">R</th>
-              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">B</th>
-              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">4s</th>
-              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">6s</th>
+            <thead><tr style="background:#E3EAF2">
+              <th style="padding:5px 4px;text-align:left;font-size:10px;color:#5C6B7A;text-transform:uppercase">Batsman</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#5C6B7A">R</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#5C6B7A">B</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#5C6B7A">4s</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#5C6B7A">6s</th>
             </tr></thead>
             <tbody>${batRows}</tbody>
           </table>
-          <div style="padding:6px 12px;font-size:11px;color:#666;border-top:1px solid #E8F5E9">
+          <div style="padding:6px 12px;font-size:11px;color:#5C6B7A;border-top:1px solid #D7E0EA">
             Extras: ${totalExtras(inn)} (Wd ${inn.extras.wides}, NB ${inn.extras.noBalls}, B ${inn.extras.byes}, LB ${inn.extras.legByes})
           </div>
           ${(() => {
             const fow = getFallOfWickets(inn);
             if (!fow.length) return '';
-            return `<div style="padding:6px 12px;font-size:11px;color:#666;border-top:1px solid #E8F5E9">
-              <strong style="color:#1B5E20">Fall:</strong> ${fow.map(f => `${f.num}-${f.score} (${esc(f.batsman)}, ${f.over})`).join(' &nbsp; ')}
+            return `<div style="padding:6px 12px;font-size:11px;color:#5C6B7A;border-top:1px solid #D7E0EA">
+              <strong style="color:#0F7A88">Fall:</strong> ${fow.map(f => `${f.num}-${f.score} (${esc(f.batsman)}, ${f.over})`).join(' &nbsp; ')}
             </div>`;
           })()}
           ${(() => {
             const pp = getPowerplayOvers(match.overs);
             const pps = getPowerplayStats(inn, pp);
             if (!pps.played) return '';
-            return `<div style="padding:6px 12px;font-size:11px;color:#666;border-top:1px solid #E8F5E9">
-              <strong style="color:#1B5E20">Powerplay</strong> (ov 1-${pp}): ${pps.runs}/${pps.wkts}
+            return `<div style="padding:6px 12px;font-size:11px;color:#5C6B7A;border-top:1px solid #D7E0EA">
+              <strong style="color:#0F7A88">Powerplay</strong> (ov 1-${pp}): ${pps.runs}/${pps.wkts}
             </div>`;
           })()}
           ${bowlRows ? `
-          <table style="width:100%;border-collapse:collapse;font-size:12px;border-top:2px solid #E8F5E9">
-            <thead><tr style="background:#F1F8E9">
-              <th style="padding:5px 4px;text-align:left;font-size:10px;color:#666;text-transform:uppercase">Bowler</th>
-              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">O</th>
-              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">R</th>
-              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#666">W</th>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;border-top:2px solid #D7E0EA">
+            <thead><tr style="background:#E3EAF2">
+              <th style="padding:5px 4px;text-align:left;font-size:10px;color:#5C6B7A;text-transform:uppercase">Bowler</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#5C6B7A">O</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#5C6B7A">R</th>
+              <th style="padding:5px 4px;text-align:center;font-size:10px;color:#5C6B7A">W</th>
             </tr></thead>
             <tbody>${bowlRows}</tbody>
           </table>` : ''}
@@ -864,10 +864,10 @@ function renderExportCard(match) {
     const txt = r.marginType === 'super over' ? `${esc(r.winner)} won the Super Over`
       : r.marginType === 'tie' ? (match.innings[2] ? 'Match Tied — Super Over also tied!' : 'Match Tied!')
       : `${esc(r.winner)} won by ${r.margin} ${r.marginType}`;
-    body += `<div style="background:#FFCA28;color:#1B5E20;padding:12px;border-radius:6px;text-align:center;font-weight:900;font-size:16px">${txt}</div>`;
+    body += `<div style="background:#FFC24B;color:#0A1B2E;padding:12px;border-radius:6px;text-align:center;font-weight:900;font-size:16px">${txt}</div>`;
   }
 
-  body += `<div style="text-align:center;padding:12px 0 4px;font-size:10px;color:#999">Made with ScoringBook</div>`;
+  body += `<div style="text-align:center;padding:12px 0 4px;font-size:10px;color:#8A98A6">Made with ScoringBook</div>`;
 
   const ecBody = document.getElementById('ec-body');
   if (ecBody) ecBody.innerHTML = body;
@@ -889,8 +889,8 @@ function deliverySymbol(d) {
 function renderOverSheet(match) {
   const el = document.getElementById('oversheet-body');
   if (!el || !match) return;
-  const th = 'padding:5px 6px;border:1px solid #888;font-size:11px;text-transform:uppercase;background:#1F6FB2;color:#fff;font-weight:800';
-  const td = 'padding:5px 6px;border:1px solid #aaa;font-size:12px;color:#111';
+  const th = 'padding:5px 6px;border:1px solid #C9D4DF;font-size:11px;text-transform:uppercase;background:#16314A;color:#fff;font-weight:800';
+  const td = 'padding:5px 6px;border:1px solid #C9D4DF;font-size:12px;color:#15212E';
   let html = '';
 
   match.innings.forEach((inn, idx) => {
@@ -902,7 +902,7 @@ function renderOverSheet(match) {
       const balls = ov.allDeliveries.map(d => {
         const s = deliverySymbol(d);
         const wkt = d.isWicket;
-        return `<span style="display:inline-block;min-width:18px;text-align:center;margin:1px 2px;padding:1px 3px;border-radius:3px;font-size:11px;font-weight:700;${wkt?'background:#E2453B;color:#fff':'background:#eef2f5;color:#111'}">${esc(s)}</span>`;
+        return `<span style="display:inline-block;min-width:18px;text-align:center;margin:1px 2px;padding:1px 3px;border-radius:3px;font-size:11px;font-weight:700;${wkt?'background:#E2453B;color:#fff':'background:#E3EAF2;color:#15212E'}">${esc(s)}</span>`;
       }).join('');
       return `<tr>
         <td style="${td};text-align:center;font-weight:800">${ov.overNumber}</td>
@@ -916,10 +916,11 @@ function renderOverSheet(match) {
 
     const label = idx >= 2 ? 'Super Over' : 'Innings ' + (idx + 1);
     html += `<div style="padding:${idx ? '22' : '18'}px 18px 0">
-      <div style="text-align:center;border-bottom:2px solid #1F6FB2;padding-bottom:8px;margin-bottom:10px">
-        <div style="font-size:16px;font-weight:900;letter-spacing:.5px;color:#111">UMPIRING SCORING SHEET</div>
-        <div style="font-size:13px;font-weight:700;color:#1F6FB2;margin-top:3px">${esc(inn.battingTeam)} &mdash; ${label}</div>
-        <div style="font-size:11px;color:#555;margin-top:2px">
+      <div style="text-align:center;border-bottom:2px solid #16314A;padding-bottom:8px;margin-bottom:10px">
+        <div style="font-size:10px;letter-spacing:2px;color:#0F7A88;font-weight:800;text-transform:uppercase">ScoringBook</div>
+        <div style="font-size:16px;font-weight:900;letter-spacing:.5px;color:#15212E;margin-top:2px">UMPIRING SCORING SHEET</div>
+        <div style="font-size:13px;font-weight:700;color:#16314A;margin-top:3px">${esc(inn.battingTeam)} &mdash; ${label}</div>
+        <div style="font-size:11px;color:#5C6B7A;margin-top:2px">
           Bowling: ${esc(inn.bowlingTeam)}${match.date ? ' &middot; ' + esc(match.date) : ''}${match.ground ? ' &middot; ' + esc(match.ground) : ''}
         </div>
       </div>
@@ -932,15 +933,16 @@ function renderOverSheet(match) {
           <th style="${th};width:46px">Wkts</th>
           <th style="${th};width:70px">Total</th>
         </tr></thead>
-        <tbody>${rows || `<tr><td colspan="6" style="${td};text-align:center;color:#888">No overs bowled</td></tr>`}</tbody>
+        <tbody>${rows || `<tr><td colspan="6" style="${td};text-align:center;color:#8A98A6">No overs bowled</td></tr>`}</tbody>
         <tfoot><tr>
-          <td colspan="3" style="${td};text-align:right;font-weight:800;background:#F1F5F9">FINAL SCORE</td>
-          <td colspan="3" style="${td};text-align:center;font-weight:900;background:#F1F5F9">${inn.totalRuns}/${inn.wickets} (${getOverDisplay(inn)} ov)</td>
+          <td colspan="3" style="${td};text-align:right;font-weight:800;background:#E3EAF2">FINAL SCORE</td>
+          <td colspan="3" style="${td};text-align:center;font-weight:900;background:#E3EAF2">${inn.totalRuns}/${inn.wickets} (${getOverDisplay(inn)} ov)</td>
         </tr></tfoot>
       </table>
     </div>`;
   });
 
+  html += `<div style="text-align:center;padding:14px 0 16px;font-size:10px;color:#8A98A6">Made with ScoringBook</div>`;
   el.innerHTML = html;
 }
 
