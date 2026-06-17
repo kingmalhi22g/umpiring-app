@@ -11,14 +11,13 @@
   box-shadow: 0 2px 12px rgba(0,0,0,.35);
   padding-left: 8px; padding-right: 8px;
 }
-#screen-title { font-size: 15px; font-weight: 800; letter-spacing: .2px; }
-/* Brand mark in the top bar — home only, beside the (display-italic) title */
+#screen-title { font-size: 15px; font-weight: 800; letter-spacing: .2px; flex: 0 1 auto; }
+/* Brand mark + title centered in the top bar; logo shows on home only */
+.header-center { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; }
 #header-logo { display: none; align-items: center; flex-shrink: 0; }
 #header-logo svg { height: 27px; width: auto; display: block; }
 body[data-screen="home"] #header-logo { display: flex; }
-body[data-screen="home"] #btn-back { display: none; }
 body[data-screen="home"] #screen-title {
-  text-align: left; padding-left: 8px;
   font-family: var(--font-display); font-style: italic; font-weight: 900;
   text-transform: uppercase; font-size: 18px; letter-spacing: .3px;
 }

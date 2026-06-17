@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=84">
-  <link rel="stylesheet" href="css/layout.css?v=84">
-  <link rel="stylesheet" href="css/components.css?v=84">
-  <link rel="stylesheet" href="css/redesign.css?v=84">
+  <link rel="stylesheet" href="css/style.css?v=85">
+  <link rel="stylesheet" href="css/layout.css?v=85">
+  <link rel="stylesheet" href="css/components.css?v=85">
+  <link rel="stylesheet" href="css/redesign.css?v=85">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -46,10 +46,12 @@
 <!-- ── Header ── -->
 <header id="app-header">
   <button id="btn-back" class="btn-icon" hidden>&#8592;</button>
-  <span id="header-logo" aria-hidden="true">
-    <svg viewBox="0 0 46 38"><text x="23" y="28" text-anchor="middle" font-family="Archivo, sans-serif" font-size="30" font-weight="900" font-style="italic" fill="#2BD4D4">SB</text><rect x="6" y="31" width="34" height="4" rx="2" fill="#FFC24B"/></svg>
-  </span>
-  <h1 id="screen-title">ScoringBook</h1>
+  <div class="header-center">
+    <span id="header-logo" aria-hidden="true">
+      <svg viewBox="0 0 46 38"><text x="23" y="28" text-anchor="middle" font-family="Archivo, sans-serif" font-size="30" font-weight="900" font-style="italic" fill="#2BD4D4">SB</text><rect x="6" y="31" width="34" height="4" rx="2" fill="#FFC24B"/></svg>
+    </span>
+    <h1 id="screen-title">ScoringBook</h1>
+  </div>
   <button id="btn-menu" class="btn-icon" aria-label="Menu">&#9881;</button>
 </header>
 
@@ -59,11 +61,7 @@
   <!-- HOME -->
   <section id="screen-home" class="screen active">
     <div class="screen-inner">
-      <div class="scr-hero">
-        <div class="scr-title">Matches</div>
-        <div class="scr-accent"></div>
-      </div>
-      <button id="btn-new-match" class="btn btn-primary btn-lg">&#127951; New Match</button>
+      <button id="btn-new-match" class="btn btn-primary">&#127951; New Match</button>
       <div class="home-bar">
         <div class="sc-tabs" style="margin-top:0">
           <button class="sc-tab active" id="tab-all"  type="button">All matches</button>
@@ -586,12 +584,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=84"></script>
-<script src="js/storage.js?v=84"></script>
-<script src="js/match.js?v=84"></script>
-<script src="js/router.js?v=84"></script>
-<script src="js/ui.js?v=84"></script>
-<script src="js/app.js?v=84"></script>
+<script src="js/cloud.js?v=85"></script>
+<script src="js/storage.js?v=85"></script>
+<script src="js/match.js?v=85"></script>
+<script src="js/router.js?v=85"></script>
+<script src="js/ui.js?v=85"></script>
+<script src="js/app.js?v=85"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
