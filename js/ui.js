@@ -350,6 +350,16 @@ function renderMatchList(containerEl) {
   matches.sort((a, b) => idTime(b.id) - idTime(a.id));
   containerEl.innerHTML = '';
   if (matches.length === 0) {
+    // First-ever launch: cloud feed hasn't arrived yet — show a loader, not "empty".
+    const feedPending = typeof state !== 'undefined' && !state.cloudFeedLoaded;
+    if (mode === 'all' && feedPending && typeof firebase !== 'undefined') {
+      containerEl.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🏏</div>
+          <p>Loading matches…</p>
+        </div>`;
+      return;
+    }
     const msg = mode === 'mine'
       ? 'No matches on this device yet.<br>Tap <strong>New Match</strong> to start.'
       : 'No matches yet.<br>Tap <strong>New Match</strong> to start.';

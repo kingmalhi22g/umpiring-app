@@ -1,10 +1,11 @@
 // storage.js — all localStorage I/O goes through here
 
 const KEYS = {
-  MATCHES:   'umpire_matches',
-  SETTINGS:  'umpire_settings',
-  ACTIVE:    'umpire_active_match',
-  DARK_MODE: 'umpire_dark_mode'
+  MATCHES:    'umpire_matches',
+  SETTINGS:   'umpire_settings',
+  ACTIVE:     'umpire_active_match',
+  DARK_MODE:  'umpire_dark_mode',
+  FEED_CACHE: 'umpire_feed_cache'
 };
 
 function _get(key, fallback) {
@@ -12,6 +13,14 @@ function _get(key, fallback) {
   catch { return fallback; }
 }
 function _set(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+// Cached copy of the last cloud feed, shown instantly on cold start while the
+// live Firestore feed reconnects — avoids a 6-7s blank list on launch.
+function getCachedFeed() { return _get(KEYS.FEED_CACHE, []); }
+function setCachedFeed(feed) {
+  try { _set(KEYS.FEED_CACHE, (feed || []).slice(0, 50)); }
+  catch (_) { /* localStorage quota — skip caching */ }
+}
 
 // ── Matches ──────────────────────────────────────────────
 function getMatches()    { return _get(KEYS.MATCHES, []); }

@@ -30,6 +30,7 @@ const state = {
   matchId:            null,
   viewMatchId:        null,
   cloudMatches:       [],    // live feed of all matches from Firestore
+  cloudFeedLoaded:    false,  // true once the live feed has arrived at least once
   homeTab:            'all',  // 'all' = everyone's matches, 'mine' = this device only
   selectedWicketType: null,
   pendingExtrasType:  null,  // 'wide'|'no_ball'|'bye'|'leg_bye'
@@ -162,6 +163,10 @@ function initApp() {
   // Apply saved dark mode preference on startup
   applyDarkMode(getDarkMode());
 
+  // Show the last-known cloud matches instantly while the live Firestore feed
+  // reconnects (cold start of Firebase + anon auth + first snapshot is ~6-7s).
+  if (typeof getCachedFeed === 'function') state.cloudMatches = getCachedFeed();
+
   // Resume active match if one exists (before the router activates a screen,
   // so a cold load straight onto #live has its matchId ready)
   const activeId = getActiveMatchId();
@@ -220,6 +225,8 @@ function initApp() {
 // if the home screen is showing.
 function _cloudFeed(feed) {
   state.cloudMatches = feed;
+  state.cloudFeedLoaded = true;
+  if (typeof setCachedFeed === 'function') setCachedFeed(feed);
   if (getCurrentScreen() === 'home') {
     const ml = document.getElementById('match-list');
     if (ml) renderMatchList(ml);
