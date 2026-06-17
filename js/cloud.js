@@ -222,7 +222,7 @@ function cloudDeleteMatch(id) {
 // Runs on the admin's device only (rules let just the admin delete others'
 // matches), at most once a day. Deletes strictly the oldest matches beyond the
 // newest KEEP_MATCHES, by updatedAt.
-const KEEP_MATCHES = 500;   // change this to keep more / fewer
+const KEEP_MATCHES = 2500;   // change this to keep more / fewer
 function cloudPruneOldMatches() {
   if (!_db || !cloudIsAdmin()) return;
   try {
