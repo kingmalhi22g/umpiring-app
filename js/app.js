@@ -1488,8 +1488,11 @@ function showMilestone(text) {
 function checkMilestones(m) {
   const inn = m.innings[m.currentInnings];
   if (!inn) return false;
-  const s = inn.batsmen[inn.strikerIdx];
-  if (s) {
+  // Check BOTH batsmen at the crease, not just the striker: a single that brings
+  // up a fifty/hundred rotates the scorer to the non-striker end, so keying off
+  // strikerIdx alone missed it until they were back on strike.
+  for (const s of [inn.batsmen[inn.strikerIdx], inn.batsmen[inn.nonStrikerIdx]]) {
+    if (!s) continue;
     if (s.runs >= 100 && !s._m100) { s._m100 = true; s._m50 = true; showMilestone('💯 ' + s.name + ' — Century!'); return true; }
     if (s.runs >= 50 && !s._m50)   { s._m50 = true; showMilestone('🎉 ' + s.name + ' — Fifty!'); return true; }
   }
