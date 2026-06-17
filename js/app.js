@@ -914,11 +914,13 @@ function setupInningsBreak() {
 function setupSummary() {
   const m = getMatchAny(state.viewMatchId || state.matchId);
   renderMatchSummary(m);
-  // "Continue scoring on this device" shows only for a LIVE match this device
-  // can't already edit — i.e. someone wants to take over scoring here.
+  // "Continue scoring on this device" shows for a LIVE match that isn't already
+  // on THIS device (i.e. this device isn't the one scoring it) — so any device
+  // without the match locally can take over, including admin/signed-in users.
   const contBtn = document.getElementById('btn-continue-here');
   if (contBtn) {
-    const eligible = m && m.status === 'in_progress' && !canEditMatch(m) &&
+    const onThisDevice = typeof getMatch === 'function' && !!getMatch(m && m.id);
+    const eligible = m && m.status === 'in_progress' && !onThisDevice &&
       typeof cloudAvailable === 'function' && cloudAvailable() &&
       typeof cloudReady === 'function' && cloudReady();
     contBtn.style.display = eligible ? '' : 'none';
