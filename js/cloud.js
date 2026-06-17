@@ -19,7 +19,7 @@ const _isIOS = /iphone|ipad|ipod/i.test(_ua) ||
 
 // App Check (anti-abuse): paste the reCAPTCHA v3 site key from
 // Firebase Console → App Check here. Leave '' to keep App Check OFF (no change).
-const APPCHECK_SITE_KEY = '';
+const APPCHECK_SITE_KEY = '6Lcy9CMtAAAAALzfwLNyxaMBQAt_KxjAdqdXyX77';
 
 const FIREBASE_CONFIG = {
   apiKey:            'AIzaSyAbqn_7pFzXLX0Q6lVhSTr2T2oV0aO-YIE',
