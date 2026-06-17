@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=92">
-  <link rel="stylesheet" href="css/layout.css?v=92">
-  <link rel="stylesheet" href="css/components.css?v=92">
-  <link rel="stylesheet" href="css/redesign.css?v=92">
+  <link rel="stylesheet" href="css/style.css?v=93">
+  <link rel="stylesheet" href="css/layout.css?v=93">
+  <link rel="stylesheet" href="css/components.css?v=93">
+  <link rel="stylesheet" href="css/redesign.css?v=93">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -163,6 +163,10 @@
             </button>
           </div>
           <div class="hero-actions">
+            <button class="hero-btn" id="btn-handoff-live" type="button" title="Hand off to another device" aria-label="Hand off to another device" style="display:none">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v13M7 4 4 7M7 4l3 3M17 20V7M17 20l-3 3M17 20l3-3"/></svg>
+              Hand off
+            </button>
             <button class="hero-btn hero-btn-accent" id="btn-live-stats" type="button" title="Full scoreboard" aria-label="Scoreboard">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-7M12 21V5M19 21v-10"/></svg>
               Scoreboard
@@ -335,8 +339,8 @@
   <!-- SUMMARY -->
   <section id="screen-summary" class="screen">
     <div class="screen-inner">
+      <button id="btn-continue-here" class="btn btn-primary mb-md" type="button" style="display:none">&#128241; Continue scoring on this device</button>
       <div id="summary-content"></div>
-      <button id="btn-continue-here" class="btn btn-primary mt-md btn-sm" type="button" style="display:none">&#128241; Continue scoring on this device</button>
       <button id="btn-export-card" class="btn btn-accent mt-md btn-sm" type="button">📤 Share Scorecard</button>
       <button id="btn-export-oversheet" class="btn btn-ghost btn-sm mt-sm" type="button">📋 Share Over-by-Over Sheet</button>
       <button id="btn-summary-home" class="btn btn-ghost mt-sm">&#8962; Home</button>
@@ -498,8 +502,7 @@
     <div class="modal-handle"></div>
     <div class="modal-title">Scoreboard</div>
     <div id="stats-content" style="overflow-y:auto;max-height:55vh"></div>
-    <button id="btn-handoff-start" class="btn btn-ghost btn-sm mt-md" type="button" style="display:none">&#128241; Hand off to another device</button>
-    <button id="btn-stats-close" class="btn btn-ghost btn-sm mt-sm" type="button">Close</button>
+    <button id="btn-stats-close" class="btn btn-ghost btn-sm mt-md" type="button">Close</button>
   </div>
 
   <!-- Handoff: receiving device shows a code -->
@@ -639,12 +642,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=92"></script>
-<script src="js/storage.js?v=92"></script>
-<script src="js/match.js?v=92"></script>
-<script src="js/router.js?v=92"></script>
-<script src="js/ui.js?v=92"></script>
-<script src="js/app.js?v=92"></script>
+<script src="js/cloud.js?v=93"></script>
+<script src="js/storage.js?v=93"></script>
+<script src="js/match.js?v=93"></script>
+<script src="js/router.js?v=93"></script>
+<script src="js/ui.js?v=93"></script>
+<script src="js/app.js?v=93"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">

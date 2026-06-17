@@ -588,7 +588,7 @@ function wireButtons() {
   on('btn-view-feedback', 'click', handleViewFeedback);
   on('btn-feedback-list-close', 'click', closeModal);
   // Device handoff
-  on('btn-handoff-start',       'click', handleHandoffStart);
+  on('btn-handoff-live',        'click', handleHandoffStart);
   on('btn-handoff-confirm',     'click', handleHandoffConfirm);
   on('btn-handoff-enter-cancel','click', closeModal);
   on('btn-continue-here',       'click', handleContinueHere);
@@ -833,6 +833,15 @@ function setupLive() {
   const inn = m.innings[m.currentInnings];
   if (inn) document.getElementById('screen-title').textContent = inn.battingTeam + ' batting';
   renderLiveHeader(m);
+  // "Hand off to another device" — only for a live match the cloud can serve to
+  // the receiving device. Hidden offline (the other device couldn't pick it up).
+  const hoBtn = document.getElementById('btn-handoff-live');
+  if (hoBtn) {
+    const eligible = m.status === 'in_progress' && canEditMatch(m) &&
+      typeof cloudAvailable === 'function' && cloudAvailable() &&
+      typeof cloudReady === 'function' && cloudReady();
+    hoBtn.style.display = eligible ? '' : 'none';
+  }
 }
 
 function setupEndOfOver() {
@@ -1159,15 +1168,6 @@ function handleOpenStats() {
   const m = getMatch(state.matchId);
   if (!m) return;
   renderStatsModal(m);
-  // Offer "hand off to another device" only while a live match is editable on
-  // this device and the cloud is reachable (the new device needs to read it).
-  const hoBtn = document.getElementById('btn-handoff-start');
-  if (hoBtn) {
-    const eligible = m.status === 'in_progress' && canEditMatch(m) &&
-      typeof cloudAvailable === 'function' && cloudAvailable() &&
-      typeof cloudReady === 'function' && cloudReady();
-    hoBtn.style.display = eligible ? '' : 'none';
-  }
   openModal('modal-stats');
 }
 
