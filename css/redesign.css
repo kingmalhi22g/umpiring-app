@@ -666,3 +666,21 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
 #screen-match-setup .form-group.mt-md { margin-top: 9px; }
 #screen-match-setup .btn-lg { padding: 12px var(--sp-md); }
 #screen-match-setup .btn.mt-md { margin-top: 9px; }
+
+/* ════════════════════════════════════════════════════════════
+   LIVE SCREEN — single static view, never scrolls. Everything
+   compacted to fit between the header and the run pad.
+   ════════════════════════════════════════════════════════════ */
+#live-scroll { overflow: hidden; }
+#screen-live .score-hero { padding: 8px 14px; }
+#screen-live .hero-actions { margin-top: 5px; }
+#screen-live .hero-team-row { margin-top: 5px; }
+#screen-live .hero-crest { width: 36px; height: 36px; font-size: 16px; }
+#screen-live .score-hero-main { font-size: 36px; }
+#screen-live .hero-oppo-row { margin-top: 4px; }
+#screen-live .hero-grad-bar { margin-top: 5px; }
+#screen-live .score-hero .score-hero-stats { margin-top: 5px; }
+#screen-live .score-hero-stats { padding-top: 5px; }
+#screen-live .bowl-line { padding: 6px 13px; }
+#screen-live .live-card .bt-row { padding: 3px 11px; }
+#screen-live .live-card .bt-head { padding: 3px 11px; }
