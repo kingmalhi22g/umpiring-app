@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=73">
-  <link rel="stylesheet" href="css/layout.css?v=73">
-  <link rel="stylesheet" href="css/components.css?v=73">
-  <link rel="stylesheet" href="css/redesign.css?v=73">
+  <link rel="stylesheet" href="css/style.css?v=74">
+  <link rel="stylesheet" href="css/layout.css?v=74">
+  <link rel="stylesheet" href="css/components.css?v=74">
+  <link rel="stylesheet" href="css/redesign.css?v=74">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -235,25 +235,25 @@
             <span class="bowl-line-fig" id="live-bowler2-fig">0&ndash;0&ndash;0&ndash;<span class="bowl-line-w">0</span></span>
           </div>
         </div>
-        <!-- This over (live ball-by-ball) -->
-        <div class="over-strip">
-          <div class="over-strip-head">
-            <span class="over-strip-spacer"></span>
-            <div class="over-strip-center">
-              <span class="over-strip-label">This over -</span>
-              <span class="over-strip-runs"><b id="live-over-runs">0</b><span class="over-strip-wkts" id="live-over-wkts"></span></span>
-            </div>
-            <button class="over-undo" id="btn-undo" type="button" title="Undo last ball" aria-label="Undo last ball">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
-              Undo
-            </button>
-          </div>
-          <div class="ball-dots" id="live-dots"></div>
-        </div>
       </div>
     </div>
     <!-- Sticky ball input -->
     <div id="ball-input-area">
+      <!-- This over (live ball-by-ball) — pinned above the run pad so it's always visible -->
+      <div class="over-strip">
+        <div class="over-strip-head">
+          <span class="over-strip-spacer"></span>
+          <div class="over-strip-center">
+            <span class="over-strip-label">This over -</span>
+            <span class="over-strip-runs"><b id="live-over-runs">0</b><span class="over-strip-wkts" id="live-over-wkts"></span></span>
+          </div>
+          <button class="over-undo" id="btn-undo" type="button" title="Undo last ball" aria-label="Undo last ball">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
+            Undo
+          </button>
+        </div>
+        <div class="ball-dots" id="live-dots"></div>
+      </div>
       <div class="run-grid">
         <button class="run-btn run-0" id="ball-btn-0" type="button">0</button>
         <button class="run-btn run-1" id="ball-btn-1" type="button">1</button>
@@ -584,12 +584,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=73"></script>
-<script src="js/storage.js?v=73"></script>
-<script src="js/match.js?v=73"></script>
-<script src="js/router.js?v=73"></script>
-<script src="js/ui.js?v=73"></script>
-<script src="js/app.js?v=73"></script>
+<script src="js/cloud.js?v=74"></script>
+<script src="js/storage.js?v=74"></script>
+<script src="js/match.js?v=74"></script>
+<script src="js/router.js?v=74"></script>
+<script src="js/ui.js?v=74"></script>
+<script src="js/app.js?v=74"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">

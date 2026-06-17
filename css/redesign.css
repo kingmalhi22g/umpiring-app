@@ -498,6 +498,10 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
 
 /* ── This over: inline label + rounded-square pills ── */
 .over-strip { display: flex; flex-direction: column; gap: 7px; padding: 4px; }
+/* Pinned above the run pad — separate it and keep the dots area from growing
+   unbounded on a freakishly long over (then a small contained scroll, not the page). */
+#ball-input-area .over-strip { padding: 2px 4px 8px; border-bottom: 1px solid var(--c-border); }
+#ball-input-area #live-dots { max-height: 72px; overflow-y: auto; }
 .over-strip-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
 .over-strip-center { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
 .over-strip-label { font: 800 12px var(--font-body); letter-spacing: 1px; text-transform: uppercase;
