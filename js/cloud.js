@@ -311,6 +311,83 @@ function cloudSignOut() {
   return _auth.signOut(); // auth listener then re-signs in anonymously
 }
 
+// ── Device handoff ────────────────────────────────────────
+// Move a live match to another device with no sign-in. The receiving device
+// calls cloudCreateHandoff() to register a 6-digit code → its uid, then watches
+// the match doc; the current owner calls cloudClaimHandoff() to look up the code
+// and rewrite ownerId to the receiver. See the `handoffs` rule in firestore.rules.
+
+// Receiving device: register a short code that maps to this device. Create-only
+// (transaction guards against collisions/squatters); retries a few fresh codes.
+async function cloudCreateHandoff(matchId) {
+  if (!cloudAvailable()) throw new Error('Cloud not available');
+  const uid = cloudUid();
+  if (!uid) throw new Error('Not signed in');
+  for (let attempt = 0; attempt < 6; attempt++) {
+    // 6-digit code, no leading-zero loss. Avoid Math.random()? It's fine here —
+    // these codes are short-lived and verified against the live match doc.
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const ref = _db.collection('handoffs').doc(code);
+    try {
+      await _db.runTransaction(async tx => {
+        const snap = await tx.get(ref);
+        if (snap.exists) throw new Error('collision');
+        tx.set(ref, {
+          newUid:    uid,
+          matchId:   String(matchId),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+      return code;
+    } catch (e) {
+      if (String(e && e.message) === 'collision') continue;  // try another code
+      throw e;
+    }
+  }
+  throw new Error('Could not generate a code — try again');
+}
+
+// Watch a single match doc; calls cb(parsedMatch|null) on every change. Returns
+// an unsubscribe function. Used by the receiving device to detect the moment
+// ownership flips to it (and to grab the latest scoring with it).
+function cloudWatchMatch(matchId, cb) {
+  if (!cloudAvailable()) return function () {};
+  return _db.collection('matches').doc(String(matchId)).onSnapshot(doc => {
+    if (!doc.exists) { cb(null); return; }
+    const d = doc.data();
+    if (!d || !d.matchJson) { cb(null); return; }
+    try { const m = JSON.parse(d.matchJson); m.ownerId = d.ownerId || null; cb(m); }
+    catch (_) { cb(null); }
+  }, err => console.error('[cloud] watch match error', err));
+}
+
+// Current owner: look up a handoff code and hand the match to that device by
+// rewriting ownerId. Resolves with the new owner's uid. Rejects if the code is
+// unknown/for a different match, or the server refuses the write.
+async function cloudClaimHandoff(code, match) {
+  if (!cloudAvailable()) throw new Error('Cloud not available');
+  const snap = await _db.collection('handoffs').doc(String(code)).get();
+  if (!snap.exists) throw new Error('That code is invalid or has expired');
+  const h = snap.data() || {};
+  if (String(h.matchId) !== String(match.id)) throw new Error('That code is for a different match');
+  if (!h.newUid) throw new Error('That code is incomplete — ask for a new one');
+  if (h.newUid === cloudUid()) throw new Error("That's this device — open the match on the other device first");
+
+  match.ownerId = h.newUid;
+  await _db.collection('matches').doc(match.id).set(Object.assign({
+    ownerId:   h.newUid,
+    status:    match.status || 'setup',
+    matchJson: JSON.stringify(match),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, _summaryFields(match)), { merge: true });
+  return h.newUid;
+}
+
+function cloudDeleteHandoff(code) {
+  if (!cloudAvailable() || !code) return Promise.resolve();
+  return _db.collection('handoffs').doc(String(code)).delete().catch(() => {});
+}
+
 // ── Feedback ──────────────────────────────────────────────
 // Anyone signed in (anonymous included) can submit; only the admin can read.
 function cloudSendFeedback(opts) {

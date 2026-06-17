@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=91">
-  <link rel="stylesheet" href="css/layout.css?v=91">
-  <link rel="stylesheet" href="css/components.css?v=91">
-  <link rel="stylesheet" href="css/redesign.css?v=91">
+  <link rel="stylesheet" href="css/style.css?v=92">
+  <link rel="stylesheet" href="css/layout.css?v=92">
+  <link rel="stylesheet" href="css/components.css?v=92">
+  <link rel="stylesheet" href="css/redesign.css?v=92">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -336,6 +336,7 @@
   <section id="screen-summary" class="screen">
     <div class="screen-inner">
       <div id="summary-content"></div>
+      <button id="btn-continue-here" class="btn btn-primary mt-md btn-sm" type="button" style="display:none">&#128241; Continue scoring on this device</button>
       <button id="btn-export-card" class="btn btn-accent mt-md btn-sm" type="button">📤 Share Scorecard</button>
       <button id="btn-export-oversheet" class="btn btn-ghost btn-sm mt-sm" type="button">📋 Share Over-by-Over Sheet</button>
       <button id="btn-summary-home" class="btn btn-ghost mt-sm">&#8962; Home</button>
@@ -497,7 +498,29 @@
     <div class="modal-handle"></div>
     <div class="modal-title">Scoreboard</div>
     <div id="stats-content" style="overflow-y:auto;max-height:55vh"></div>
-    <button id="btn-stats-close" class="btn btn-ghost btn-sm mt-md" type="button">Close</button>
+    <button id="btn-handoff-start" class="btn btn-ghost btn-sm mt-md" type="button" style="display:none">&#128241; Hand off to another device</button>
+    <button id="btn-stats-close" class="btn btn-ghost btn-sm mt-sm" type="button">Close</button>
+  </div>
+
+  <!-- Handoff: receiving device shows a code -->
+  <div id="modal-handoff-code" class="modal hidden">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Continue on this device</div>
+    <p class="text-center text-2 text-sm mb-md">On the device that's scoring now, open this match, tap <b>Hand off to another device</b>, and enter this code:</p>
+    <div id="handoff-code-display" class="handoff-code">------</div>
+    <p class="text-center text-2 text-sm mt-md" id="handoff-code-wait"><span class="live-pulse"></span> Waiting for the other device…</p>
+    <button id="btn-handoff-code-cancel" class="btn btn-ghost btn-sm mt-md" type="button">Cancel</button>
+  </div>
+
+  <!-- Handoff: sending device enters the code -->
+  <div id="modal-handoff-enter" class="modal hidden">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Hand off to another device</div>
+    <p class="text-center text-2 text-sm mb-md">On the other device, open this match and tap <b>Continue scoring on this device</b>. Type the code it shows you:</p>
+    <input id="handoff-code-input" class="form-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="off" style="text-align:center;font-size:24px;letter-spacing:8px;font-weight:600">
+    <p class="text-center text-2 text-sm mt-sm">Scoring moves to that device. This one becomes view-only.</p>
+    <button id="btn-handoff-confirm" class="btn btn-primary mt-md" type="button">Hand off this match</button>
+    <button id="btn-handoff-enter-cancel" class="btn btn-ghost btn-sm mt-sm" type="button">Cancel</button>
   </div>
 
   <!-- Send feedback -->
@@ -616,12 +639,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=91"></script>
-<script src="js/storage.js?v=91"></script>
-<script src="js/match.js?v=91"></script>
-<script src="js/router.js?v=91"></script>
-<script src="js/ui.js?v=91"></script>
-<script src="js/app.js?v=91"></script>
+<script src="js/cloud.js?v=92"></script>
+<script src="js/storage.js?v=92"></script>
+<script src="js/match.js?v=92"></script>
+<script src="js/router.js?v=92"></script>
+<script src="js/ui.js?v=92"></script>
+<script src="js/app.js?v=92"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">

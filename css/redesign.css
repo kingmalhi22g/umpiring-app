@@ -672,6 +672,14 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
 .fb-del { margin-top: 5px; font-size: 11px; font-weight: 700; color: var(--c-danger);
   background: none; border: none; padding: 2px 0; cursor: pointer; }
 
+/* Device-handoff code — big, monospaced, easy to read across the table */
+.handoff-code { font-family: 'Saira Condensed', monospace; font-size: 46px;
+  font-weight: 800; letter-spacing: 10px; text-align: center; color: var(--c-primary-mid);
+  background: var(--c-bg); border: 1px solid var(--c-border); border-radius: var(--r-md);
+  padding: 14px 6px 14px 16px; margin: 4px auto 0; }
+#handoff-code-wait .live-pulse { display: inline-block; vertical-align: middle;
+  margin-right: 6px; background: var(--c-primary-mid); }
+
 /* Home refresh button — visible in BOTH themes (was white-on-light) */
 #btn-refresh { background: var(--c-surface); border: 1px solid var(--c-border);
   color: var(--c-text-2); }

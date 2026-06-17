@@ -45,6 +45,14 @@ async function deleteMatch(id) {
   if (getActiveMatchId() === id) setActiveMatchId(null);
 }
 
+// Drop a match from THIS device only — no cloud delete. Used after handing a
+// live match to another device: the match lives on in the cloud (now owned by
+// the other device) and stays visible here as view-only.
+function releaseMatchLocal(id) {
+  _set(KEYS.MATCHES, getMatches().filter(m => m.id !== id));
+  if (getActiveMatchId() === id) setActiveMatchId(null);
+}
+
 // ── Active match ─────────────────────────────────────────
 function getActiveMatchId() { return localStorage.getItem(KEYS.ACTIVE) || null; }
 function setActiveMatchId(id) {

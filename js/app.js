@@ -587,6 +587,12 @@ function wireButtons() {
   });
   on('btn-view-feedback', 'click', handleViewFeedback);
   on('btn-feedback-list-close', 'click', closeModal);
+  // Device handoff
+  on('btn-handoff-start',       'click', handleHandoffStart);
+  on('btn-handoff-confirm',     'click', handleHandoffConfirm);
+  on('btn-handoff-enter-cancel','click', closeModal);
+  on('btn-continue-here',       'click', handleContinueHere);
+  on('btn-handoff-code-cancel', 'click', handleHandoffCodeCancel);
   on('btn-install', 'click', handleInstall);
   on('btn-clear-data', 'click', () => {
     showConfirm({
@@ -633,6 +639,83 @@ function renderFeedbackList(items) {
       onConfirm: () => cloudDeleteFeedback(id).then(handleViewFeedback).catch(() => showToast('Delete failed'))
     });
   }));
+}
+
+// ── Device handoff ────────────────────────────────────────
+// Move a live match to another device without signing in. The OLD device (still
+// scoring) opens the "enter code" modal; the NEW device shows a code and watches
+// the match until ownership flips to it. See cloud.js + firestore.rules.
+let _handoffCode  = null;   // code this (receiving) device registered
+let _handoffWatch = null;   // unsubscribe fn for the match-doc watcher
+
+// OLD device: open the "enter the code" sheet.
+function handleHandoffStart() {
+  const inp = document.getElementById('handoff-code-input');
+  if (inp) inp.value = '';
+  openModal('modal-handoff-enter');
+  if (inp) setTimeout(() => inp.focus(), 50);
+}
+
+// OLD device: look up the typed code and transfer ownership to that device.
+function handleHandoffConfirm() {
+  const m = getMatch(state.matchId);
+  if (!m) { showToast('No live match'); return; }
+  const code = ((document.getElementById('handoff-code-input') || {}).value || '').replace(/\D/g, '');
+  if (code.length !== 6) { showToast('Enter the 6-digit code'); return; }
+  if (typeof cloudClaimHandoff !== 'function') { showToast('Handoff needs a connection'); return; }
+  const btn = document.getElementById('btn-handoff-confirm');
+  if (btn) { btn.disabled = true; btn.textContent = 'Handing off…'; }
+  cloudClaimHandoff(code, m)
+    .then(() => {
+      cloudDeleteHandoff(code);
+      releaseMatchLocal(m.id);        // this device is now view-only
+      state.matchId = null;
+      closeModal();
+      showToast('Handed off — now scoring on the other device');
+      navigateTo('home');
+    })
+    .catch(err => showToast((err && err.message) || 'Handoff failed'))
+    .finally(() => { if (btn) { btn.disabled = false; btn.textContent = 'Hand off this match'; } });
+}
+
+// NEW device: register a code and wait for the old device to confirm.
+function handleContinueHere() {
+  const m = getMatchAny(state.viewMatchId || state.matchId);
+  if (!m) return;
+  if (typeof cloudCreateHandoff !== 'function') { showToast('Handoff needs a connection'); return; }
+  const disp = document.getElementById('handoff-code-display');
+  if (disp) disp.textContent = '······';
+  openModal('modal-handoff-code');
+  cloudCreateHandoff(m.id)
+    .then(code => {
+      _handoffCode = code;
+      if (disp) disp.textContent = code;
+      // Watch the match; unlock scoring the moment ownership becomes ours.
+      _handoffWatch = cloudWatchMatch(m.id, fresh => {
+        if (!fresh || !fresh.ownerId) return;
+        if (typeof cloudUid === 'function' && fresh.ownerId === cloudUid()) {
+          _stopHandoffWatch();
+          cloudDeleteHandoff(_handoffCode); _handoffCode = null;
+          saveMatch(fresh);                 // owned locally now → editable + synced
+          setActiveMatchId(fresh.id);
+          state.matchId = fresh.id; state.viewMatchId = null;
+          closeModal();
+          showToast("You're now scoring this match");
+          navigateTo(fresh.status === 'in_progress' ? 'live' : 'summary');
+        }
+      });
+    })
+    .catch(err => { closeModal(); showToast((err && err.message) || 'Could not start handoff'); });
+}
+
+function handleHandoffCodeCancel() {
+  _stopHandoffWatch();
+  if (_handoffCode) { cloudDeleteHandoff(_handoffCode); _handoffCode = null; }
+  closeModal();
+}
+
+function _stopHandoffWatch() {
+  if (_handoffWatch) { try { _handoffWatch(); } catch (_) {} _handoffWatch = null; }
 }
 
 // ── Screen setup ──────────────────────────────────────────
@@ -766,7 +849,17 @@ function setupInningsBreak() {
 }
 
 function setupSummary() {
-  renderMatchSummary(getMatchAny(state.viewMatchId || state.matchId));
+  const m = getMatchAny(state.viewMatchId || state.matchId);
+  renderMatchSummary(m);
+  // "Continue scoring on this device" shows only for a LIVE match this device
+  // can't already edit — i.e. someone wants to take over scoring here.
+  const contBtn = document.getElementById('btn-continue-here');
+  if (contBtn) {
+    const eligible = m && m.status === 'in_progress' && !canEditMatch(m) &&
+      typeof cloudAvailable === 'function' && cloudAvailable() &&
+      typeof cloudReady === 'function' && cloudReady();
+    contBtn.style.display = eligible ? '' : 'none';
+  }
 }
 
 // Subtle red outline on an empty/invalid required field (cleared on input).
@@ -1066,6 +1159,15 @@ function handleOpenStats() {
   const m = getMatch(state.matchId);
   if (!m) return;
   renderStatsModal(m);
+  // Offer "hand off to another device" only while a live match is editable on
+  // this device and the cloud is reachable (the new device needs to read it).
+  const hoBtn = document.getElementById('btn-handoff-start');
+  if (hoBtn) {
+    const eligible = m.status === 'in_progress' && canEditMatch(m) &&
+      typeof cloudAvailable === 'function' && cloudAvailable() &&
+      typeof cloudReady === 'function' && cloudReady();
+    hoBtn.style.display = eligible ? '' : 'none';
+  }
   openModal('modal-stats');
 }
 

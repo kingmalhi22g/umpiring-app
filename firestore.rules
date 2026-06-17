@@ -30,6 +30,23 @@ service cloud.firestore {
             || isAdmin());
     }
 
+    // Device handoff: lets an anonymous scorer move a live match to another
+    // device without signing in. The RECEIVING device registers a short code
+    // pointing at its own uid; the CURRENT owner reads that code and rewrites
+    // the match's ownerId to it (allowed by the matches `update` rule above,
+    // since the current owner may change any field). The code reveals only a
+    // uid + matchId — useless to anyone who isn't already the match's owner.
+    match /handoffs/{code} {
+      allow read: if request.auth != null;
+      // You may only register a code that points at yourself, and create-only
+      // (no overwrite) so a squatter can't repoint someone else's pending code.
+      allow create: if request.auth != null
+        && request.resource.data.newUid == request.auth.uid
+        && request.resource.data.matchId is string;
+      allow update: if false;
+      allow delete: if request.auth != null;
+    }
+
     // Feedback: anyone signed in (incl. anonymous) may submit a message;
     // only the admin can read or delete it. No updates.
     match /feedback/{feedbackId} {
