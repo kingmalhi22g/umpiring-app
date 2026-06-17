@@ -517,7 +517,9 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
 /* Pinned above the run pad — separate it and keep the dots area from growing
    unbounded on a freakishly long over (then a small contained scroll, not the page). */
 #ball-input-area .over-strip { padding: 2px 4px 8px; border-bottom: 1px solid var(--c-border); }
-#ball-input-area #live-dots { max-height: 72px; overflow-y: auto; }
+/* Let the over's dots use the empty space above and wrap freely — a long over
+   (many wides/no-balls) grows the strip upward instead of scrolling inside a box. */
+#ball-input-area #live-dots { max-height: none; overflow: visible; }
 .over-strip-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
 .over-strip-center { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
 .over-strip-label { font: 800 12px var(--font-body); letter-spacing: 1px; text-transform: uppercase;
@@ -706,7 +708,9 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
    LIVE SCREEN — single static view, never scrolls. Everything
    compacted to fit between the header and the run pad.
    ════════════════════════════════════════════════════════════ */
-#live-scroll { overflow: hidden; }
+/* Top info shrinks and (only if truly squeezed) scrolls instead of clipping, so
+   the run pad + a grown over-strip are always fully visible at the bottom. */
+#live-scroll { overflow-y: auto; min-height: 0; }
 #screen-live .score-hero { padding: 8px 14px; }
 #screen-live .hero-actions { margin-top: 5px; }
 #screen-live .hero-team-row { margin-top: 5px; }
