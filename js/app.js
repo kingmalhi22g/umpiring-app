@@ -536,7 +536,7 @@ function wireButtons() {
         const ml = document.getElementById('match-list');
         if (ml && getCurrentScreen() === 'home') renderMatchList(ml);
       })
-      .catch(() => showToast('Sign-in failed'));
+      .catch(err => showToast('Sign-in failed: ' + ((err && err.code) || (err && err.message) || 'unknown')));
   });
   on('btn-google-signout', 'click', () => {
     if (typeof cloudSignOut !== 'function') return;

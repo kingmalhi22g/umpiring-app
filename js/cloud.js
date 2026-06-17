@@ -79,7 +79,10 @@ function cloudInit() {
   // Complete a redirect-based sign-in if we just came back from one (mobile).
   _auth.getRedirectResult()
     .then(res => { if (res && res.user) { _startFeed(); if (typeof onCloudAuth === 'function') onCloudAuth(); } })
-    .catch(e => console.error('[cloud] redirect sign-in failed', e));
+    .catch(e => {
+      console.error('[cloud] redirect sign-in failed', e);
+      if (typeof showToast === 'function') showToast('Sign-in error: ' + (e.code || e.message || 'unknown'));
+    });
 
   _auth.onAuthStateChanged(user => {
     if (user) {
