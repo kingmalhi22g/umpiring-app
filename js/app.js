@@ -1239,7 +1239,7 @@ function handleExportCard() {
   setTimeout(() => {
     const card = document.getElementById('export-card');
     if (!card || typeof html2canvas === 'undefined') { showToast('Preview unavailable'); return; }
-    html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#1B5E20' }).then(canvas => {
+    html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#0A1B2E' }).then(canvas => {
       canvas.toBlob(blob => {
         if (!blob) { showToast('Could not generate image'); return; }
         _showImagePreview(blob, 'Scorecard', 'scorecard.png');
