@@ -9,9 +9,17 @@
 // If the Firebase SDK fails to load (offline, blocked), every function here
 // no-ops and the app keeps working as a local-only app.
 
+// iOS Safari blocks the cross-origin OAuth flow (auth handler on a different
+// origin than the app), so sign-in silently failed on iPhone. Only on iOS, run
+// the auth handler first-party on the hosting domain. Desktop keeps the default
+// firebaseapp.com handler untouched (so it can't regress).
+const _ua = (typeof navigator !== 'undefined' && navigator.userAgent) || '';
+const _isIOS = /iphone|ipad|ipod/i.test(_ua) ||
+  (/Macintosh/.test(_ua) && typeof document !== 'undefined' && 'ontouchend' in document);
+
 const FIREBASE_CONFIG = {
   apiKey:            'AIzaSyAbqn_7pFzXLX0Q6lVhSTr2T2oV0aO-YIE',
-  authDomain:        'tally-stats.firebaseapp.com',
+  authDomain:        _isIOS ? 'tally-stats.web.app' : 'tally-stats.firebaseapp.com',
   projectId:         'tally-stats',
   storageBucket:     'tally-stats.firebasestorage.app',
   messagingSenderId: '927750615819',
