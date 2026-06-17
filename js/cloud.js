@@ -218,6 +218,39 @@ function cloudDeleteMatch(id) {
   return _db.collection('matches').doc(id).delete();
 }
 
+// ── Auto-prune: keep only the newest N matches so storage stays bounded ──
+// Runs on the admin's device only (rules let just the admin delete others'
+// matches), at most once a day. Deletes strictly the oldest matches beyond the
+// newest KEEP_MATCHES, by updatedAt.
+const KEEP_MATCHES = 500;   // change this to keep more / fewer
+function cloudPruneOldMatches() {
+  if (!_db || !cloudIsAdmin()) return;
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem('umpire_last_prune') === today) return; // once/day
+    localStorage.setItem('umpire_last_prune', today);
+  } catch (_) { /* ignore */ }
+
+  _db.collection('matches').orderBy('updatedAt', 'desc').limit(KEEP_MATCHES + 1).get()
+    .then(async snap => {
+      if (snap.size <= KEEP_MATCHES) return;            // nothing to prune
+      const cursor = snap.docs[KEEP_MATCHES - 1];        // the Nth-newest match
+      let removed = 0;
+      for (let i = 0; i < 50; i++) {                     // hard cap: 50 batches/run
+        const old = await _db.collection('matches')
+          .orderBy('updatedAt', 'desc').startAfter(cursor).limit(200).get();
+        if (old.empty) break;
+        const batch = _db.batch();
+        old.docs.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+        removed += old.size;
+        if (old.size < 200) break;
+      }
+      if (removed) console.log('[cloud] auto-pruned ' + removed + ' old matches (kept newest ' + KEEP_MATCHES + ')');
+    })
+    .catch(e => console.warn('[cloud] prune skipped:', e && e.code));
+}
+
 // ── Admin sign-in / out ───────────────────────────────────
 function cloudSignInGoogle() {
   if (!_auth) return Promise.reject(new Error('Firebase not ready'));

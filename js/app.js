@@ -236,6 +236,8 @@ function _cloudFeed(feed) {
 // Called by cloud.js whenever sign-in state settles (anon or admin).
 function onCloudAuth() {
   updateAccountUI();
+  // Admin device: keep cloud storage bounded (no-op for everyone else).
+  if (typeof cloudPruneOldMatches === 'function') cloudPruneOldMatches();
   if (getCurrentScreen() === 'home') {
     const ml = document.getElementById('match-list');
     if (ml) renderMatchList(ml);
