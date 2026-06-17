@@ -848,7 +848,9 @@ function updateVersionLabel() {
   const el = document.getElementById('app-version');
   if (!el) return;
   const link = document.querySelector('link[href*="?v="], script[src*="?v="]');
-  const ver = (((link && (link.href || link.src)) || '').match(/\?v=(\d+)/) || [])[1];
+  const raw = (((link && (link.href || link.src)) || '').match(/\?v=(\d+)/) || [])[1];
+  // Show the cache-bust integer as a dotted version: 102 -> 1.02, 103 -> 1.03.
+  const ver = raw ? (parseInt(raw, 10) / 100).toFixed(2) : '';
   el.textContent = 'ScoringBook' + (ver ? ' · v' + ver : '');
 }
 
