@@ -176,6 +176,11 @@ function initApp() {
   // fires its setup handler on a cold load (otherwise e.g. the home match
   // list renders blank until you navigate away and back).
   onScreenChange(screen => {
+    // A newer build was detected while scoring — apply it now that we've left
+    // the live screen (so the reload never interrupts an in-progress over).
+    if (_updatePending && screen !== 'live' && screen !== 'end-of-over') {
+      location.reload(); return;
+    }
     // Keep the screen awake while actively scoring a match.
     if (screen === 'live' || screen === 'end-of-over') acquireWakeLock();
     else releaseWakeLock();
@@ -219,6 +224,43 @@ function initApp() {
       cloudSubscribeMatches(_cloudFeed);
     }
   }
+
+  // Auto-update: an iOS home-screen app keeps the last-opened page in memory
+  // and never re-fetches on resume, so a new deploy can go unseen. Check on
+  // launch and whenever the app is brought back to the foreground.
+  checkForUpdate();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) checkForUpdate(); });
+}
+
+// ── Auto-update (no service worker) ───────────────────────
+// Fetch the live (no-cache) index.html, read its ?v=NN, and if the deployed
+// build is newer than the one we're running, reload to pull it — so the app
+// updates itself without removing/re-adding it to the home screen.
+let _updatePending = false;
+let _updateChecking = false;
+function runningVersion() {
+  const link = document.querySelector('link[href*="?v="], script[src*="?v="]');
+  return parseInt((((link && (link.href || link.src)) || '').match(/\?v=(\d+)/) || [])[1] || '0', 10);
+}
+function checkForUpdate() {
+  if (_updateChecking || _updatePending) return;
+  _updateChecking = true;
+  fetch('index.html?_=' + Date.now(), { cache: 'no-store' })
+    .then(res => res.ok ? res.text() : Promise.reject())
+    .then(html => {
+      const latest  = parseInt((html.match(/\?v=(\d+)/) || [])[1] || '0', 10);
+      const current = runningVersion();
+      if (!latest || latest <= current) return;
+      const screen = getCurrentScreen();
+      if (screen === 'live' || screen === 'end-of-over') {
+        _updatePending = true;            // apply when they leave the live screen
+        showToast('Update ready — refreshes when you finish this innings', 4000);
+      } else {
+        location.reload();
+      }
+    })
+    .catch(() => { /* offline or blocked — try again next foreground */ })
+    .finally(() => { _updateChecking = false; });
 }
 
 // Home-feed snapshot handler: cache the shared matches and refresh the list
