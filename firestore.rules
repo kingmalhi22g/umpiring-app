@@ -29,5 +29,16 @@ service cloud.firestore {
             || resource.data.ownerId == request.auth.uid
             || isAdmin());
     }
+
+    // Feedback: anyone signed in (incl. anonymous) may submit a message;
+    // only the admin can read or delete it. No updates.
+    match /feedback/{feedbackId} {
+      allow read, delete: if isAdmin();
+      allow create: if request.auth != null
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 1000;
+      allow update: if false;
+    }
   }
 }

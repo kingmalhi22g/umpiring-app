@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=88">
-  <link rel="stylesheet" href="css/layout.css?v=88">
-  <link rel="stylesheet" href="css/components.css?v=88">
-  <link rel="stylesheet" href="css/redesign.css?v=88">
+  <link rel="stylesheet" href="css/style.css?v=89">
+  <link rel="stylesheet" href="css/layout.css?v=89">
+  <link rel="stylesheet" href="css/components.css?v=89">
+  <link rel="stylesheet" href="css/redesign.css?v=89">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -358,6 +358,12 @@
         <button id="btn-backfill" class="btn btn-ghost btn-sm mt-sm" type="button" style="display:none">🛠️ Add readable info to all matches</button>
       </div>
       <div class="card mt-sm">
+        <div class="section-head">Feedback</div>
+        <p class="text-sm text-2 mt-sm">Have an idea, found a problem, or want to leave a review? We'd love to hear it.</p>
+        <button id="btn-feedback" class="btn btn-primary btn-sm mt-md" type="button">&#128172; Send feedback</button>
+        <button id="btn-view-feedback" class="btn btn-ghost btn-sm mt-sm" type="button" style="display:none">&#128229; View feedback</button>
+      </div>
+      <div class="card mt-sm">
         <div class="section-head">Preferences</div>
         <div class="form-group mt-md">
           <label class="form-label" for="settings-overs">Default Overs Per Innings</label>
@@ -494,6 +500,31 @@
     <button id="btn-stats-close" class="btn btn-ghost btn-sm mt-md" type="button">Close</button>
   </div>
 
+  <!-- Send feedback -->
+  <div id="modal-feedback" class="modal hidden">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Send feedback</div>
+    <p class="text-center text-2 text-sm mb-md">Reviews, feature ideas, bugs — all welcome.</p>
+    <div class="form-group">
+      <label class="form-label" for="feedback-message">Your message</label>
+      <textarea id="feedback-message" class="form-input" rows="4" maxlength="1000" placeholder="What's on your mind?"></textarea>
+    </div>
+    <div class="form-group mt-md">
+      <label class="form-label" for="feedback-name">Name <span class="opt-note">(optional)</span></label>
+      <input id="feedback-name" class="form-input" type="text" maxlength="60" placeholder="Anonymous" autocomplete="off">
+    </div>
+    <button id="btn-feedback-send" class="btn btn-primary mt-md" type="button">Send</button>
+    <button id="btn-feedback-cancel" class="btn btn-ghost btn-sm mt-sm" type="button">Cancel</button>
+  </div>
+
+  <!-- View feedback (admin) -->
+  <div id="modal-feedback-list" class="modal hidden">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Feedback</div>
+    <div id="feedback-list-content" style="overflow-y:auto;max-height:60vh"></div>
+    <button id="btn-feedback-list-close" class="btn btn-ghost btn-sm mt-md" type="button">Close</button>
+  </div>
+
   <!-- New Batsman -->
   <div id="modal-new-batsman" class="modal hidden">
     <div class="modal-handle"></div>
@@ -584,12 +615,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=88"></script>
-<script src="js/storage.js?v=88"></script>
-<script src="js/match.js?v=88"></script>
-<script src="js/router.js?v=88"></script>
-<script src="js/ui.js?v=88"></script>
-<script src="js/app.js?v=88"></script>
+<script src="js/cloud.js?v=89"></script>
+<script src="js/storage.js?v=89"></script>
+<script src="js/match.js?v=89"></script>
+<script src="js/router.js?v=89"></script>
+<script src="js/ui.js?v=89"></script>
+<script src="js/app.js?v=89"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:#1B5E20;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">

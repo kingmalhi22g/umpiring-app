@@ -270,12 +270,14 @@ function updateAccountUI() {
   // otherwise override the plain [hidden] attribute and show both buttons.
   const show = (btn, on) => { if (btn) btn.style.display = on ? '' : 'none'; };
   const backfillBtn = document.getElementById('btn-backfill');
+  const viewFbBtn   = document.getElementById('btn-view-feedback');
   if (typeof cloudReady !== 'function' || !cloudReady()) {
     el.textContent = 'Connecting…';
-    show(inBtn, false); show(outBtn, false); show(backfillBtn, false);
+    show(inBtn, false); show(outBtn, false); show(backfillBtn, false); show(viewFbBtn, false);
     return;
   }
   show(backfillBtn, !!cloudIsAdmin());   // admin-only maintenance tool
+  show(viewFbBtn,   !!cloudIsAdmin());   // admin-only feedback reader
   if (cloudIsAdmin()) {
     // Only the owner email is admin (enforced server-side in firestore.rules).
     el.textContent = 'Signed in as admin. You can edit or delete any match.';
@@ -561,6 +563,30 @@ function wireButtons() {
       .catch(() => showToast('Backfill failed'))
       .finally(() => { if (btn) { btn.disabled = false; btn.textContent = orig; } });
   });
+  // Feedback
+  on('btn-feedback', 'click', () => {
+    const msg = document.getElementById('feedback-message');
+    const nm  = document.getElementById('feedback-name');
+    if (msg) msg.value = '';
+    if (nm)  nm.value = (typeof cloudDisplayName === 'function' ? (cloudDisplayName() || '') : '');
+    openModal('modal-feedback');
+    if (msg) setTimeout(() => msg.focus(), 50);
+  });
+  on('btn-feedback-cancel', 'click', closeModal);
+  on('btn-feedback-send', 'click', () => {
+    const msg = (document.getElementById('feedback-message') || {}).value || '';
+    const name = (document.getElementById('feedback-name') || {}).value || '';
+    if (!msg.trim()) { showToast('Please type a message first'); return; }
+    if (typeof cloudSendFeedback !== 'function') { showToast('Feedback unavailable offline'); return; }
+    const btn = document.getElementById('btn-feedback-send');
+    if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+    cloudSendFeedback({ message: msg, name: name })
+      .then(() => { closeModal(); showToast('Thanks for your feedback!'); })
+      .catch(() => showToast('Could not send — check your connection'))
+      .finally(() => { if (btn) { btn.disabled = false; btn.textContent = 'Send'; } });
+  });
+  on('btn-view-feedback', 'click', handleViewFeedback);
+  on('btn-feedback-list-close', 'click', closeModal);
   on('btn-install', 'click', handleInstall);
   on('btn-clear-data', 'click', () => {
     showConfirm({
@@ -570,6 +596,43 @@ function wireButtons() {
       onConfirm: () => { clearAll(); navigateTo('home'); showToast('All data cleared'); }
     });
   });
+}
+
+// ── Feedback (admin reader) ───────────────────────────────
+function handleViewFeedback() {
+  if (typeof cloudGetFeedback !== 'function') return;
+  const box = document.getElementById('feedback-list-content');
+  if (box) box.innerHTML = '<p class="text-center text-2 text-sm" style="padding:16px 0">Loading…</p>';
+  openModal('modal-feedback-list');
+  cloudGetFeedback()
+    .then(renderFeedbackList)
+    .catch(() => { if (box) box.innerHTML = '<p class="text-center text-2 text-sm" style="padding:16px 0">Could not load feedback.</p>'; });
+}
+
+function renderFeedbackList(items) {
+  const box = document.getElementById('feedback-list-content');
+  if (!box) return;
+  if (!items || !items.length) {
+    box.innerHTML = '<p class="text-center text-2 text-sm" style="padding:16px 0">No feedback yet.</p>';
+    return;
+  }
+  box.innerHTML = items.map(f => {
+    const when = (f.createdAt && f.createdAt.toDate) ? f.createdAt.toDate().toLocaleString() : '';
+    const who  = f.name ? esc(f.name) : (f.email ? esc(f.email) : (f.anon ? 'Anonymous' : 'User'));
+    const meta = [who, when, f.appVersion ? 'v' + esc(f.appVersion) : ''].filter(Boolean).join(' · ');
+    return `<div class="fb-item">
+      <div class="fb-msg">${esc(f.message)}</div>
+      <div class="fb-meta">${meta}</div>
+      <button class="fb-del" data-fbdel="${esc(f.id)}" type="button">Delete</button>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('[data-fbdel]').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.fbdel;
+    showConfirm({
+      title: 'Delete feedback?', message: 'Remove this message permanently?', confirmText: 'Delete',
+      onConfirm: () => cloudDeleteFeedback(id).then(handleViewFeedback).catch(() => showToast('Delete failed'))
+    });
+  }));
 }
 
 // ── Screen setup ──────────────────────────────────────────

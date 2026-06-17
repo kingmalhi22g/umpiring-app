@@ -54,6 +54,7 @@ function _userEmail(u) {
 }
 function cloudUid()   { const u = _curUser(); return u ? u.uid : _uid; }
 function cloudEmail() { return _userEmail(_curUser()); }
+function cloudDisplayName() { const u = _curUser(); return (u && !u.isAnonymous && u.displayName) ? u.displayName : null; }
 function cloudIsAnon(){ const u = _curUser(); return u ? !!u.isAnonymous : true; }
 function cloudIsAdmin() {
   const u = _curUser(); const e = _userEmail(u);
@@ -294,4 +295,36 @@ function cloudSignInGoogle() {
 function cloudSignOut() {
   if (!_auth) return Promise.resolve();
   return _auth.signOut(); // auth listener then re-signs in anonymously
+}
+
+// ── Feedback ──────────────────────────────────────────────
+// Anyone signed in (anonymous included) can submit; only the admin can read.
+function cloudSendFeedback(opts) {
+  if (!cloudAvailable()) return Promise.reject(new Error('Cloud not available'));
+  const o = opts || {};
+  const msg = String(o.message || '').trim();
+  if (!msg) return Promise.reject(new Error('Empty message'));
+  const u = _curUser();
+  const appVersion = (((document.querySelector('link[href*="?v="]') || {}).href || '').match(/\?v=(\d+)/) || [])[1] || null;
+  return _db.collection('feedback').add({
+    message:    msg.slice(0, 1000),
+    name:       o.name ? String(o.name).trim().slice(0, 60) : null,
+    uid:        u ? u.uid : null,
+    email:      _userEmail(u) || null,
+    anon:       cloudIsAnon(),
+    appVersion: appVersion,
+    userAgent:  (navigator.userAgent || '').slice(0, 300),
+    createdAt:  firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+function cloudGetFeedback() {
+  if (!cloudAvailable() || !cloudIsAdmin()) return Promise.resolve([]);
+  return _db.collection('feedback').orderBy('createdAt', 'desc').limit(200).get()
+    .then(snap => snap.docs.map(d => Object.assign({ id: d.id }, d.data())));
+}
+
+function cloudDeleteFeedback(id) {
+  if (!cloudAvailable()) return Promise.resolve();
+  return _db.collection('feedback').doc(id).delete();
 }
