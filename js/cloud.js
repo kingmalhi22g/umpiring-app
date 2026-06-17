@@ -11,7 +11,11 @@
 
 const FIREBASE_CONFIG = {
   apiKey:            'AIzaSyAbqn_7pFzXLX0Q6lVhSTr2T2oV0aO-YIE',
-  authDomain:        'tally-stats.firebaseapp.com',
+  // Auth handler runs on the SAME origin the app is served from (the Firebase
+  // Hosting domain). Using the default *.firebaseapp.com here put the OAuth
+  // popup/redirect on a different origin, which iOS Safari's tracking
+  // prevention blocks — sign-in just silently did nothing on iPhone.
+  authDomain:        'tally-stats.web.app',
   projectId:         'tally-stats',
   storageBucket:     'tally-stats.firebasestorage.app',
   messagingSenderId: '927750615819',
