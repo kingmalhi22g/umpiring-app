@@ -94,8 +94,8 @@ function handleInstall() {
     confirmText: 'Got it',
     cancelText: 'Close',
     message: isIOS
-      ? "In Safari, tap the Share button (the square with an up-arrow), then choose “Add to Home Screen.”"
-      : "Open your browser menu (⋮), then tap “Install app” or “Add to Home screen.”",
+      ? "iPhone adds apps manually. In Safari: tap the Share button (the square with an ↑ arrow) at the bottom, scroll down and choose “Add to Home Screen,” then tap Add."
+      : "In Chrome: open the menu (⋮ top-right), tap “Add to Home screen” (or “Install app”), then confirm.",
     onConfirm: () => {}
   });
 }
@@ -107,9 +107,16 @@ function updateInstallUI() {
   if (isAppInstalled()) {
     btn.style.display = 'none';
     if (note) note.textContent = '✓ The app is installed on this device.';
-  } else {
+  } else if (_deferredPrompt) {
+    // A real install prompt is available (Android/Chrome) — this button installs.
     btn.style.display = '';
-    if (note) note.textContent = 'Add the app to your home screen for quick, full-screen access.';
+    btn.innerHTML = '&#128241; Install app';
+    if (note) note.textContent = 'Add the app to your home screen for full-screen, app-like access.';
+  } else {
+    // No native prompt — the button opens platform-specific manual steps.
+    btn.style.display = '';
+    btn.innerHTML = '&#128241; How to add to home screen';
+    if (note) note.textContent = 'Add the app to your home screen for full-screen, app-like access — tap below for the steps.';
   }
 }
 
