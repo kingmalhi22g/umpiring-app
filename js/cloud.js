@@ -17,6 +17,10 @@ const _ua = (typeof navigator !== 'undefined' && navigator.userAgent) || '';
 const _isIOS = /iphone|ipad|ipod/i.test(_ua) ||
   (/Macintosh/.test(_ua) && typeof document !== 'undefined' && 'ontouchend' in document);
 
+// App Check (anti-abuse): paste the reCAPTCHA v3 site key from
+// Firebase Console → App Check here. Leave '' to keep App Check OFF (no change).
+const APPCHECK_SITE_KEY = '';
+
 const FIREBASE_CONFIG = {
   apiKey:            'AIzaSyAbqn_7pFzXLX0Q6lVhSTr2T2oV0aO-YIE',
   authDomain:        _isIOS ? 'scoringbook.web.app' : 'tally-stats.firebaseapp.com',
@@ -70,6 +74,16 @@ function cloudInit() {
   }
   try {
     firebase.initializeApp(FIREBASE_CONFIG);
+    // App Check — proves requests come from the real app, blocking bot/script
+    // abuse. No-op until APPCHECK_SITE_KEY is set. Must run before auth/firestore.
+    if (APPCHECK_SITE_KEY && firebase.appCheck) {
+      try {
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+          self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;   // dev preview: prints a debug token to register
+        }
+        firebase.appCheck().activate(new firebase.appCheck.ReCaptchaV3Provider(APPCHECK_SITE_KEY), true);
+      } catch (e) { console.warn('[cloud] App Check init failed', e); }
+    }
     _auth = firebase.auth();
     _db   = firebase.firestore();
   } catch (e) {
