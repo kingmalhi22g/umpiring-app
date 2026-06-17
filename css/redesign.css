@@ -12,6 +12,16 @@
   padding-left: 8px; padding-right: 8px;
 }
 #screen-title { font-size: 15px; font-weight: 800; letter-spacing: .2px; }
+/* Brand mark in the top bar — home only, beside the (display-italic) title */
+#header-logo { display: none; align-items: center; flex-shrink: 0; }
+#header-logo svg { height: 27px; width: auto; display: block; }
+body[data-screen="home"] #header-logo { display: flex; }
+body[data-screen="home"] #btn-back { display: none; }
+body[data-screen="home"] #screen-title {
+  text-align: left; padding-left: 8px;
+  font-family: var(--font-display); font-style: italic; font-weight: 900;
+  text-transform: uppercase; font-size: 18px; letter-spacing: .3px;
+}
 .btn-icon {
   width: 36px; height: 36px; font-size: 18px;
   background: rgba(255,255,255,.14); margin: 0 3px;
