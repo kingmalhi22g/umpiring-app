@@ -217,6 +217,13 @@ function cloudSignInGoogle() {
   // when linking an anonymous account).
   const finish = res => { _startFeed(); if (typeof onCloudAuth === 'function') onCloudAuth(); return res; };
 
+  // iOS Safari heavily restricts popups (they silently fail to open), so the
+  // popup-first flow just did nothing on iPhone. Go straight to a full-page
+  // redirect there — completed by getRedirectResult() when we come back.
+  const ua = navigator.userAgent || '';
+  const isIOS = /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document);
+  if (isIOS) return _auth.signInWithRedirect(provider);
+
   // Popups are unreliable on mobile; fall back to a full-page redirect.
   const isPopupProblem = e => e && [
     'auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/cancelled-popup-request',
