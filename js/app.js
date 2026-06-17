@@ -796,6 +796,18 @@ function setupSettings() {
   applyDarkMode(getDarkMode()); // syncs the toggle label
   updateAccountUI();
   updateInstallUI();
+  updateVersionLabel();
+}
+
+// Show the app version, read straight from the ?v=NN cache-bust query on the
+// asset links — so bumping that number (done on every update) is the single
+// source of truth and the displayed version never drifts out of sync.
+function updateVersionLabel() {
+  const el = document.getElementById('app-version');
+  if (!el) return;
+  const link = document.querySelector('link[href*="?v="], script[src*="?v="]');
+  const ver = (((link && (link.href || link.src)) || '').match(/\?v=(\d+)/) || [])[1];
+  el.textContent = 'ScoringBook' + (ver ? ' · v' + ver : '');
 }
 
 function setupMatchSetup() {
