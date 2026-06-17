@@ -3,7 +3,7 @@
    teal/green + amber identity. Loaded last so it overrides the
    base component styles. Compact, information-dense typography.
    ============================================================ */
-:root { --header-h: 52px; }
+:root { --header-h: 46px; }
 
 /* ── App bar ─────────────────────────────────────────────── */
 #app-header {
@@ -29,6 +29,13 @@ body[data-screen="home"] #screen-title {
 
 /* Tighter side gutters so tables read edge-to-edge like CricClubs */
 #screen-summary, #screen-home { padding-left: 10px; padding-right: 10px; }
+
+/* Summary: fill the screen so a short scorecard doesn't leave a big void —
+   the scorecard stays at the top and the action buttons sink to the bottom
+   (like a bottom action bar). On a long scorecard the auto margin collapses to
+   0 and it scrolls normally. */
+#screen-summary .screen-inner { display: flex; flex-direction: column; min-height: 100%; }
+#screen-summary #btn-export-card { margin-top: auto; }
 
 /* ── Generic card softening ──────────────────────────────── */
 .card { border-radius: 16px; border: 1px solid var(--c-border); box-shadow: 0 2px 10px rgba(20,60,50,.06); }
