@@ -455,6 +455,7 @@ function wireButtons() {
   on('btn-switch-strike', 'click', handleSwitchStrike);
   on('btn-live-stats',   'click', handleOpenStats);
   on('btn-stats-close',  'click', closeModal);
+  on('btn-stats-oversheet', 'click', () => { closeModal(); handleOpenOverSheet(); });
   // Tap the dimmed area outside the sheet to dismiss the Scoreboard only — mid-flow
   // modals (wicket, openers, new batsman) still require an explicit button.
   const _overlay = document.getElementById('modal-overlay');

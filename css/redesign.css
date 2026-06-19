@@ -712,8 +712,12 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
    the run pad + a grown over-strip are always fully visible at the bottom.
    Centre the info block in the spare height so a tall screen doesn't leave a big
    void — `safe` keeps it top-aligned (and fully scrollable) when it overflows. */
-#live-scroll { overflow-y: auto; min-height: 0;
-  display: flex; flex-direction: column; justify-content: safe center; }
+#live-scroll { overflow-y: auto; min-height: 0; display: flex; flex-direction: column; }
+/* Spread the score/batting/bowling cards to fill the height instead of bunching
+   at the top. When a long over squeezes the area, space-between packs back to the
+   top (no clipping) and it scrolls. */
+#live-scroll .screen-inner { flex: 1 1 auto; min-height: 0;
+  display: flex; flex-direction: column; justify-content: space-between; }
 #screen-live .score-hero { padding: 8px 14px; }
 #screen-live .hero-actions { margin-top: 5px; }
 #screen-live .hero-team-row { margin-top: 5px; }
