@@ -538,12 +538,6 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
 .run-btn { height: 44px; border-radius: 9px; font-size: 19px; }
 .run-grid .run-4, .run-grid .run-6 { font-size: 19px; }
 
-/* Taller bottom input section — bigger buttons + a little more spacing so the
-   whole block (This over + run/extras/wicket) rises about halfway up toward the
-   popup zone. Everything stays together. */
-#screen-live #ball-input-area { gap: 9px; padding-top: 12px; }
-#screen-live .run-btn { height: 52px; }
-#screen-live .extra-btn, #screen-live .wicket-btn-main { height: 46px; }
 
 /* ════════════════════════════════════════════════════════════
    APP-WIDE BROADCAST THEME (Sky) — extends the live look to
