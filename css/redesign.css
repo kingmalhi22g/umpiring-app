@@ -731,18 +731,18 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
    browser. The content block fills this area, so alignment is driven by it. */
 #live-scroll { overflow-y: auto; min-height: 0;
   display: flex; flex-direction: column; }
-#screen-live .score-hero { padding: 8px 14px; }
-#screen-live .hero-actions { margin-top: 5px; }
-#screen-live .hero-team-row { margin-top: 5px; }
+#screen-live .score-hero { padding: 5px 14px; }
+#screen-live .hero-actions { margin-top: 3px; }
+#screen-live .hero-team-row { margin-top: 3px; }
 #screen-live .hero-crest { width: 36px; height: 36px; font-size: 16px; }
 #screen-live .score-hero-main { font-size: 36px; }
-#screen-live .hero-oppo-row { margin-top: 4px; }
-#screen-live .hero-grad-bar { margin-top: 5px; }
-#screen-live .score-hero .score-hero-stats { margin-top: 5px; }
-#screen-live .score-hero-stats { padding-top: 5px; }
-#screen-live .bowl-line { padding: 9px 13px; }
-#screen-live .live-card .bt-row { padding: 7px 11px; }
-#screen-live .live-card .bt-head { padding: 5px 11px; }
+#screen-live .hero-oppo-row { margin-top: 2px; }
+#screen-live .hero-grad-bar { margin-top: 3px; }
+#screen-live .score-hero .score-hero-stats { margin-top: 3px; }
+#screen-live .score-hero-stats { padding-top: 3px; }
+#screen-live .bowl-line { padding: 6px 13px; }
+#screen-live .live-card .bt-row { padding: 3px 11px; }
+#screen-live .live-card .bt-head { padding: 3px 11px; }
 /* Live frames span the full width, aligned to the run pad (WIDTH only — no
    height change, so the run pad stays visible and the screen never scrolls).
    The content block is normally centred with side margins + max-width; on the
@@ -753,7 +753,7 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
    no-ball notice shows there. "This over" is compact and pinned above the run pad. */
 #live-scroll .screen-inner { max-width: none; margin-left: 0; margin-right: 0;
   flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
-  justify-content: flex-start; gap: 8px; }
+  justify-content: flex-start; gap: 6px; }
 /* Never let the frames collapse below their content (the cards clip with hidden
    overflow, which made batting/bowling squash and overlap on a long over + free
    hit). They keep full size; if it genuinely can't fit, the area scrolls. */
