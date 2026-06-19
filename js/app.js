@@ -330,13 +330,15 @@ function updateAccountUI() {
   const show = (btn, on) => { if (btn) btn.style.display = on ? '' : 'none'; };
   const backfillBtn = document.getElementById('btn-backfill');
   const viewFbBtn   = document.getElementById('btn-view-feedback');
+  const dangerZone  = document.getElementById('danger-zone');
   if (typeof cloudReady !== 'function' || !cloudReady()) {
     el.textContent = 'Connecting…';
-    show(inBtn, false); show(outBtn, false); show(backfillBtn, false); show(viewFbBtn, false);
+    show(inBtn, false); show(outBtn, false); show(backfillBtn, false); show(viewFbBtn, false); show(dangerZone, false);
     return;
   }
   show(backfillBtn, !!cloudIsAdmin());   // admin-only maintenance tool
   show(viewFbBtn,   !!cloudIsAdmin());   // admin-only feedback reader
+  show(dangerZone,  !!cloudIsAdmin());   // admin-only: wipe all cloud matches
   if (cloudIsAdmin()) {
     // Only the owner email is admin (enforced server-side in firestore.rules).
     el.textContent = 'Signed in as admin. You can edit or delete any match.';
@@ -656,13 +658,39 @@ function wireButtons() {
   on('btn-install', 'click', handleInstall);
   on('btn-install-banner', 'click', handleInstall);
   on('btn-install-dismiss', 'click', dismissInstallBanner);
-  on('btn-clear-data', 'click', () => {
-    showConfirm({
-      title: 'Clear all data?',
-      message: 'Delete all matches? This cannot be undone.',
-      confirmText: 'Clear all',
-      onConfirm: () => { clearAll(); navigateTo('home'); showToast('All data cleared'); }
-    });
+  on('btn-clear-data', 'click', handleAdminClearAll);
+}
+
+// Admin-only: wipe EVERY match in the cloud. Two confirmations guard against an
+// accidental tap. Only reachable when the admin button is shown, and the cloud
+// call itself re-checks admin (and the rules enforce it server-side).
+function handleAdminClearAll() {
+  if (typeof cloudClearAllMatches !== 'function' || typeof cloudIsAdmin !== 'function' || !cloudIsAdmin()) {
+    showToast('Admin only'); return;
+  }
+  showConfirm({
+    title: 'Delete ALL matches?',
+    message: 'This permanently deletes EVERY match on the server — for all users, on all devices. It cannot be undone.',
+    confirmText: 'Continue', cancelText: 'Cancel', danger: true,
+    onConfirm: () => {
+      showConfirm({
+        title: 'Are you absolutely sure?',
+        message: 'Last chance. This wipes the entire match history for everyone.',
+        confirmText: 'Yes, delete everything', cancelText: 'Keep matches', danger: true,
+        onConfirm: () => {
+          showToast('Deleting all matches…', 5000);
+          cloudClearAllMatches()
+            .then(n => {
+              if (typeof clearAllMatchesLocal === 'function') clearAllMatchesLocal();
+              state.cloudMatches = []; state.cloudFeedLoaded = true;
+              state.matchId = null; state.viewMatchId = null;
+              showToast('Deleted ' + n + ' match' + (n === 1 ? '' : 'es'));
+              navigateTo('home');
+            })
+            .catch(e => showToast('Delete failed: ' + ((e && e.message) || 'error')));
+        }
+      });
+    }
   });
 }
 

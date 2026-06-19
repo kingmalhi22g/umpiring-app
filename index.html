@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=125">
-  <link rel="stylesheet" href="css/layout.css?v=125">
-  <link rel="stylesheet" href="css/components.css?v=125">
-  <link rel="stylesheet" href="css/redesign.css?v=125">
+  <link rel="stylesheet" href="css/style.css?v=126">
+  <link rel="stylesheet" href="css/layout.css?v=126">
+  <link rel="stylesheet" href="css/components.css?v=126">
+  <link rel="stylesheet" href="css/redesign.css?v=126">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -392,10 +392,10 @@
         <button id="btn-import-data" class="btn btn-ghost btn-sm mt-sm" type="button">&#11014; Import Backup</button>
         <input id="import-file" type="file" accept="application/json,.json" style="display:none">
       </div>
-      <div class="card" style="border-left:4px solid var(--c-danger)">
-        <div class="section-head" style="color:var(--c-danger)">Danger Zone</div>
-        <p class="text-sm text-2 mt-sm">Permanently delete all matches on this device.</p>
-        <button id="btn-clear-data" class="btn btn-danger btn-sm mt-md" type="button">Clear All Data</button>
+      <div class="card" id="danger-zone" style="border-left:4px solid var(--c-danger);display:none">
+        <div class="section-head" style="color:var(--c-danger)">Danger Zone — Admin</div>
+        <p class="text-sm text-2 mt-sm">Permanently delete <b>every match on the server</b>, for all users. This cannot be undone.</p>
+        <button id="btn-clear-data" class="btn btn-danger btn-sm mt-md" type="button">Clear all matches (server)</button>
       </div>
       <div class="card mt-sm">
         <div class="section-head">Install App</div>
@@ -645,12 +645,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=125"></script>
-<script src="js/storage.js?v=125"></script>
-<script src="js/match.js?v=125"></script>
-<script src="js/router.js?v=125"></script>
-<script src="js/ui.js?v=125"></script>
-<script src="js/app.js?v=125"></script>
+<script src="js/cloud.js?v=126"></script>
+<script src="js/storage.js?v=126"></script>
+<script src="js/match.js?v=126"></script>
+<script src="js/router.js?v=126"></script>
+<script src="js/ui.js?v=126"></script>
+<script src="js/app.js?v=126"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:linear-gradient(135deg,#16314A,#0A1B2E);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">

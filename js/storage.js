@@ -88,3 +88,11 @@ function importAllData(data) {
 function clearAll() {
   Object.values(KEYS).forEach(k => localStorage.removeItem(k));
 }
+
+// Clear local match copies (matches list, cached feed, active match) but keep
+// settings/dark-mode. Used after an admin wipes the cloud collection.
+function clearAllMatchesLocal() {
+  _set(KEYS.MATCHES, []);
+  _set(KEYS.FEED_CACHE, []);
+  setActiveMatchId(null);
+}

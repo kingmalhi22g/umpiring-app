@@ -266,6 +266,25 @@ function cloudPruneOldMatches() {
     .catch(e => console.warn('[cloud] prune skipped:', e && e.code));
 }
 
+// Admin-only: delete EVERY match in the cloud (all users). Batched. Rules let
+// only the admin delete others' matches, so this rejects for anyone else.
+// Returns the number of matches removed.
+async function cloudClearAllMatches() {
+  if (!cloudAvailable()) throw new Error('Cloud not available');
+  if (!cloudIsAdmin()) throw new Error('Admin only');
+  let removed = 0;
+  for (let i = 0; i < 200; i++) {                 // hard cap: 200 batches/run
+    const snap = await _db.collection('matches').limit(300).get();
+    if (snap.empty) break;
+    const batch = _db.batch();
+    snap.docs.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+    removed += snap.size;
+    if (snap.size < 300) break;
+  }
+  return removed;
+}
+
 // ── Admin sign-in / out ───────────────────────────────────
 function cloudSignInGoogle() {
   if (!_auth) return Promise.reject(new Error('Firebase not ready'));
