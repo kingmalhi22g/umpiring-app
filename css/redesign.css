@@ -754,4 +754,9 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
 #live-scroll .screen-inner { max-width: none; margin-left: 0; margin-right: 0;
   flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
   justify-content: flex-start; gap: 8px; }
+/* Never let the frames collapse below their content (the cards clip with hidden
+   overflow, which made batting/bowling squash and overlap on a long over + free
+   hit). They keep full size; if it genuinely can't fit, the area scrolls. */
+#screen-live .score-hero, #screen-live .live-card,
+#screen-live .bowl-line-card, #screen-live #live-freehit { flex-shrink: 0; }
 #screen-live .free-hit-bar { margin-top: 2px; }
