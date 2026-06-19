@@ -121,6 +121,22 @@ function updateInstallUI() {
   }
 }
 
+// First-visit nudge to install. Shows on home only, for a device that hasn't
+// installed the app and hasn't dismissed the banner. "Add" reuses handleInstall
+// (Android: fires the native prompt; iPhone: shows the Add-to-Home-Screen steps).
+function maybeShowInstallBanner() {
+  const bn = document.getElementById('install-banner');
+  if (!bn) return;
+  let dismissed = false;
+  try { dismissed = localStorage.getItem('umpire_install_dismissed') === '1'; } catch (_) {}
+  bn.style.display = (!isAppInstalled() && !dismissed) ? '' : 'none';
+}
+function dismissInstallBanner() {
+  try { localStorage.setItem('umpire_install_dismissed', '1'); } catch (_) {}
+  const bn = document.getElementById('install-banner');
+  if (bn) bn.style.display = 'none';
+}
+
 // ── Init ─────────────────────────────────────────────────
 function initApp() {
   // The app no longer uses a service worker — offline caching caused stale
@@ -158,6 +174,7 @@ function initApp() {
     _deferredPrompt = null;
     showToast('App added to your home screen');
     updateInstallUI();
+    maybeShowInstallBanner();   // now installed → banner hides
   });
 
   // Apply saved dark mode preference on startup
@@ -637,6 +654,8 @@ function wireButtons() {
   on('btn-continue-here',       'click', handleContinueHere);
   on('btn-handoff-code-cancel', 'click', handleHandoffCodeCancel);
   on('btn-install', 'click', handleInstall);
+  on('btn-install-banner', 'click', handleInstall);
+  on('btn-install-dismiss', 'click', dismissInstallBanner);
   on('btn-clear-data', 'click', () => {
     showConfirm({
       title: 'Clear all data?',
@@ -765,6 +784,7 @@ function _stopHandoffWatch() {
 function setupHome() {
   syncHomeTabUI();
   renderMatchList(document.getElementById('match-list'));
+  maybeShowInstallBanner();
 }
 
 function switchHomeTab(tab) {
