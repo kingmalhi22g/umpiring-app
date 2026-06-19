@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=107">
-  <link rel="stylesheet" href="css/layout.css?v=107">
-  <link rel="stylesheet" href="css/components.css?v=107">
-  <link rel="stylesheet" href="css/redesign.css?v=107">
+  <link rel="stylesheet" href="css/style.css?v=120">
+  <link rel="stylesheet" href="css/layout.css?v=120">
+  <link rel="stylesheet" href="css/components.css?v=120">
+  <link rel="stylesheet" href="css/redesign.css?v=120">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -203,11 +203,6 @@
             <div class="stat hidden" id="stat-target"><span class="stat-label">Target</span><span class="stat-val" id="live-stat-target">&mdash;</span></div>
           </div>
         </div>
-        <!-- Free hit -->
-        <div class="free-hit-bar hidden" id="live-freehit">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h12l-2.5 4L17 12H5"/></svg>
-          <span>Free hit <span class="fh-sub">&mdash; only run-out valid</span></span>
-        </div>
         <!-- Batting (current pair) -->
         <div class="card live-card">
           <div class="bt-head"><span>Batting</span><span>R</span><span>B</span><span>4s</span><span>6s</span><span>SR</span></div>
@@ -245,11 +240,16 @@
             <span class="bowl-line-fig" id="live-bowler2-fig">0&ndash;0&ndash;0&ndash;<span class="bowl-line-w">0</span></span>
           </div>
         </div>
+        <!-- Popup zone (Free hit / no-ball notice) — open area below bowling -->
+        <div class="free-hit-bar hidden" id="live-freehit">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h12l-2.5 4L17 12H5"/></svg>
+          <span>Free hit <span class="fh-sub">&mdash; only run-out valid</span></span>
+        </div>
       </div>
     </div>
     <!-- Sticky ball input -->
     <div id="ball-input-area">
-      <!-- This over (live ball-by-ball) — pinned above the run pad so it's always visible -->
+      <!-- This over (compact) — pinned above the run pad -->
       <div class="over-strip">
         <div class="over-strip-head">
           <span class="over-strip-spacer"></span>
@@ -650,12 +650,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=107"></script>
-<script src="js/storage.js?v=107"></script>
-<script src="js/match.js?v=107"></script>
-<script src="js/router.js?v=107"></script>
-<script src="js/ui.js?v=107"></script>
-<script src="js/app.js?v=107"></script>
+<script src="js/cloud.js?v=120"></script>
+<script src="js/storage.js?v=120"></script>
+<script src="js/match.js?v=120"></script>
+<script src="js/router.js?v=120"></script>
+<script src="js/ui.js?v=120"></script>
+<script src="js/app.js?v=120"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:linear-gradient(135deg,#16314A,#0A1B2E);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
