@@ -96,3 +96,11 @@ function clearAllMatchesLocal() {
   _set(KEYS.FEED_CACHE, []);
   setActiveMatchId(null);
 }
+
+// Clear only THIS device's own matches ("My matches"). The cloud copies are
+// untouched (kept on the server + still shown under "All matches"); the cached
+// cloud feed and settings are kept too. Available to everyone.
+function clearMyMatchesLocal() {
+  _set(KEYS.MATCHES, []);
+  setActiveMatchId(null);
+}

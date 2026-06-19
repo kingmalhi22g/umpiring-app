@@ -659,6 +659,23 @@ function wireButtons() {
   on('btn-install-banner', 'click', handleInstall);
   on('btn-install-dismiss', 'click', dismissInstallBanner);
   on('btn-clear-data', 'click', handleAdminClearAll);
+  on('btn-clear-mine', 'click', handleClearMyMatches);
+}
+
+// Everyone: remove this device's own matches. The cloud keeps them (still shown
+// under "All matches"); settings are kept. Confirm first.
+function handleClearMyMatches() {
+  showConfirm({
+    title: 'Clear matches from this device?',
+    message: 'This removes matches from this device only. They stay in the cloud and still show under "All matches". Your settings are kept.',
+    confirmText: 'Clear from this device', cancelText: 'Cancel',
+    onConfirm: () => {
+      if (typeof clearMyMatchesLocal === 'function') clearMyMatchesLocal();
+      state.matchId = null; state.viewMatchId = null;
+      showToast('Matches cleared from this device');
+      navigateTo('home');
+    }
+  });
 }
 
 // Admin-only: wipe EVERY match in the cloud. Two confirmations guard against an
