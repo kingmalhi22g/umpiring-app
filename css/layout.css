@@ -112,7 +112,7 @@ body[data-screen="live"] #app-main { top: var(--safe-t); }
   padding: var(--sp-lg);
   width: 100%;
   max-width: 480px;
-  max-height: 80vh;
+  max-height: 92vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   box-shadow: var(--sh-lg);

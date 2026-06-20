@@ -449,9 +449,19 @@ function wireButtons() {
   on('ball-btn-nb', 'click', debounced(() => { haptic(); handleBallExtra('no_ball'); }));
   on('ball-btn-b',  'click', debounced(() => { haptic(); handleBallExtra('bye'); }));
   on('ball-btn-lb', 'click', debounced(() => { haptic(); handleBallExtra('leg_bye'); }));
-  on('ball-btn-w',  'click', debounced(() => { haptic(); handleWicketButton(); }));
+  on('ball-btn-pen','click', debounced(() => { haptic(); handlePenaltyRuns(); }));
+  on('ball-btn-w',  'click', debounced(() => { haptic(); state.extrasWicketMode = null; handleWicketButton(); }));
   on('btn-undo',          'click', handleUndo);
   on('btn-end-innings',   'click', handleEndInningsEarly);
+
+  // Change bowler mid-over — tap the current-bowler line
+  on('live-bowler', 'click', handleChangeBowlerOpen);
+  on('cb-chips', 'click', e => {
+    const chip = e.target.closest('.eos-bowler-chip');
+    if (chip && chip.dataset.bowler) document.getElementById('cb-name').value = chip.dataset.bowler;
+  });
+  on('btn-cb-confirm', 'click', handleChangeBowlerConfirm);
+  on('btn-cb-cancel',  'click', closeModal);
 
   // Edit any ball — tap a dot in the current over
   on('live-dots', 'click', e => {
@@ -508,7 +518,8 @@ function wireButtons() {
   document.querySelectorAll('.extras-run-btn').forEach(btn =>
     btn.addEventListener('click', () => handleExtrasRuns(parseInt(btn.dataset.runs)))
   );
-  on('btn-extras-cancel', 'click', closeModal);
+  on('btn-extras-cancel', 'click', () => { state.pendingExtrasType = null; closeModal(); });
+  on('btn-extras-wicket', 'click', handleExtrasWicket);
 
   // Wicket modal
   document.querySelectorAll('.wicket-btn').forEach(btn =>
@@ -516,9 +527,17 @@ function wireButtons() {
       document.querySelectorAll('.wicket-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
       state.selectedWicketType = btn.dataset.type;
-      const showFielder = ['caught','run_out','stumped'].includes(state.selectedWicketType);
+      const t = state.selectedWicketType;
+      const showFielder = ['caught','run_out','stumped'].includes(t);
       document.getElementById('wicket-fielder-group').classList.toggle('hidden', !showFielder);
-      document.getElementById('wicket-runout-group').classList.toggle('hidden', state.selectedWicketType !== 'run_out');
+      // In a wide/no-ball wicket flow, "runs completed" still applies to run-outs.
+      document.getElementById('wicket-runout-group').classList.toggle('hidden', t !== 'run_out');
+      const note = document.getElementById('wicket-mankad-note');
+      if (note) note.classList.toggle('hidden', t !== 'mankad');
+      // Mankad dismisses the non-striker — reflect that in the name shown.
+      const who = t === 'mankad' ? (state._wkNonStriker || 'Non-striker') : state._wkStriker;
+      const mode = state.extrasWicketMode;
+      setEl('wicket-batsman-name', (who || '') + (mode ? ' · on a ' + (mode === 'wide' ? 'wide' : 'no-ball') : ''));
     })
   );
   // Run-out: runs completed + who is out
@@ -1132,6 +1151,17 @@ function handleBallRun(runs) {
   afterBall(m);
 }
 
+// 5 penalty runs to the batting side (e.g. illegal fielding). Not a ball, no
+// batsman change — just added to the team total.
+function handlePenaltyRuns() {
+  let m = getMatch(state.matchId);
+  if (!canRecord(m)) return;
+  m = recordBall(m, { runs: 0, extras: { type: 'penalty', runs: 5 } });
+  saveMatch(m);
+  showToast('+5 penalty runs');
+  afterBall(m);
+}
+
 function handleBallExtra(type) {
   state.pendingExtrasType = type;
   const cfg = {
@@ -1149,7 +1179,20 @@ function handleBallExtra(type) {
   grid.querySelectorAll('.extras-run-btn').forEach(btn =>
     btn.addEventListener('click', () => handleExtrasRuns(parseInt(btn.dataset.runs)))
   );
+  // A wicket can fall on a wide or no-ball (stumped / run-out) — offer it here.
+  const wkBtn = document.getElementById('btn-extras-wicket');
+  if (wkBtn) wkBtn.classList.toggle('hidden', !(type === 'wide' || type === 'no_ball'));
   openModal('modal-extras');
+}
+
+// "+ Wicket on this ball" from the wide/no-ball dialog: keep the extra pending
+// and open the wicket dialog. handleWicketConfirm combines them into one ball.
+function handleExtrasWicket() {
+  const type = state.pendingExtrasType;
+  if (type !== 'wide' && type !== 'no_ball') return;
+  state.extrasWicketMode = type;          // 'wide' or 'no_ball'
+  closeModal();
+  handleWicketButton();
 }
 
 function handleExtrasRuns(runs) {
@@ -1184,12 +1227,31 @@ function handleWicketButton() {
 
   document.querySelectorAll('.wicket-btn').forEach(b => b.classList.remove('selected'));
   state.selectedWicketType = null;
-  setEl('wicket-batsman-name', striker.name);
+  const nonStriker = inn.batsmen[inn.nonStrikerIdx];
+  state._wkStriker    = striker.name;
+  state._wkNonStriker = nonStriker ? nonStriker.name : '';
   document.getElementById('wicket-fielder').value = '';
   document.getElementById('wicket-fielder-group').classList.add('hidden');
+  const note = document.getElementById('wicket-mankad-note');
+  if (note) note.classList.add('hidden');
+
+  // When the wicket falls on a wide / no-ball, only certain dismissals are
+  // valid — disable the rest so the umpire can't pick an impossible one.
+  const mode = state.extrasWicketMode;   // null | 'wide' | 'no_ball'
+  const valid = mode === 'wide'    ? ['stumped','run_out']
+              : mode === 'no_ball' ? ['run_out']
+              : null;
+  document.querySelectorAll('.wicket-btn').forEach(b => {
+    const ok = !valid || valid.includes(b.dataset.type);
+    b.disabled = !ok;
+    b.classList.toggle('wkt-disabled', !ok);
+    // In wide/no-ball mode, hide the impossible dismissals entirely so the
+    // dialog stays short and never scrolls (even with the run-out controls open).
+    b.style.display = (valid && !ok) ? 'none' : '';
+  });
+  setEl('wicket-batsman-name', striker.name + (mode ? ' · on a ' + (mode === 'wide' ? 'wide' : 'no-ball') : ''));
 
   // Reset run-out controls
-  const nonStriker = inn.batsmen[inn.nonStrikerIdx];
   state.runoutRuns = 0;
   state.runoutWho  = 'striker';
   setEl('ro-who-striker',    striker.name);
@@ -1215,7 +1277,7 @@ function handleWicketConfirm() {
     return;
   }
 
-  if (inn.freeHitNext && wType && wType !== 'run_out') {
+  if (inn.freeHitNext && wType && wType !== 'run_out' && wType !== 'mankad') {
     showToast('Free hit — only run-out is valid'); return;
   }
 
@@ -1223,18 +1285,38 @@ function handleWicketConfirm() {
   const nonStriker = inn.batsmen[inn.nonStrikerIdx];
 
   const isRunOut   = wType === 'run_out';
+  const isMankad   = wType === 'mankad';
   const runoutRuns = isRunOut ? (state.runoutRuns || 0) : 0;
-  const batsmanOut = (isRunOut && state.runoutWho === 'nonstriker' && nonStriker)
-    ? nonStriker.name : striker.name;
+  // Mankad always dismisses the non-striker; a run-out can be either end.
+  const batsmanOut = isMankad
+    ? (nonStriker ? nonStriker.name : striker.name)
+    : (isRunOut && state.runoutWho === 'nonstriker' && nonStriker) ? nonStriker.name : striker.name;
 
   const wicket  = {
     type:        wType || 'out',
     batsmanOut:  batsmanOut,
     fielder:     val('wicket-fielder') || null,
-    bowlerCredit: wType ? !['run_out','obstructing'].includes(wType) : true
+    bowlerCredit: wType ? !['run_out','obstructing','mankad'].includes(wType) : true
   };
 
-  m = recordBall(m, { runs: runoutRuns, extras: { type: null, runs: 0 }, isWicket: true, wicket });
+  // If this wicket fell on a wide / no-ball, record the extra + wicket as ONE
+  // delivery: the extra penalty still counts and the ball isn't a legal ball.
+  const mode = state.extrasWicketMode;   // null | 'wide' | 'no_ball'
+  let recordRuns, recordExtras;
+  if (mode === 'wide') {
+    recordRuns = 0;
+    recordExtras = { type: 'wide', runs: isRunOut ? runoutRuns : 0 };  // byes run on the wide
+  } else if (mode === 'no_ball') {
+    recordRuns = runoutRuns;             // runs completed before the run-out
+    recordExtras = { type: 'no_ball', runs: 0 };
+  } else {
+    recordRuns = runoutRuns;
+    recordExtras = { type: null, runs: 0 };
+  }
+  state.extrasWicketMode = null;
+  state.pendingExtrasType = null;
+
+  m = recordBall(m, { runs: recordRuns, extras: recordExtras, isWicket: true, wicket });
   closeModal();
 
   const updatedInn = m.innings[m.currentInnings];
@@ -1286,6 +1368,47 @@ function handleNewBatsmanConfirm() {
   closeModal();
   renderLiveHeader(m);
   afterBall(m);
+}
+
+// ── Change bowler (mid-over) ──────────────────────────────
+function handleChangeBowlerOpen() {
+  const m = getMatch(state.matchId);
+  if (!canRecord(m)) return;
+  const inn = m.innings[m.currentInnings];
+  if (!inn || !inn.currentOver) return;
+
+  const counts = {};
+  inn.overs.forEach(o => { counts[o.bowler] = (counts[o.bowler] || 0) + 1; });
+  const cur = inn.currentOver.bowler;
+  if (!(cur in counts)) counts[cur] = 0;
+
+  const chipsEl = document.getElementById('cb-chips');
+  const names = Object.keys(counts);
+  if (chipsEl) {
+    chipsEl.innerHTML = names.length
+      ? names.map(n => {
+          const isCur = n === cur;
+          return `<button class="eos-bowler-chip${isCur ? ' eos-chip-used' : ''}" type="button" ${isCur ? 'disabled' : `data-bowler="${esc(n)}"`}>${esc(n)}<span class="chip-overs">${counts[n]}ov</span></button>`;
+        }).join('')
+      : '<span class="text-2 text-sm">No bowlers yet — type a name below.</span>';
+  }
+  const inp = document.getElementById('cb-name');
+  if (inp) inp.value = '';
+  openModal('modal-change-bowler');
+}
+
+function handleChangeBowlerConfirm() {
+  let m = getMatch(state.matchId);
+  const inn = m && m.innings[m.currentInnings];
+  if (!inn || !inn.currentOver) { closeModal(); return; }
+  const name = (val('cb-name') || '').trim();
+  if (!name) { showToast('Enter or pick a bowler'); return; }
+  if (name === inn.currentOver.bowler) { closeModal(); return; }
+  inn.currentOver.bowler = name;
+  saveMatch(m);
+  closeModal();
+  renderLiveHeader(m);
+  showToast('Bowler changed to ' + name);
 }
 
 function handleOpenStats() {
@@ -1443,6 +1566,14 @@ function openEditBall(idx) {
   const over = inn && inn.currentOver;
   const d = over && over.allDeliveries[idx];
   if (!d) return;
+
+  // Penalty runs and mankads aren't normal deliveries — the edit grid can't
+  // represent them. Use Undo (if it's the last event) to remove one.
+  const dType = d.extras ? d.extras.type : null;
+  if (dType === 'penalty' || (d.isWicket && d.wicket && d.wicket.type === 'mankad')) {
+    showToast('Use Undo to remove a penalty or mankad');
+    return;
+  }
 
   const eType = d.extras ? d.extras.type : null;
   // Reconstruct the editor's run value from how the delivery stored it.

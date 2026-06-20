@@ -3,12 +3,16 @@
 // ── Ball dot ─────────────────────────────────────────────
 function ballDotClass(delivery) {
   if (!delivery) return 'bd-dot';
-  if (delivery.isWicket) return 'bd-w';
+  if (delivery.isWicket) {
+    const wt = delivery.extras ? delivery.extras.type : null;
+    return (wt === 'wide' || wt === 'no_ball') ? 'bd-w bd-wx' : 'bd-w';
+  }
   const eType = delivery.extras ? delivery.extras.type : null;
   if (eType === 'wide')   return 'bd-wd';
   if (eType === 'no_ball') return 'bd-nb';
   if (eType === 'bye')    return 'bd-bye';
   if (eType === 'leg_bye') return 'bd-lb';
+  if (eType === 'penalty') return 'bd-pen';
   if (delivery.runs === 6) return 'bd-6';
   if (delivery.runs === 4) return 'bd-4';
   if (delivery.runs > 0)  return 'bd-' + delivery.runs;
@@ -19,6 +23,8 @@ function ballDotLabel(delivery) {
   if (!delivery) return '·';
   if (delivery.isWicket) {
     const eType = delivery.extras ? delivery.extras.type : null;
+    if (eType === 'wide')    return 'Wd+W';
+    if (eType === 'no_ball') return 'NB+W';
     if (delivery.runs > 0 && !eType) return delivery.runs + 'W';
     return 'W';
   }
@@ -28,6 +34,7 @@ function ballDotLabel(delivery) {
   if (eType === 'no_ball') return delivery.runs > 0 ? 'NB+' + delivery.runs : 'NB';
   if (eType === 'bye')     return 'B';
   if (eType === 'leg_bye') return 'LB';
+  if (eType === 'penalty') return '+5';
   if (delivery.runs === 0) return '·';
   return String(delivery.runs);
 }
@@ -520,7 +527,7 @@ function renderInningsAccordion(match, inn, i, open) {
       <div class="bt-head"><span>Batsman</span><span>R</span><span>B</span><span>4s</span><span>6s</span><span>SR</span></div>
       ${bat}
       <div class="sum-extras"><span><b>Extras</b> ${totalExtras(inn)}</span>
-        <span class="mut">wd ${inn.extras.wides} · nb ${inn.extras.noBalls} · b ${inn.extras.byes} · lb ${inn.extras.legByes}</span></div>
+        <span class="mut">wd ${inn.extras.wides} · nb ${inn.extras.noBalls} · b ${inn.extras.byes} · lb ${inn.extras.legByes}${inn.extras.penalties ? ' · pen ' + inn.extras.penalties : ''}</span></div>
       <div class="sum-total"><span>Total&nbsp;&nbsp;${inn.totalRuns}/${inn.wickets}</span><span class="rr">RR ${runRate(inn)}</span></div>
       ${bowl ? `<div class="bt-sec">Bowling</div>
         <div class="bt-head bowl"><span>Bowler</span><span>O</span><span>M</span><span>R</span><span>W</span><span>Econ</span><span>Wd</span><span>NB</span></div>${bowl}` : ''}
@@ -760,7 +767,7 @@ function renderStatsModal(match) {
     </table>
     <div class="text-xs text-2 mt-sm">
       Extras: ${totalExtras(inn)}
-      (Wd ${inn.extras.wides}, NB ${inn.extras.noBalls}, B ${inn.extras.byes}, LB ${inn.extras.legByes})
+      (Wd ${inn.extras.wides}, NB ${inn.extras.noBalls}, B ${inn.extras.byes}, LB ${inn.extras.legByes}${inn.extras.penalties ? ', Pen ' + inn.extras.penalties : ''})
     </div>
     ${bowlRows ? `
     <div class="divider mt-sm"></div>
@@ -828,7 +835,7 @@ function renderExportCard(match) {
             <tbody>${batRows}</tbody>
           </table>
           <div style="padding:6px 12px;font-size:11px;color:#5C6B7A;border-top:1px solid #D7E0EA">
-            Extras: ${totalExtras(inn)} (Wd ${inn.extras.wides}, NB ${inn.extras.noBalls}, B ${inn.extras.byes}, LB ${inn.extras.legByes})
+            Extras: ${totalExtras(inn)} (Wd ${inn.extras.wides}, NB ${inn.extras.noBalls}, B ${inn.extras.byes}, LB ${inn.extras.legByes}${inn.extras.penalties ? ', Pen ' + inn.extras.penalties : ''})
           </div>
           ${(() => {
             const fow = getFallOfWickets(inn);

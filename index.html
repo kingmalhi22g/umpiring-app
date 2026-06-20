@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=127">
-  <link rel="stylesheet" href="css/layout.css?v=127">
-  <link rel="stylesheet" href="css/components.css?v=127">
-  <link rel="stylesheet" href="css/redesign.css?v=127">
+  <link rel="stylesheet" href="css/style.css?v=128">
+  <link rel="stylesheet" href="css/layout.css?v=128">
+  <link rel="stylesheet" href="css/components.css?v=128">
+  <link rel="stylesheet" href="css/redesign.css?v=128">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -229,11 +229,12 @@
         </div>
         <!-- Bowling (current bowler — compact broadcast line) -->
         <div class="card bowl-line-card">
-          <div class="bowl-line" id="live-bowler">
+          <button class="bowl-line bowl-line-btn" id="live-bowler" type="button" aria-label="Change bowler">
             <span class="bowl-av" id="live-bowler-av"></span>
             <span class="bowl-line-name"><span id="live-bowler-name">&mdash;</span><span class="bowl-line-sub"> bowling</span></span>
             <span class="bowl-line-fig" id="live-bowler-fig">0&ndash;0&ndash;0&ndash;<span class="bowl-line-w">0</span></span>
-          </div>
+            <span class="bowl-change-hint" aria-hidden="true">&#9998;</span>
+          </button>
           <div class="bowl-line prev-bowler hidden" id="live-bowler2">
             <span class="bowl-av" id="live-bowler2-av"></span>
             <span class="bowl-line-name"><span id="live-bowler2-name">&mdash;</span><span class="bowl-line-sub"> last over</span></span>
@@ -272,6 +273,7 @@
         <button class="extra-btn" id="ball-btn-nb" type="button">NB</button>
         <button class="extra-btn" id="ball-btn-b"  type="button">B</button>
         <button class="extra-btn" id="ball-btn-lb" type="button">LB</button>
+        <button class="extra-btn" id="ball-btn-pen" type="button" title="5 penalty runs">+5</button>
         <button class="wicket-btn-main" id="ball-btn-w" type="button">WICKET</button>
       </div>
       <button class="end-innings-link" id="btn-end-innings" type="button">End innings early</button>
@@ -456,7 +458,8 @@
     <div class="modal-handle"></div>
     <div class="modal-title" id="extras-modal-title">Wide — total runs?</div>
     <div id="extras-runs-grid" class="ball-btns" style="justify-content:center"></div>
-    <button id="btn-extras-cancel" class="btn btn-ghost btn-sm mt-md" type="button">Cancel</button>
+    <button id="btn-extras-wicket" class="btn btn-danger btn-sm mt-md hidden" type="button">+ Wicket on this ball</button>
+    <button id="btn-extras-cancel" class="btn btn-ghost btn-sm mt-sm" type="button">Cancel</button>
   </div>
 
   <!-- Wicket -->
@@ -477,9 +480,14 @@
       <button class="wicket-btn" data-type="run_out"     type="button">Run Out</button>
       <button class="wicket-btn" data-type="stumped"     type="button">Stumped</button>
       <button class="wicket-btn" data-type="hit_wicket"  type="button">Hit Wicket</button>
+      <button class="wicket-btn" data-type="mankad"      type="button">Mankad</button>
+      <button class="wicket-btn" data-type="obstructing" type="button">Obstructing</button>
       <button class="wicket-btn" data-type="retired_hurt" type="button">Retired Hurt</button>
       <button class="wicket-btn" data-type="retired_out"  type="button">Retired Out</button>
     </div>
+    <p id="wicket-mankad-note" class="text-center text-2 text-sm hidden" style="margin-top:8px">
+      Mankad — non-striker run out before delivery. No ball is counted.
+    </p>
     <div id="wicket-runout-group" class="hidden mt-md">
       <label class="form-label">Runs completed before run-out</label>
       <div class="ro-grid ro-runs" id="runout-runs">
@@ -572,6 +580,19 @@
     <button id="btn-new-batsman-ok" class="btn btn-primary btn-lg mt-md" type="button">&#9654; Continue</button>
   </div>
 
+  <!-- Change bowler (mid-over) -->
+  <div id="modal-change-bowler" class="modal hidden">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Change bowler</div>
+    <p class="text-center text-2 text-sm mb-md">Switch who's bowling this over. Balls already bowled this over move to the new bowler too.</p>
+    <div id="cb-chips" class="eos-bowler-chips"></div>
+    <div class="form-group mt-sm">
+      <input id="cb-name" class="form-input" type="text" placeholder="Or type a new bowler…" autocomplete="off">
+    </div>
+    <button id="btn-cb-confirm" class="btn btn-primary mt-md" type="button">Change bowler</button>
+    <button id="btn-cb-cancel" class="btn btn-ghost btn-sm mt-sm" type="button">Cancel</button>
+  </div>
+
   <!-- Edit Ball (feature A) -->
   <div id="modal-edit-ball" class="modal hidden">
     <div class="modal-handle"></div>
@@ -650,12 +671,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=127"></script>
-<script src="js/storage.js?v=127"></script>
-<script src="js/match.js?v=127"></script>
-<script src="js/router.js?v=127"></script>
-<script src="js/ui.js?v=127"></script>
-<script src="js/app.js?v=127"></script>
+<script src="js/cloud.js?v=128"></script>
+<script src="js/storage.js?v=128"></script>
+<script src="js/match.js?v=128"></script>
+<script src="js/router.js?v=128"></script>
+<script src="js/ui.js?v=128"></script>
+<script src="js/app.js?v=128"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:linear-gradient(135deg,#16314A,#0A1B2E);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">

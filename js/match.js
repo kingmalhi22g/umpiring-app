@@ -22,7 +22,7 @@ function createInnings(battingTeam, bowlingTeam) {
   return {
     battingTeam, bowlingTeam,
     totalRuns: 0, wickets: 0,
-    extras: { wides: 0, noBalls: 0, byes: 0, legByes: 0 },
+    extras: { wides: 0, noBalls: 0, byes: 0, legByes: 0, penalties: 0 },
     batsmen: [],
     strikerIdx: -1, nonStrikerIdx: -1,
     overs: [], currentOver: null,
@@ -72,7 +72,11 @@ function recordBall(match, { runs, extras, isWicket, wicket }) {
   const isNB   = eType === 'no_ball';
   const isBye  = eType === 'bye';
   const isLB   = eType === 'leg_bye';
-  const isLegal = !isWide && !isNB;
+  const isPenalty = eType === 'penalty';
+  // Mankad = run-out of the non-striker before delivery. Not a legal ball, not
+  // credited to the bowler, no runs scored.
+  const isMankad  = !!(isWicket && wicket && wicket.type === 'mankad');
+  const isLegal = !isWide && !isNB && !isPenalty && !isMankad;
 
   const striker    = inn.batsmen[inn.strikerIdx]    || null;
   const nonStriker = inn.batsmen[inn.nonStrikerIdx] || null;
@@ -93,7 +97,14 @@ function recordBall(match, { runs, extras, isWicket, wicket }) {
   if (isLegal) over.balls.push(delivery);
 
   // ── Scoring ──────────────────────────────────────────────
-  if (isWide) {
+  if (isPenalty) {
+    const amt = eRuns || 5;
+    inn.extras.penalties = (inn.extras.penalties || 0) + amt;
+    inn.totalRuns += amt;
+    over.runs     += amt;
+  } else if (isMankad) {
+    // No runs, no ball faced — the wicket itself is applied below.
+  } else if (isWide) {
     const tot = 1 + eRuns;
     inn.extras.wides += tot;
     inn.totalRuns    += tot;
@@ -133,7 +144,7 @@ function recordBall(match, { runs, extras, isWicket, wicket }) {
   // ── Wicket ───────────────────────────────────────────────
   // On a free hit only a run-out counts; every other dismissal is void.
   const wicketCounts = delivery.isWicket && delivery.wicket &&
-    (!delivery.freeHit || delivery.wicket.type === 'run_out');
+    (!delivery.freeHit || delivery.wicket.type === 'run_out' || delivery.wicket.type === 'mankad');
   if (wicketCounts) {
     const out = inn.batsmen.find(b => b.name === delivery.wicket.batsmanOut);
     if (out) { out.isOut = true; out.how = delivery.wicket.type; }
@@ -197,6 +208,8 @@ function undoLastBall(match) {
   const eRuns = delivery.extras ? (delivery.extras.runs || 0) : 0;
   const isWide = eType === 'wide', isNB = eType === 'no_ball';
   const isBye = eType === 'bye',   isLB = eType === 'leg_bye';
+  const isPenalty = eType === 'penalty';
+  const isMankad  = delivery.isWicket && delivery.wicket && delivery.wicket.type === 'mankad';
 
   // Reverse in the opposite order to recordBall + addBatsman:
   // 1) remove the replacement batsman, 2) un-rotate strike, 3) un-mark the
@@ -233,7 +246,13 @@ function undoLastBall(match) {
 
   // 4) Reverse runs (strikerIdx now points at the original striker)
   const s = inn.batsmen[inn.strikerIdx];
-  if (isWide) {
+  if (isPenalty) {
+    const amt = eRuns || 5;
+    inn.extras.penalties = (inn.extras.penalties || 0) - amt;
+    inn.totalRuns -= amt; over.runs -= amt;
+  } else if (isMankad) {
+    // No runs or bat stats were added for a mankad — nothing to reverse here.
+  } else if (isWide) {
     const tot = 1 + eRuns; inn.extras.wides -= tot; inn.totalRuns -= tot; over.runs -= tot;
   } else if (isNB) {
     const tot = 1 + delivery.runs + eRuns;
@@ -276,7 +295,7 @@ function replayInnings(match) {
   }));
 
   inn.totalRuns = 0; inn.wickets = 0;
-  inn.extras = { wides: 0, noBalls: 0, byes: 0, legByes: 0 };
+  inn.extras = { wides: 0, noBalls: 0, byes: 0, legByes: 0, penalties: 0 };
   inn.batsmen = []; inn.overs = []; inn.currentOver = null; inn.freeHitNext = false;
 
   if (order.length === 0) return match;
@@ -395,14 +414,18 @@ function getBowlerStats(inn, bowlerName) {
   const inOver = inn.currentOver && inn.currentOver.bowler === bowlerName
     ? inn.currentOver.balls.length : 0;
   const overStr = inOver ? completedOvers + '.' + inOver : String(completedOvers);
-  const runs = myOvers.reduce((s, o) => s + o.runs, 0);
-  const wkts = myOvers.reduce((s, o) => s + o.wickets, 0);
+  // Only wickets actually credited to the bowler (excludes run-outs, mankads,
+  // obstructing-the-field) — over.wickets counts every dismissal in the over.
+  const wkts = bowlerWicketCount(inn, bowlerName);
   const maidens = inn.overs.filter(o => o.bowler === bowlerName && o.runs === 0).length;
-  let wides = 0, noBalls = 0;
+  let wides = 0, noBalls = 0, penaltyRuns = 0;
   myOvers.forEach(o => o.allDeliveries.forEach(d => {
     if (d.extras && d.extras.type === 'wide')    wides++;
     if (d.extras && d.extras.type === 'no_ball') noBalls++;
+    if (d.extras && d.extras.type === 'penalty') penaltyRuns += (d.extras.runs || 5);
   }));
+  // Penalty runs are the fielding side's fault — not charged to the bowler.
+  const runs = myOvers.reduce((s, o) => s + o.runs, 0) - penaltyRuns;
   return { overStr, completedOvers, inOver, runs, wkts, maidens, wides, noBalls, extras: wides + noBalls };
 }
 
@@ -432,7 +455,8 @@ function bowlerHatTrick(inn, bowler) {
     if (o.bowler !== bowler) return;
     o.allDeliveries.forEach(d => {
       const t = d.extras ? d.extras.type : null;
-      if (t !== 'wide' && t !== 'no_ball') legal.push(d);
+      const isMankadD = d.isWicket && d.wicket && d.wicket.type === 'mankad';
+      if (t !== 'wide' && t !== 'no_ball' && t !== 'penalty' && !isMankadD) legal.push(d);
     });
   });
   return legal.length >= 3 && legal.slice(-3).every(isBowlerWicket);
@@ -449,9 +473,10 @@ function getPartnership(inn) {
       let teamRuns;
       if (eType === 'wide')         teamRuns = 1 + eRuns;
       else if (eType === 'no_ball') teamRuns = 1 + (d.runs || 0) + eRuns;
+      else if (eType === 'penalty') teamRuns = 0;   // penalty runs aren't part of a partnership
       else                          teamRuns = d.runs || 0;
       runs += teamRuns;
-      if (eType !== 'wide' && eType !== 'no_ball') balls += 1;
+      if (eType !== 'wide' && eType !== 'no_ball' && eType !== 'penalty') balls += 1;
       if (d.isWicket && !d.freeHit) { runs = 0; balls = 0; }
     });
   });
@@ -468,6 +493,7 @@ function deliveryTeamRuns(d) {
   const eRuns = d.extras ? (d.extras.runs || 0) : 0;
   if (eType === 'wide')    return 1 + eRuns;
   if (eType === 'no_ball') return 1 + (d.runs || 0) + eRuns;
+  if (eType === 'penalty') return eRuns || 5;
   return d.runs || 0;
 }
 
@@ -509,5 +535,5 @@ function getPowerplayStats(inn, ppOvers) {
 
 function totalExtras(inn) {
   const e = inn.extras;
-  return e.wides + e.noBalls + e.byes + e.legByes;
+  return e.wides + e.noBalls + e.byes + e.legByes + (e.penalties || 0);
 }
