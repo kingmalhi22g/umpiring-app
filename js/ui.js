@@ -23,8 +23,9 @@ function ballDotLabel(delivery) {
   if (!delivery) return '·';
   if (delivery.isWicket) {
     const eType = delivery.extras ? delivery.extras.type : null;
-    if (eType === 'wide')    return 'Wd+W';
-    if (eType === 'no_ball') return 'NB+W';
+    const eRuns = delivery.extras ? (delivery.extras.runs || 0) : 0;
+    if (eType === 'wide')    return (eRuns > 0 ? eRuns : '') + 'Wd+W';        // e.g. 1Wd+W
+    if (eType === 'no_ball') return (delivery.runs > 0 ? delivery.runs : '') + 'NB+W'; // e.g. 1NB+W
     if (delivery.runs > 0 && !eType) return delivery.runs + 'W';
     return 'W';
   }
