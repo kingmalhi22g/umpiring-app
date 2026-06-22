@@ -729,17 +729,57 @@ function commentaryOutcome(d) {
   return plural(d.runs);
 }
 
+// Per-over snapshot: cumulative team score/RR, the two batsmen at the crease
+// (with their runs/balls at that point) and the bowler's running figures.
+function buildOverSnapshots(inn) {
+  const allOvers = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])];
+  const bat = {};
+  const getB = n => (bat[n] || (bat[n] = { r: 0, b: 0 }));
+  const bowl = {};
+  let teamRuns = 0, teamWkts = 0, legalBalls = 0;
+
+  return allOvers.map(o => {
+    let penInOver = 0, creditWkts = 0;
+    o.allDeliveries.forEach(d => {
+      const eType = d.extras ? d.extras.type : null;
+      const eRuns = d.extras ? (d.extras.runs || 0) : 0;
+      teamRuns += deliveryTeamRuns(d);
+      const sb = getB(d.batsman || 'Batsman');
+      if (eType === 'penalty') penInOver += (eRuns || 5);
+      else if (eType === 'wide') { /* batsman: nothing */ }
+      else if (eType === 'no_ball') { sb.r += (d.runs || 0); sb.b++; }
+      else if (eType === 'bye' || eType === 'leg_bye') { sb.b++; }
+      else if (d.isWicket && d.wicket && d.wicket.type === 'mankad') { /* nothing */ }
+      else { sb.r += (d.runs || 0); sb.b++; }
+
+      const isLegal = !(eType === 'wide' || eType === 'no_ball' || eType === 'penalty')
+        && !(d.isWicket && d.wicket && d.wicket.type === 'mankad');
+      if (isLegal) legalBalls++;
+      if (d.isWicket && (!d.freeHit || (d.wicket && (d.wicket.type === 'run_out' || d.wicket.type === 'mankad')))) teamWkts++;
+      if (typeof isBowlerWicket === 'function' && isBowlerWicket(d)) creditWkts++;
+    });
+
+    const bw = bowl[o.bowler] || (bowl[o.bowler] = { balls: 0, runs: 0, wkts: 0, maidens: 0 });
+    bw.balls += o.balls.length;
+    bw.runs  += (o.runs - penInOver);   // penalties aren't charged to the bowler
+    bw.wkts  += creditWkts;
+    if (o.runs === 0 && o.balls.length >= 6) bw.maidens++;
+    const fig = Math.floor(bw.balls / 6) + '.' + (bw.balls % 6) + '-' + bw.maidens + '-' + bw.runs + '-' + bw.wkts;
+
+    const last = o.allDeliveries[o.allDeliveries.length - 1] || {};
+    const crease = [last.batsman, last.nonStriker].filter(Boolean)
+      .map(n => ({ name: n, r: getB(n).r, b: getB(n).b }));
+    const rr = legalBalls > 0 ? (teamRuns / (legalBalls / 6)).toFixed(2) : '0.00';
+    return { teamRuns, teamWkts, rr, fig, bowler: o.bowler, crease };
+  });
+}
+
 function renderInningsCommentary(match, inn) {
   const allOvers = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])];
   if (!allOvers.length || allOvers.every(o => o.allDeliveries.length === 0)) {
     return '<div class="cm-empty">No balls bowled yet.</div>';
   }
-  // Cumulative score + run-rate after each over, for the over-summary banners.
-  let runs = 0, wkts = 0, balls = 0;
-  const snap = allOvers.map(o => {
-    runs += o.runs; wkts += o.wickets; balls += o.balls.length;
-    return { runs, wkts, rr: balls > 0 ? (runs / (balls / 6)).toFixed(2) : '0.00' };
-  });
+  const snap = buildOverSnapshots(inn);
 
   let h = `<div class="cm-inn-head">${esc(inn.battingTeam)} — ${inn.totalRuns}/${inn.wickets} <span class="cm-inn-ov">(${getOverDisplay(inn)} ov)</span></div>`;
 
@@ -772,9 +812,11 @@ function renderInningsCommentary(match, inn) {
     if (isCurrent) {
       h += `<div class="cm-over cm-over-live"><span class="cm-over-n">Over ${o.overNumber}</span><span class="cm-seq">${seq || '—'}</span></div>${rows}`;
     } else {
+      const bats = sn.crease.map(c => `<span class="cm-bat"><b>${esc(c.name)}</b> ${c.r} (${c.b})</span>`).join('');
       h += `<div class="cm-over">
         <div class="cm-over-top"><span class="cm-over-n">Over ${o.overNumber}</span><span class="cm-seq">${seq}</span></div>
-        <div class="cm-over-bot"><span>${o.runs} run${o.runs === 1 ? '' : 's'}${o.wickets ? ' · ' + o.wickets + 'w' : ''}</span><span>${esc(inn.battingTeam)} ${sn.runs}/${sn.wkts} · RR ${sn.rr}</span></div>
+        <div class="cm-over-bot"><span>${o.runs} run${o.runs === 1 ? '' : 's'}${o.wickets ? ' · ' + o.wickets + 'w' : ''}</span><span>${esc(inn.battingTeam)} ${sn.teamRuns}/${sn.teamWkts} · RR ${sn.rr}</span></div>
+        <div class="cm-over-crease"><div class="cm-bat-list">${bats}</div><div class="cm-bowl"><b>${esc(sn.bowler)}</b> ${sn.fig}</div></div>
       </div>${rows}`;
     }
   }
