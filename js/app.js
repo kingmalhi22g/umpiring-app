@@ -493,6 +493,15 @@ function wireButtons() {
     if (e.target === _overlay && stats && !stats.classList.contains('hidden')) closeModal();
   });
   enableSheetDrag('modal-stats', 'stats-content');
+  // Scoreboard / Commentary tab switch inside the live Scoreboard modal
+  on('stats-content', 'click', e => {
+    const tab = e.target.closest('.sc-tab');
+    if (!tab) return;
+    const root = document.getElementById('stats-content');
+    const panel = tab.dataset.panel;
+    root.querySelectorAll('.sc-tab').forEach(t => t.classList.toggle('active', t === tab));
+    root.querySelectorAll('.sc-panel').forEach(p => p.classList.toggle('active', p.dataset.panel === panel));
+  });
   // Home from the live screen — keep the match active so it can be resumed.
   on('btn-live-home',    'click', () => navigateTo('home'));
 

@@ -473,6 +473,7 @@ function renderMatchSummary(match) {
   const tabs = `<div class="sc-tabs">
     <div class="sc-tab active" data-panel="scorecard">Scorecard</div>
     <div class="sc-tab" data-panel="summary">Summary</div>
+    <div class="sc-tab" data-panel="commentary">Commentary</div>
   </div>`;
 
   const innList = match.innings.map((inn, i) => inn ? { inn, i } : null).filter(Boolean);
@@ -482,8 +483,9 @@ function renderMatchSummary(match) {
     innList.map(({ inn, i }) => renderInningsAccordion(match, inn, i, i === lastIdx)).join('')
   }</div>`;
   const summaryPanel = `<div class="sc-panel" data-panel="summary">${renderSummaryPanel(match, innList)}</div>`;
+  const commentaryPanel = `<div class="sc-panel" data-panel="commentary">${renderCommentary(match, innList)}</div>`;
 
-  el.innerHTML = card + superBtn + tabs + scorecard + summaryPanel;
+  el.innerHTML = card + superBtn + tabs + scorecard + summaryPanel + commentaryPanel;
 }
 
 function renderInningsAccordion(match, inn, i, open) {
@@ -704,6 +706,89 @@ function esc(s) {
 }
 
 // ── Live Stats modal ─────────────────────────────────────
+// ── Ball-by-ball commentary ──────────────────────────────
+// Verbose description of one delivery, e.g. "Sid S to Shiva K, 1 run".
+function commentaryOutcome(d) {
+  const eType = d.extras ? d.extras.type : null;
+  const eRuns = d.extras ? (d.extras.runs || 0) : 0;
+  if (eType === 'penalty') return '5 penalty runs';
+  const plural = n => n + ' run' + (n === 1 ? '' : 's');
+  if (d.isWicket) {
+    const how = d.wicket ? (d.wicket.type || 'out').replace(/_/g, ' ') : 'out';
+    const pre = eType === 'wide' ? 'wide, ' : eType === 'no_ball' ? 'no ball, ' : '';
+    const who = d.wicket && d.wicket.batsmanOut ? ' (' + d.wicket.batsmanOut + ')' : '';
+    return pre + 'OUT! ' + how + who;
+  }
+  if (eType === 'wide')    return 'wide' + (eRuns > 0 ? ' + ' + plural(eRuns) : '');
+  if (eType === 'no_ball') return 'no ball' + (d.runs > 0 ? ' + ' + plural(d.runs) : '');
+  if (eType === 'bye')     return d.runs + ' bye' + (d.runs === 1 ? '' : 's');
+  if (eType === 'leg_bye') return d.runs + ' leg bye' + (d.runs === 1 ? '' : 's');
+  if (d.runs === 0) return 'no run';
+  if (d.runs === 4) return 'FOUR';
+  if (d.runs === 6) return 'SIX';
+  return plural(d.runs);
+}
+
+function renderInningsCommentary(match, inn) {
+  const allOvers = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])];
+  if (!allOvers.length || allOvers.every(o => o.allDeliveries.length === 0)) {
+    return '<div class="cm-empty">No balls bowled yet.</div>';
+  }
+  // Cumulative score + run-rate after each over, for the over-summary banners.
+  let runs = 0, wkts = 0, balls = 0;
+  const snap = allOvers.map(o => {
+    runs += o.runs; wkts += o.wickets; balls += o.balls.length;
+    return { runs, wkts, rr: balls > 0 ? (runs / (balls / 6)).toFixed(2) : '0.00' };
+  });
+
+  let h = `<div class="cm-inn-head">${esc(inn.battingTeam)} — ${inn.totalRuns}/${inn.wickets} <span class="cm-inn-ov">(${getOverDisplay(inn)} ov)</span></div>`;
+
+  for (let oi = allOvers.length - 1; oi >= 0; oi--) {
+    const o = allOvers[oi];
+    const isCurrent = inn.currentOver && o === inn.currentOver;
+    const dispOver = o.overNumber - 1;
+
+    // Ball labels (extras don't advance the legal-ball count).
+    let legal = 0;
+    const labels = o.allDeliveries.map(d => {
+      const isLegal = !(d.extras && (d.extras.type === 'wide' || d.extras.type === 'no_ball' || d.extras.type === 'penalty'))
+        && !(d.isWicket && d.wicket && d.wicket.type === 'mankad');
+      if (isLegal) legal++;
+      return dispOver + '.' + (isLegal ? legal : legal + 1);
+    });
+
+    let rows = '';
+    for (let di = o.allDeliveries.length - 1; di >= 0; di--) {
+      const d = o.allDeliveries[di];
+      rows += `<div class="cm-row">
+        <span class="ball-dot ${ballDotClass(d)} cm-badge">${ballDotLabel(d)}</span>
+        <div class="cm-text"><span class="cm-num">${labels[di]}</span>
+          <span class="cm-line">${esc(o.bowler)} to ${esc(d.batsman || 'Batsman')}, ${esc(commentaryOutcome(d))}</span></div>
+      </div>`;
+    }
+
+    const seq = o.allDeliveries.map(d => ballDotLabel(d)).join(' ');
+    const sn = snap[oi];
+    if (isCurrent) {
+      h += `<div class="cm-over cm-over-live"><span class="cm-over-n">Over ${o.overNumber}</span><span class="cm-seq">${seq || '—'}</span></div>${rows}`;
+    } else {
+      h += `<div class="cm-over">
+        <div class="cm-over-top"><span class="cm-over-n">Over ${o.overNumber}</span><span class="cm-seq">${seq}</span></div>
+        <div class="cm-over-bot"><span>${o.runs} run${o.runs === 1 ? '' : 's'}${o.wickets ? ' · ' + o.wickets + 'w' : ''}</span><span>${esc(inn.battingTeam)} ${sn.runs}/${sn.wkts} · RR ${sn.rr}</span></div>
+      </div>${rows}`;
+    }
+  }
+  return h;
+}
+
+// Commentary for the whole match (latest innings first) — used on the summary.
+function renderCommentary(match, innList) {
+  if (!innList || !innList.length) return '<div class="cm-empty">No commentary yet.</div>';
+  return innList.slice().reverse()
+    .map(({ inn }) => renderInningsCommentary(match, inn))
+    .join('<div class="cm-divider"></div>');
+}
+
 function renderStatsModal(match) {
   const el = document.getElementById('stats-content');
   if (!el || !match) return;
@@ -756,6 +841,11 @@ function renderStatsModal(match) {
     </div>` : '';
 
   el.innerHTML = `
+    <div class="sc-tabs">
+      <div class="sc-tab active" data-panel="board">Scoreboard</div>
+      <div class="sc-tab" data-panel="commentary">Commentary</div>
+    </div>
+    <div class="sc-panel active" data-panel="board">
     <div class="stats-hero">
       <div class="stats-hero-team">${esc(inn.battingTeam)}</div>
       <div class="stats-hero-score">${inn.totalRuns}<span>/${inn.wickets}</span></div>
@@ -778,6 +868,8 @@ function renderStatsModal(match) {
       <tbody>${bowlRows}</tbody>
     </table>` : ''}
     ${fowHtml}
+    </div>
+    <div class="sc-panel" data-panel="commentary">${renderInningsCommentary(match, inn)}</div>
   `;
 }
 

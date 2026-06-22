@@ -95,6 +95,29 @@ body[data-screen="home"] #screen-title {
 .sc-panel { display: none; }
 .sc-panel.active { display: block; }
 
+/* ── Ball-by-ball commentary ─────────────────────────────── */
+.cm-empty { padding: 24px 8px; text-align: center; color: var(--c-text-2); font-size: 13px; }
+.cm-inn-head { font: 800 13px var(--font-body); color: var(--c-text); margin: 12px 0 8px; }
+.cm-inn-head .cm-inn-ov { color: var(--c-text-2); font-weight: 600; }
+.cm-divider { height: 14px; }
+.cm-over {
+  background: rgba(20,151,163,.08); border: 1px solid var(--c-border);
+  border-radius: 10px; padding: 8px 11px; margin: 10px 0 6px;
+}
+.cm-over-top { display: flex; align-items: center; gap: 10px; }
+.cm-over-n { font: 800 12px var(--font-body); color: var(--c-primary-mid); white-space: nowrap; }
+.cm-seq { font: 700 12px var(--font-num); color: var(--c-text-2); letter-spacing: 1px; flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cm-over-bot { display: flex; justify-content: space-between; gap: 8px; margin-top: 4px;
+  font-size: 11.5px; color: var(--c-text-2); }
+.cm-over-live { display: flex; align-items: center; gap: 10px; background: rgba(229,133,26,.10); }
+.cm-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 2px;
+  border-bottom: 1px solid var(--c-border); }
+.cm-badge { flex-shrink: 0; margin-top: 1px; }
+.cm-text { display: flex; flex-direction: column; min-width: 0; }
+.cm-num { font: 700 11px var(--font-num); color: var(--c-text-2); }
+.cm-line { font-size: 13px; color: var(--c-text); line-height: 1.35; }
+
 /* ── Innings accordion ───────────────────────────────────── */
 .inn-acc { background: var(--c-surface); border: 1px solid var(--c-border);
   border-radius: 12px; margin-top: 8px; overflow: hidden; }
