@@ -108,8 +108,11 @@ body[data-screen="home"] #screen-title {
 .cm-over-n { font: 800 12px var(--font-body); color: var(--c-primary-mid); white-space: nowrap; }
 .cm-seq { font: 700 12px var(--font-num); color: var(--c-text-2); letter-spacing: 1px; flex: 1; min-width: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cm-over-bot { display: flex; justify-content: space-between; gap: 8px; margin-top: 2px;
+.cm-over-bot { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-top: 3px;
   font-size: 11px; color: var(--c-text-2); }
+.cm-score { color: var(--c-text); font-size: 12px; white-space: nowrap; }
+.cm-score b { font: 800 17px var(--font-num); color: var(--c-text); letter-spacing: .3px; }
+.cm-rr { color: var(--c-text-2); font-size: 11px; }
 .cm-over-crease { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px;
   margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--c-border); }
 .cm-bat-list { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
