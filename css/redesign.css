@@ -109,6 +109,7 @@ body[data-screen="home"] #screen-title {
 .cm-over-n { font: 800 12px var(--font-body); color: var(--c-primary-mid); flex-shrink: 0; }
 .cm-seq { font: 700 12px var(--font-num); color: var(--c-text-2); letter-spacing: 1px; min-width: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cm-over-runs { font: 800 12px var(--font-num); color: var(--c-text); flex-shrink: 0; }
 .cm-score { color: var(--c-text); font-size: 12px; white-space: nowrap; flex-shrink: 0; }
 .cm-score b { font: 800 15px var(--font-num); color: var(--c-text); letter-spacing: .3px; }
 .cm-rr { color: var(--c-text-2); font-size: 11px; }
