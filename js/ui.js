@@ -817,8 +817,7 @@ function renderInningsCommentary(match, inn) {
     } else {
       const bats = sn.crease.map(c => `<span class="cm-bat"><b>${esc(c.name)}</b> ${c.r} (${c.b})</span>`).join('');
       h += `<div class="cm-over">
-        <div class="cm-over-top"><span class="cm-over-n">Over ${o.overNumber}</span><span class="cm-seq">${seq}</span></div>
-        <div class="cm-over-bot"><span>${o.runs} run${o.runs === 1 ? '' : 's'}${o.wickets ? ' · ' + o.wickets + 'w' : ''}</span><span class="cm-score">${esc(inn.battingTeam)} <b>${sn.teamRuns}/${sn.teamWkts}</b><span class="cm-rr"> · RR ${sn.rr}</span></span></div>
+        <div class="cm-over-line"><span class="cm-over-meta"><span class="cm-over-n">Over ${o.overNumber}</span> · ${o.runs} run${o.runs === 1 ? '' : 's'}${o.wickets ? ' · ' + o.wickets + 'w' : ''}</span><span class="cm-score">${esc(inn.battingTeam)} <b>${sn.teamRuns}/${sn.teamWkts}</b><span class="cm-rr"> · RR ${sn.rr}</span></span></div>
         <div class="cm-over-crease"><div class="cm-bat-list">${bats}</div><div class="cm-bowl"><b>${esc(sn.bowler)}</b> ${sn.fig}</div></div>
       </div>${rows}`;
     }
