@@ -619,7 +619,10 @@ function renderOverSummary(match) {
   setEl('eos-over-runs',   lastOver.runs);
   setEl('eos-over-wkts',   lastOver.wickets);
   setEl('eos-bowler-fig',  getBowlerFigures(inn, lastOver.bowler));
-  setEl('eos-total',       inn.battingTeam + ' · ' + inn.totalRuns + '-' + inn.wickets);
+  setEl('eos-total',       inn.battingTeam + ' ' + inn.totalRuns + '/' + inn.wickets);
+  const eosBalls = inn.overs.length * 6 + (inn.currentOver ? inn.currentOver.balls.length : 0);
+  const eosCrr = eosBalls > 0 ? (inn.totalRuns / (eosBalls / 6)).toFixed(2) : '0.00';
+  setEl('eos-crr', getOverDisplay(inn) + ' overs · CRR ' + eosCrr);
 
   renderBallDots(document.getElementById('eos-dots'), lastOver);
 
