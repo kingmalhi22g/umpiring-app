@@ -95,6 +95,14 @@ body[data-screen="home"] #screen-title {
 .sc-panel { display: none; }
 .sc-panel.active { display: block; }
 
+/* "My matches" auto-clean reminder */
+.mine-note {
+  background: rgba(229,133,26,.12); border: 1px solid rgba(229,133,26,.5);
+  color: var(--c-text); border-radius: 10px;
+  padding: 8px 11px; margin: 4px 0 12px;
+  font-size: 12px; line-height: 1.35;
+}
+
 /* ── Ball-by-ball commentary ─────────────────────────────── */
 .cm-empty { padding: 24px 8px; text-align: center; color: var(--c-text-2); font-size: 13px; }
 .cm-inn-head { font: 800 13px var(--font-body); color: var(--c-text); margin: 12px 0 8px; }

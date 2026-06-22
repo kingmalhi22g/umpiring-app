@@ -356,7 +356,11 @@ function renderMatchList(containerEl) {
     matches = [...byId.values()];
   }
   matches.sort((a, b) => idTime(b.id) - idTime(a.id));
-  containerEl.innerHTML = '';
+  // Gentle reminder on the "My matches" tab: this device auto-clears old matches.
+  const mineNote = mode === 'mine'
+    ? '<div class="mine-note">🕒 Matches older than 3 months are removed automatically to keep this list tidy.</div>'
+    : '';
+  containerEl.innerHTML = mineNote;
   if (matches.length === 0) {
     // First-ever launch: cloud feed hasn't arrived yet — show a loader, not "empty".
     const feedPending = typeof state !== 'undefined' && !state.cloudFeedLoaded;
@@ -371,7 +375,7 @@ function renderMatchList(containerEl) {
     const msg = mode === 'mine'
       ? 'No matches on this device yet.<br>Tap <strong>New Match</strong> to start.'
       : 'No matches yet.<br>Tap <strong>New Match</strong> to start.';
-    containerEl.innerHTML = `
+    containerEl.innerHTML = mineNote + `
       <div class="empty-state">
         <div class="empty-icon">🏏</div>
         <p>${msg}</p>
