@@ -104,3 +104,27 @@ function clearMyMatchesLocal() {
   _set(KEYS.MATCHES, []);
   setActiveMatchId(null);
 }
+
+// Auto-clean this device's local match copies older than `months` months (by
+// match date). LOCAL ONLY — the cloud copy is untouched, so the match still
+// shows under "All matches" until the cloud's own retention removes it. Skips
+// the active match and any unfinished match (no result yet) so in-progress work
+// is never lost. Returns how many were removed. Runs on every device, for all.
+function pruneOldLocalMatches(months) {
+  months = months || 3;
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - months);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);   // YYYY-MM-DD
+  const active = getActiveMatchId();
+  const list = getMatches();
+  const kept = list.filter(m => {
+    if (!m) return false;
+    if (m.id === active) return true;              // never drop the active match
+    if (!m.result) return true;                    // keep unfinished matches regardless of age
+    const d = m.date;                              // match date, "YYYY-MM-DD"
+    if (!d || typeof d !== 'string') return true;  // no usable date — keep
+    return d >= cutoffStr;                         // keep if within the last `months`
+  });
+  if (kept.length !== list.length) _set(KEYS.MATCHES, kept);
+  return list.length - kept.length;
+}

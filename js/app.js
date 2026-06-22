@@ -180,6 +180,10 @@ function initApp() {
   // Apply saved dark mode preference on startup
   applyDarkMode(getDarkMode());
 
+  // Keep this device's local match list lean: drop finished matches older than
+  // 3 months. Local-only — cloud copies stay (still under "All matches").
+  if (typeof pruneOldLocalMatches === 'function') pruneOldLocalMatches(3);
+
   // Show the last-known cloud matches instantly while the live Firestore feed
   // reconnects (cold start of Firebase + anon auth + first snapshot is ~6-7s).
   if (typeof getCachedFeed === 'function') state.cloudMatches = getCachedFeed();
