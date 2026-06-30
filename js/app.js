@@ -548,8 +548,12 @@ function wireButtons() {
       btn.classList.add('selected');
       state.selectedWicketType = btn.dataset.type;
       const t = state.selectedWicketType;
-      const showFielder = ['caught','run_out','stumped'].includes(t);
+      const showFielder = ['caught','caught_behind','run_out','stumped'].includes(t);
       document.getElementById('wicket-fielder-group').classList.toggle('hidden', !showFielder);
+      // For keeper dismissals, ask for the keeper specifically.
+      const isKeeper = t === 'caught_behind' || t === 'stumped';
+      const fEl = document.getElementById('wicket-fielder');
+      if (fEl) fEl.placeholder = (isKeeper ? 'Keeper' : 'Fielder') + ' name (optional)';
       // In a wide/no-ball wicket flow, "runs completed" still applies to run-outs.
       document.getElementById('wicket-runout-group').classList.toggle('hidden', t !== 'run_out');
       const note = document.getElementById('wicket-mankad-note');

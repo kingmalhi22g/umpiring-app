@@ -492,12 +492,51 @@ function renderMatchSummary(match) {
   el.innerHTML = card + superBtn + tabs + scorecard + summaryPanel + commentaryPanel;
 }
 
+// ── Dismissal notation ────────────────────────────────────
+// "c Fielder b Bowler" style text, using the fielder recorded with the wicket
+// and the bowler of the over it fell in. Keeper catches/stumpings get a † mark.
+function formatDismissal(w, bowler) {
+  const t  = w ? w.type : null;
+  const f  = w && w.fielder ? String(w.fielder).trim() : '';
+  const bw = bowler || 'bowler';
+  switch (t) {
+    case 'bowled':        return 'b ' + bw;
+    case 'lbw':           return 'lbw b ' + bw;
+    case 'caught':        return 'c ' + (f || 'fielder') + ' b ' + bw;
+    case 'caught_behind': return 'c †' + (f || 'keeper') + ' b ' + bw;
+    case 'stumped':       return 'st †' + (f || 'keeper') + ' b ' + bw;
+    case 'hit_wicket':    return 'hit wkt b ' + bw;
+    case 'run_out':       return 'run out' + (f ? ' (' + f + ')' : '');
+    case 'obstructing':   return 'obstructing the field';
+    case 'mankad':        return 'run out (Mankad)';
+    case 'retired_out':   return 'retired out';
+    case 'retired_hurt':  return 'retired hurt';
+    default:              return (t || 'out').replace(/_/g, ' ');
+  }
+}
+
+// Full dismissal line for an out batsman (or '' if not out). Locates the
+// counting dismissal delivery and the bowler of that over; falls back to the
+// stored label for non-delivery dismissals (e.g. retirements).
+function dismissalText(inn, b) {
+  if (!b || !b.isOut) return '';
+  const overs = [...inn.overs, ...(inn.currentOver ? [inn.currentOver] : [])];
+  for (const o of overs) {
+    for (const d of o.allDeliveries) {
+      const counts = d.isWicket && d.wicket && d.wicket.batsmanOut === b.name &&
+        (!d.freeHit || d.wicket.type === 'run_out' || d.wicket.type === 'mankad');
+      if (counts) return formatDismissal(d.wicket, o.bowler);
+    }
+  }
+  return (b.how || 'out').replace(/_/g, ' ');
+}
+
 function renderInningsAccordion(match, inn, i, open) {
   const label = i >= 2 ? (inn.battingTeam + ' · Super Over' + (i === 3 ? ' (Chase)' : '')) : inn.battingTeam;
 
   const bat = inn.batsmen.map(b => {
     const sr = b.balls > 0 ? (b.runs / b.balls * 100).toFixed(1) : '0.0';
-    const dis = b.isOut ? esc(b.how || 'out') : 'not out';
+    const dis = b.isOut ? esc(dismissalText(inn, b)) : 'not out';
     return `<div class="bt-row">
       <div class="bt-bp">${avatarHtml(b.name,'bt-av')}<div style="min-width:0">
         <div class="bt-name">${esc(b.name)}</div>
@@ -875,7 +914,7 @@ function renderStatsModal(match) {
     const sr = b.balls > 0 ? (b.runs / b.balls * 100).toFixed(0) : '—';
     return `<tr${isStriker ? ' class="sc-active"' : ''}>
       <td><div class="player-name"><span class="${nameCls}" data-name="${esc(b.name)}">${esc(b.name)}</span>${isStriker ? ' <span class="sc-strike">on strike</span>' : ''}</div>
-          <div class="sc-out">${b.isOut ? esc(b.how) : 'batting'}</div></td>
+          <div class="sc-out">${b.isOut ? esc(dismissalText(inn, b)) : 'batting'}</div></td>
       <td class="sc-runs">${b.runs}</td><td>${b.balls}</td>
       <td>${b.fours}</td><td>${b.sixes}</td><td>${sr}</td>
     </tr>`;
@@ -961,7 +1000,7 @@ function renderExportCard(match) {
     const batRows = inn.batsmen.map(b => `
       <tr>
         <td style="padding:5px 4px"><strong>${esc(b.name)}</strong><br>
-          <span style="font-size:10px;color:#5C6B7A">${b.isOut ? esc(b.how) : 'not out'}</span></td>
+          <span style="font-size:10px;color:#5C6B7A">${b.isOut ? esc(dismissalText(inn, b)) : 'not out'}</span></td>
         <td style="padding:5px 4px;font-weight:700;text-align:center">${b.runs}</td>
         <td style="padding:5px 4px;text-align:center">${b.balls}</td>
         <td style="padding:5px 4px;text-align:center">${b.fours}</td>
