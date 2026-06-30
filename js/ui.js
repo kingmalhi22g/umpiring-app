@@ -679,9 +679,10 @@ function renderOverSummary(match) {
       : '';
   }
 
-  // Pre-fill the next-bowler field with the suggestion (umpire usually just taps Continue).
+  // No auto-fill — the umpire picks a bowler by tapping a chip (which marks it
+  // selected) or by typing a new name. The ✨ badge only *hints* the suggestion.
   const inp = document.getElementById('eos-next-bowler');
-  if (inp && suggested && !inp.value) inp.value = suggested;
+  if (inp) inp.value = '';
 }
 
 // Likely next bowler: someone off-quota who didn't just bowl. Prefer the

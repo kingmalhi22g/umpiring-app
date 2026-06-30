@@ -574,10 +574,20 @@ function wireButtons() {
   // New batsman modal
   on('btn-new-batsman-ok', 'click', handleNewBatsmanConfirm);
 
-  // End of over — recent bowler chips
+  // End of over — recent bowler chips. Tapping a chip marks it as the selected
+  // next bowler (highlighted) and fills the name; typing a new name clears the
+  // chip selection so the two can't disagree.
   on('eos-recent-bowlers', 'click', e => {
     const chip = e.target.closest('.eos-bowler-chip');
-    if (chip) document.getElementById('eos-next-bowler').value = chip.dataset.bowler;
+    if (!chip || chip.disabled) return;
+    document.querySelectorAll('#eos-recent-bowlers .eos-chip-selected')
+      .forEach(c => c.classList.remove('eos-chip-selected'));
+    chip.classList.add('eos-chip-selected');
+    document.getElementById('eos-next-bowler').value = chip.dataset.bowler;
+  });
+  on('eos-next-bowler', 'input', () => {
+    document.querySelectorAll('#eos-recent-bowlers .eos-chip-selected')
+      .forEach(c => c.classList.remove('eos-chip-selected'));
   });
   on('btn-eos-continue', 'click', handleEndOfOverContinue);
 

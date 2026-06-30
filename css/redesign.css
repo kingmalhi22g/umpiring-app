@@ -675,6 +675,36 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
 .eos-recap .rk-num.wkt { color: var(--c-danger); }
 .eos-recap .rk-fig { font: 700 11px var(--font-num); color: var(--c-primary); margin-top: 2px; }
 
+/* Compact chase strip (2nd innings) — fits without growing the screen */
+.eos-chase {
+  border-radius: 14px; padding: 11px 14px; text-align: center;
+  background: linear-gradient(150deg, rgba(43,212,212,.14), var(--c-surface));
+  box-shadow: 0 0 0 1px rgba(43,212,212,.25), inset 0 0 26px rgba(43,212,212,.05);
+}
+.eos-chase-main { font: 700 13.5px var(--font-body); color: var(--c-text); }
+.eos-chase-main b { font: 800 22px var(--font-num); color: var(--c-primary-mid); margin: 0 3px; }
+.eos-chase-stats { display: flex; justify-content: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
+.eos-chase-stats .k { font: 800 9px var(--font-body); letter-spacing: 1px; color: var(--c-text-2); text-transform: uppercase; }
+.eos-chase-stats .v { font: 700 13px var(--font-num); color: var(--c-text); margin-left: 4px; }
+
+/* ── End-of-over: keep the whole screen on one page (no scrolling) ── */
+#screen-end-of-over { padding-top: var(--sp-sm); padding-bottom: calc(var(--sp-sm) + var(--safe-b)); }
+#screen-end-of-over .screen-inner { gap: var(--sp-sm); }
+#screen-end-of-over .scr-hero { padding: 11px 16px; }
+#screen-end-of-over .scr-hero .scr-title { font-size: 21px; margin-top: 3px; }
+#screen-end-of-over .scr-hero .scr-sub { margin-top: 4px; font-size: 12px; }
+#screen-end-of-over .card { padding: 12px 14px; }
+#screen-end-of-over .eos-recap { padding-top: 10px; margin-top: 10px; }
+#screen-end-of-over #eos-dots .ball-dot { width: 30px; height: 30px; font-size: 14px; }
+#screen-end-of-over .form-label { margin-bottom: 6px !important; }
+#screen-end-of-over #eos-next-bowler { padding-top: 8px; padding-bottom: 8px; }
+#screen-end-of-over .eos-recap .rk-num { font-size: 22px; }
+#screen-end-of-over .eos-recap .rk-fig { font-size: 10px; }
+#screen-end-of-over .eos-bowler-chip { min-height: 32px; padding: 6px 11px; }
+#screen-end-of-over .eos-bowler-chips { gap: 5px; }
+#screen-end-of-over .eos-chase { padding: 9px 14px; }
+#screen-end-of-over .eos-chase-main b { font-size: 20px; }
+
 /* ── Innings break: total card + cyan target reveal ── */
 .ib-total-card { text-align: center; border-top: 3px solid var(--c-accent); }
 .ib-team { display: flex; align-items: center; justify-content: center; gap: 11px; }

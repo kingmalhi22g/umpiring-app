@@ -81,6 +81,13 @@
   transition: background 0.12s;
 }
 .eos-bowler-chip:active { background: rgba(20,151,163,.18); }
+/* The chip the umpire tapped — clearly marks the chosen next bowler. */
+.eos-chip-selected {
+  background: var(--c-primary); color: #fff; border-color: var(--c-primary);
+  box-shadow: 0 0 0 2px rgba(20,151,163,.30);
+}
+.eos-chip-selected::before { content: '✓'; font-weight: 800; margin-right: 1px; }
+.eos-chip-selected .chip-overs { color: #fff; background: rgba(255,255,255,.22); }
 .eos-chip-used { cursor: not-allowed; background: #E0E0E0; color: #5A5A5A; border-color: #BDBDBD; }
 .eos-chip-used .chip-overs { color: #5A5A5A; background: rgba(0,0,0,.10); }
 .chip-max, .chip-just {
