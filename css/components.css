@@ -299,10 +299,18 @@
 .scorecard-table tr.sc-active td { background: rgba(76,175,80,.13); }
 .scorecard-table tr.sc-active td:first-child { box-shadow: inset 3px 0 0 var(--c-primary-light); }
 .scorecard-table tr.sc-active .sc-runs { color: var(--c-primary-mid); }
-/* Tap-to-rename affordance on player names in the Scoreboard */
-.sc-edit-name { cursor: pointer; text-decoration: underline dotted var(--c-primary-mid); text-underline-offset: 3px; }
+/* Tap-to-rename affordance on player names in the Scoreboard — made obvious so
+   people can find it: names read as tappable links and carry a visible pencil. */
+.sc-edit-name { cursor: pointer; color: var(--c-primary-mid); font-weight: 700;
+  text-decoration: underline; text-decoration-color: rgba(43,212,212,.45); text-underline-offset: 3px; }
+.sc-edit-name::after { content: "\270E"; margin-left: 5px; font-size: 12px; opacity: .9; text-decoration: none; }
 .sc-edit-name:active { opacity: .55; }
-.sc-edit-hint { font: 600 11px var(--font-body); color: var(--c-text-2); text-align: center; margin-top: 14px; }
+/* Prominent tip banner at the top of the Scoreboard */
+.sc-edit-hint { font: 600 11.5px var(--font-body); line-height: 1.4; color: var(--c-primary-mid);
+  background: rgba(43,212,212,.10); border: 1px solid rgba(43,212,212,.30);
+  border-radius: 10px; padding: 8px 12px; margin: 11px 0 3px; text-align: center; }
+.sc-edit-hint b { font-weight: 800; }
+.sc-edit-hint-ico { font-size: 13px; }
 .sc-strike {
   display: inline-block;
   font-size: 9px; font-weight: 700;

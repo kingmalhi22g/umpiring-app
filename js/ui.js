@@ -925,6 +925,7 @@ function renderStatsModal(match) {
       <div class="stats-hero-score">${inn.totalRuns}<span>/${inn.wickets}</span></div>
       <div class="stats-hero-meta">${getOverDisplay(inn)} overs &middot; CRR ${crr}</div>
     </div>
+    ${editable ? '<div class="sc-edit-hint"><span class="sc-edit-hint-ico">&#9998;</span> Spelt a name wrong? <b>Tap any player\'s name</b> below to fix it.</div>' : ''}
     <div class="section-head">BATTING — ${esc(inn.battingTeam)}</div>
     <table class="scorecard-table mt-sm">
       <thead><tr><th>Batsman</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead>
@@ -942,7 +943,6 @@ function renderStatsModal(match) {
       <tbody>${bowlRows}</tbody>
     </table>` : ''}
     ${fowHtml}
-    ${editable ? '<div class="sc-edit-hint">&#9998; Tap a player\'s name to fix its spelling</div>' : ''}
     </div>
     <div class="sc-panel" data-panel="commentary">${renderInningsCommentary(match, inn)}</div>
   `;
