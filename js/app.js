@@ -1932,8 +1932,13 @@ function enableSheetDrag(modalId, scrollId) {
   sheet.addEventListener('touchstart', e => {
     const scroller = scrollId ? document.getElementById(scrollId) : null;
     const onGrip = e.target.closest('.modal-handle') || e.target.closest('.modal-title');
+    // Never hijack a tap on interactive content (editable names, tabs, buttons,
+    // inputs) as a drag — otherwise the tap's tiny finger movement gets eaten by
+    // the drag gesture and the click never fires. Drag only from the grip, or
+    // from empty space when the sheet is scrolled to the top.
+    const onInteractive = e.target.closest('button, a, input, textarea, select, .sc-edit-name, .sc-tab');
     const atTop  = !scroller || scroller.scrollTop <= 0;
-    dragging = !!(onGrip || atTop);
+    dragging = !!(onGrip || (atTop && !onInteractive));
     if (!dragging) return;
     startY = e.touches[0].clientY; dy = 0;
     sheet.style.transition = 'none';
