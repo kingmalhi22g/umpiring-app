@@ -683,6 +683,8 @@ function wireButtons() {
   on('btn-feedback-list-close', 'click', closeModal);
   // Device handoff
   on('btn-handoff-live',        'click', handleHandoffStart);
+  on('btn-eos-handoff',         'click', handleHandoffStart);
+  on('btn-ib-handoff',          'click', handleHandoffStart);
   on('btn-handoff-confirm',     'click', handleHandoffConfirm);
   on('btn-handoff-enter-cancel','click', closeModal);
   on('btn-continue-here',       'click', handleContinueHere);
@@ -990,12 +992,15 @@ function setupLive() {
   // "Hand off to another device" — only for a live match the cloud can serve to
   // the receiving device. Hidden offline (the other device couldn't pick it up).
   const hoBtn = document.getElementById('btn-handoff-live');
-  if (hoBtn) {
-    const eligible = m.status === 'in_progress' && canEditMatch(m) &&
-      typeof cloudAvailable === 'function' && cloudAvailable() &&
-      typeof cloudReady === 'function' && cloudReady();
-    hoBtn.style.display = eligible ? '' : 'none';
-  }
+  if (hoBtn) hoBtn.style.display = handoffEligible(m) ? '' : 'none';
+}
+
+// A live match can be handed off only when it's in progress, editable here, and
+// the cloud is connected (the receiving device picks it up via Firestore).
+function handoffEligible(m) {
+  return !!m && m.status === 'in_progress' && canEditMatch(m) &&
+    typeof cloudAvailable === 'function' && cloudAvailable() &&
+    typeof cloudReady === 'function' && cloudReady();
 }
 
 function setupEndOfOver() {
@@ -1004,11 +1009,15 @@ function setupEndOfOver() {
   const inp = document.getElementById('eos-next-bowler');
   if (inp) inp.value = '';
   renderOverSummary(m);
+  const hoBtn = document.getElementById('btn-eos-handoff');
+  if (hoBtn) hoBtn.style.display = handoffEligible(m) ? '' : 'none';
 }
 
 function setupInningsBreak() {
   const m = getMatch(state.matchId);
   if (m) renderInningsBreak(m);
+  const hoBtn = document.getElementById('btn-ib-handoff');
+  if (hoBtn) hoBtn.style.display = handoffEligible(m) ? '' : 'none';
 }
 
 function setupSummary() {

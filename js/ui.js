@@ -628,6 +628,27 @@ function renderOverSummary(match) {
   const eosCrr = eosBalls > 0 ? (inn.totalRuns / (eosBalls / 6)).toFixed(2) : '0.00';
   setEl('eos-crr', getOverDisplay(inn) + ' overs · CRR ' + eosCrr);
 
+  // Chase tracker — only in the team batting second (innings 1, or super-over 3).
+  const chaseEl = document.getElementById('eos-chase');
+  if (chaseEl) {
+    const chasing = match.currentInnings === 1 || match.currentInnings === 3;
+    if (chasing) {
+      const target    = getTarget(match);
+      const runsNeed  = Math.max(0, target - inn.totalRuns);
+      const ballsLeft = effectiveOvers(match) * 6 - eosBalls;
+      const rrr = ballsLeft > 0 ? (runsNeed / (ballsLeft / 6)).toFixed(2) : '—';
+      setEl('eos-chase-need-line', inn.battingTeam + ' need');
+      setEl('eos-chase-need', runsNeed);
+      setEl('eos-chase-sub', (runsNeed === 1 ? 'run' : 'runs') + ' to win');
+      setEl('eos-chase-target', target);
+      setEl('eos-chase-balls', ballsLeft);
+      setEl('eos-chase-rrr', rrr);
+      chaseEl.style.display = '';
+    } else {
+      chaseEl.style.display = 'none';
+    }
+  }
+
   renderBallDots(document.getElementById('eos-dots'), lastOver);
 
   // Recent bowlers chips (current innings only) — grey out last bowler and quota-reached bowlers

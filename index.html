@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=141">
-  <link rel="stylesheet" href="css/layout.css?v=141">
-  <link rel="stylesheet" href="css/components.css?v=141">
-  <link rel="stylesheet" href="css/redesign.css?v=141">
+  <link rel="stylesheet" href="css/style.css?v=142">
+  <link rel="stylesheet" href="css/layout.css?v=142">
+  <link rel="stylesheet" href="css/components.css?v=142">
+  <link rel="stylesheet" href="css/redesign.css?v=142">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -300,6 +300,16 @@
           </div>
         </div>
       </div>
+      <div class="ib-target-card" id="eos-chase" style="display:none">
+        <div class="ib-target-eyebrow" id="eos-chase-need-line">Need</div>
+        <div class="bignum ib-target-num" id="eos-chase-need">0</div>
+        <div class="ib-target-sub" id="eos-chase-sub">runs to win</div>
+        <div class="ib-target-row">
+          <div><span class="k">TARGET </span><span class="v" id="eos-chase-target">0</span></div>
+          <div><span class="k">BALLS LEFT </span><span class="v" id="eos-chase-balls">0</span></div>
+          <div><span class="k">RRR </span><span class="v" id="eos-chase-rrr">0</span></div>
+        </div>
+      </div>
       <div class="card">
         <div class="form-label" style="margin-bottom:9px">Next bowler</div>
         <div id="eos-recent-bowlers" class="eos-bowler-chips"></div>
@@ -309,6 +319,7 @@
         </div>
       </div>
       <button id="btn-eos-continue" class="btn btn-primary btn-lg">Continue &rarr;</button>
+      <button id="btn-eos-handoff" class="btn btn-ghost btn-sm" type="button" style="display:none">&#8644; Hand off to another device</button>
     </div>
   </section>
 
@@ -337,6 +348,7 @@
         </div>
       </div>
       <button id="btn-start-2nd" class="btn btn-primary btn-lg">Start 2nd Innings &rarr;</button>
+      <button id="btn-ib-handoff" class="btn btn-ghost btn-sm" type="button" style="display:none">&#8644; Hand off to another device</button>
     </div>
   </section>
 
@@ -672,12 +684,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=141"></script>
-<script src="js/storage.js?v=141"></script>
-<script src="js/match.js?v=141"></script>
-<script src="js/router.js?v=141"></script>
-<script src="js/ui.js?v=141"></script>
-<script src="js/app.js?v=141"></script>
+<script src="js/cloud.js?v=142"></script>
+<script src="js/storage.js?v=142"></script>
+<script src="js/match.js?v=142"></script>
+<script src="js/router.js?v=142"></script>
+<script src="js/ui.js?v=142"></script>
+<script src="js/app.js?v=142"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:linear-gradient(135deg,#16314A,#0A1B2E);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
