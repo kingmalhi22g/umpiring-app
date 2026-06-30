@@ -299,6 +299,10 @@
 .scorecard-table tr.sc-active td { background: rgba(76,175,80,.13); }
 .scorecard-table tr.sc-active td:first-child { box-shadow: inset 3px 0 0 var(--c-primary-light); }
 .scorecard-table tr.sc-active .sc-runs { color: var(--c-primary-mid); }
+/* Tap-to-rename affordance on player names in the Scoreboard */
+.sc-edit-name { cursor: pointer; text-decoration: underline dotted var(--c-primary-mid); text-underline-offset: 3px; }
+.sc-edit-name:active { opacity: .55; }
+.sc-edit-hint { font: 600 11px var(--font-body); color: var(--c-text-2); text-align: center; margin-top: 14px; }
 .sc-strike {
   display: inline-block;
   font-size: 9px; font-weight: 700;

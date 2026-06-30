@@ -865,12 +865,16 @@ function renderStatsModal(match) {
   const inn = match.innings[match.currentInnings];
   if (!inn) return;
 
+  // Only offer tap-to-rename when this device may edit the match.
+  const editable = typeof canEditMatch === 'function' ? canEditMatch(match) : true;
+  const nameCls = editable ? 'sc-edit-name' : '';
+
   // Batting table
   const batRows = inn.batsmen.map((b, i) => {
     const isStriker = i === inn.strikerIdx && !b.isOut;
     const sr = b.balls > 0 ? (b.runs / b.balls * 100).toFixed(0) : '—';
     return `<tr${isStriker ? ' class="sc-active"' : ''}>
-      <td><div class="player-name">${esc(b.name)}${isStriker ? ' <span class="sc-strike">on strike</span>' : ''}</div>
+      <td><div class="player-name"><span class="${nameCls}" data-name="${esc(b.name)}">${esc(b.name)}</span>${isStriker ? ' <span class="sc-strike">on strike</span>' : ''}</div>
           <div class="sc-out">${b.isOut ? esc(b.how) : 'batting'}</div></td>
       <td class="sc-runs">${b.runs}</td><td>${b.balls}</td>
       <td>${b.fours}</td><td>${b.sixes}</td><td>${sr}</td>
@@ -889,7 +893,7 @@ function renderStatsModal(match) {
     const econ = balls > 0 ? (s.runs / (balls / 6)).toFixed(1) : '—';
     const isCurrent = inn.currentOver && inn.currentOver.bowler === name;
     return `<tr${isCurrent ? ' class="sc-active"' : ''}>
-      <td><div class="player-name">${esc(name)}${isCurrent ? ' <span class="sc-strike">bowling</span>' : ''}</div></td>
+      <td><div class="player-name"><span class="${nameCls}" data-name="${esc(name)}">${esc(name)}</span>${isCurrent ? ' <span class="sc-strike">bowling</span>' : ''}</div></td>
       <td>${s.overStr}</td><td>${s.maidens}</td><td>${s.runs}</td><td>${s.wkts}</td><td>${econ}</td><td>${s.wides}</td><td>${s.noBalls}</td>
     </tr>`;
   }).join('');
@@ -938,6 +942,7 @@ function renderStatsModal(match) {
       <tbody>${bowlRows}</tbody>
     </table>` : ''}
     ${fowHtml}
+    ${editable ? '<div class="sc-edit-hint">&#9998; Tap a player\'s name to fix its spelling</div>' : ''}
     </div>
     <div class="sc-panel" data-panel="commentary">${renderInningsCommentary(match, inn)}</div>
   `;

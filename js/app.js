@@ -438,7 +438,14 @@ function wireButtons() {
     if (nameEl) openEditName(nameEl.textContent.trim());
   });
   on('btn-edit-name-save',   'click', handleEditNameSave);
-  on('btn-edit-name-cancel', 'click', closeModal);
+  on('btn-edit-name-cancel', 'click', () => { state.editNameOld = null; returnToStatsOrClose(); });
+  // Tap a player's name in the Scoreboard to rename them (batsman or bowler,
+  // current or earlier) — fixes a misspelling everywhere in the innings.
+  on('stats-content', 'click', e => {
+    const nameEl = e.target.closest('.sc-edit-name');
+    if (!nameEl) return;
+    openEditName(nameEl.dataset.name, 'stats');
+  });
 
   // Clear the subtle required-field highlight as soon as the user types.
   document.addEventListener('input', e => {
@@ -1055,29 +1062,40 @@ function flagRequired(id, isError) {
 }
 
 // ── Quick-edit a player's name mid-innings ────────────────
-function openEditName(oldName) {
+function openEditName(oldName, source) {
   if (!oldName || oldName === '—') return;
   const m = getMatch(state.matchId);
   if (!m || !m.innings[m.currentInnings]) return;
   state.editNameOld = oldName;
+  state.editNameReturn = source || null;   // 'stats' → reopen the Scoreboard after
   const inp = document.getElementById('edit-name-input');
   if (inp) inp.value = oldName;
   openModal('modal-edit-name');
+}
+
+// After saving/cancelling a rename: return to the Scoreboard if that's where the
+// edit was launched (so the corrected name is visible), otherwise just close.
+function returnToStatsOrClose() {
+  if (state.editNameReturn === 'stats') {
+    state.editNameReturn = null;
+    const m = getMatch(state.matchId);
+    if (m) { renderStatsModal(m); openModal('modal-stats'); return; }
+  }
+  closeModal();
 }
 
 function handleEditNameSave() {
   const m = getMatch(state.matchId);
   const oldName = state.editNameOld;
   const newName = (val('edit-name-input') || '').trim();
-  if (!m || !oldName) { closeModal(); return; }
-  if (!newName || newName === oldName) { closeModal(); return; }
-  const inn = m.innings[m.currentInnings];
-  renamePlayerInInnings(inn, oldName, newName);
-  saveMatch(m);
+  if (m && oldName && newName && newName !== oldName) {
+    renamePlayerInInnings(m.innings[m.currentInnings], oldName, newName);
+    saveMatch(m);
+    renderLiveHeader(m);
+    showToast('Renamed to ' + newName);
+  }
   state.editNameOld = null;
-  closeModal();
-  renderLiveHeader(m);
-  showToast('Renamed to ' + newName);
+  returnToStatsOrClose();
 }
 
 // Rename a player everywhere in the current innings (batsmen, bowler, deliveries).
