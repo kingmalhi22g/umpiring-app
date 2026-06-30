@@ -465,8 +465,8 @@ function wireButtons() {
   on('btn-undo',          'click', handleUndo);
   on('btn-end-innings',   'click', handleEndInningsEarly);
 
-  // Change bowler mid-over — tap the current-bowler line
-  on('live-bowler', 'click', handleChangeBowlerOpen);
+  // Change bowler mid-over — dedicated button under the bowler lines
+  on('btn-change-bowler', 'click', handleChangeBowlerOpen);
   on('cb-chips', 'click', e => {
     const chip = e.target.closest('.eos-bowler-chip');
     if (chip && chip.dataset.bowler) document.getElementById('cb-name').value = chip.dataset.bowler;
