@@ -36,7 +36,7 @@ function ballDotLabel(delivery) {
   if (eType === 'bye')     return 'B';
   if (eType === 'leg_bye') return 'LB';
   if (eType === 'penalty') return '+5';
-  if (delivery.runs === 0) return '·';
+  if (delivery.runs === 0) return '0';
   return String(delivery.runs);
 }
 

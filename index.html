@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;0,900;1,800;1,900&family=Saira+Condensed:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=143">
-  <link rel="stylesheet" href="css/layout.css?v=143">
-  <link rel="stylesheet" href="css/components.css?v=143">
-  <link rel="stylesheet" href="css/redesign.css?v=143">
+  <link rel="stylesheet" href="css/style.css?v=144">
+  <link rel="stylesheet" href="css/layout.css?v=144">
+  <link rel="stylesheet" href="css/components.css?v=144">
+  <link rel="stylesheet" href="css/redesign.css?v=144">
   <style>
     /* Disable double-tap-to-zoom (keeps pinch-zoom & scrolling) */
     * { touch-action: manipulation; }
@@ -284,6 +284,10 @@
   <section id="screen-end-of-over" class="screen">
     <div class="screen-inner">
       <div class="scr-hero center">
+        <button id="btn-eos-scoreboard" class="scr-hero-btn" type="button" title="Full scoreboard" aria-label="Scoreboard">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-7M12 21V5M19 21v-10"/></svg>
+          <span class="scr-hero-btn-lbl">Scoreboard</span>
+        </button>
         <div class="scr-eyebrow" id="eos-over-num">End of over</div>
         <div class="scr-title" id="eos-total">&nbsp;</div>
         <div class="scr-sub" id="eos-crr"></div>
@@ -325,6 +329,10 @@
   <section id="screen-innings-break" class="screen">
     <div class="screen-inner">
       <div class="scr-hero center">
+        <button id="btn-ib-scoreboard" class="scr-hero-btn" type="button" title="Full scoreboard" aria-label="Scoreboard">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-7M12 21V5M19 21v-10"/></svg>
+          <span class="scr-hero-btn-lbl">Scoreboard</span>
+        </button>
         <div class="scr-title">Innings Break</div>
       </div>
       <div class="card ib-total-card">
@@ -682,12 +690,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <!-- ── Scripts (order matters) ── -->
-<script src="js/cloud.js?v=143"></script>
-<script src="js/storage.js?v=143"></script>
-<script src="js/match.js?v=143"></script>
-<script src="js/router.js?v=143"></script>
-<script src="js/ui.js?v=143"></script>
-<script src="js/app.js?v=143"></script>
+<script src="js/cloud.js?v=144"></script>
+<script src="js/storage.js?v=144"></script>
+<script src="js/match.js?v=144"></script>
+<script src="js/router.js?v=144"></script>
+<script src="js/ui.js?v=144"></script>
+<script src="js/app.js?v=144"></script>
 
 <!-- Export card — hidden off-screen, captured by html2canvas -->
 <div id="export-card" style="position:fixed;left:-9999px;top:0;width:640px;background:linear-gradient(135deg,#16314A,#0A1B2E);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">

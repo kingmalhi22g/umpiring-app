@@ -590,9 +590,11 @@ function wireButtons() {
       .forEach(c => c.classList.remove('eos-chip-selected'));
   });
   on('btn-eos-continue', 'click', handleEndOfOverContinue);
+  on('btn-eos-scoreboard', 'click', handleOpenStats);
 
   // Innings break
   on('btn-start-2nd', 'click', handleStart2ndInnings);
+  on('btn-ib-scoreboard', 'click', handleOpenStats);
 
   // Update banner — hard reset so a wedged old worker can't keep serving stale
   // files: unregister all workers, wipe caches, then reload fresh.

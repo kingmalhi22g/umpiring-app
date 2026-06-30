@@ -602,6 +602,19 @@ body.dark-mode .bt-role { color: var(--c-primary-light); }
   overflow: hidden;
 }
 .scr-hero.center { text-align: center; }
+/* Icon button parked in a hero's top-right corner (e.g. Scoreboard) — sits over
+   the hero so it adds no vertical height and clears the centered title text. */
+.scr-hero-btn {
+  position: absolute; top: 8px; right: 8px; z-index: 2;
+  width: 34px; height: 34px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(43,212,212,.20); border: 1px solid rgba(124,240,228,.45);
+  color: #BFF4EE; border-radius: 50%; cursor: pointer;
+}
+.scr-hero-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.scr-hero-btn:active { background: rgba(43,212,212,.34); }
+/* Label kept for screen readers / tooltip, hidden visually (icon is the cue). */
+.scr-hero-btn-lbl { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 .scr-hero .scr-eyebrow {
   font: 800 10px var(--font-body); letter-spacing: 2.2px;
   text-transform: uppercase; color: #5FA0D6;

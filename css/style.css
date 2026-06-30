@@ -24,6 +24,9 @@
   --c-6:            #E5851A;
   --c-dot:          #9FB3C6;
   --c-wicket:       #E5343B;
+  /* Neutral ball-dot (0/1/2/3/bye/lb) — fill + edge, kept clearly visible */
+  --c-dot-bg:       #C4D3E2;
+  --c-dot-bd:       #98AEC5;
 
   /* Sky cyan / amber gradients + stadium glow (reused across screens) */
   --grad-cyan:   linear-gradient(145deg,#2BD4D4,#138A95);
@@ -131,6 +134,8 @@ input, textarea, select { user-select: auto; font-family: inherit; font-size: 16
     --c-6:            #FFC24B;
     --c-dot:          #5E7C99;
     --c-wicket:       #E5343B;
+    --c-dot-bg:       #284964;
+    --c-dot-bd:       #3D5E7E;
   }
 }
 /* Manual dark mode class on body */
@@ -154,4 +159,6 @@ body.dark-mode {
   --c-6:            #FFC24B;
   --c-dot:          #5E7C99;
   --c-wicket:       #E5343B;
+  --c-dot-bg:       #284964;
+  --c-dot-bd:       #3D5E7E;
 }
